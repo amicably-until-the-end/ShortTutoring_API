@@ -5,9 +5,16 @@ import { UsersModule } from './users/users.module';
 import { RequestsModule } from './requests/requests.module';
 import { TutoringsModule } from './tutorings/tutorings.module';
 import { ReviewsModule } from './reviews/reviews.module';
+import { ResponsesModule } from './responses/responses.module';
 
 @Module({
-  imports: [UsersModule, RequestsModule, TutoringsModule, ReviewsModule],
+  imports: [
+    UsersModule,
+    RequestsModule,
+    TutoringsModule,
+    ReviewsModule,
+    ResponsesModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
