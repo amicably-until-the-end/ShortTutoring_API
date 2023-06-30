@@ -11,9 +11,9 @@ import { ResponsesModule } from './responses/responses.module';
   imports: [
     UsersModule,
     RequestsModule,
+    ResponsesModule,
     TutoringsModule,
     ReviewsModule,
-    ResponsesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
