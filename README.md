@@ -1,6 +1,6 @@
 ## Description
 
-API server for [ShortTutoring] (https://github.com/amicably-until-the-end/ShortTutoring)
+API server for [ShortTutoring](https://github.com/amicably-until-the-end/ShortTutoring)
 
 ## Specification
 
@@ -28,4 +28,4 @@ $ npm run start:prod
 
 ## Stay in touch
 
-- Author - [w8385] (https://github.com/w8385)
+- Author - [w8385](https://github.com/w8385)
