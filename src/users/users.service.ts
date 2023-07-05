@@ -1,26 +1,48 @@
 import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
+import { InjectModel, Model } from 'nestjs-dynamoose';
+import { User, UserKey } from './user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectModel('User')
+    private userModel: Model<User, UserKey>,
+  ) {}
+
+  async create(user: User) {
+    return await this.userModel.create(user);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll() {
+    return this.userModel.scan().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string) {
+    return this.userModel.get({ id });
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto) {
+    return await this.userModel.update({ id }, updateUserDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  remove(id: string) {
+    return this.userModel.delete({ id });
+  }
+
+  async removeAll() {
+    let ret = 'This action removes all users\n';
+
+    await this.userModel
+      .scan()
+      .exec()
+      .then((users) => {
+        users.forEach((user) => {
+          ret += user.id + ' removed\n';
+          this.userModel.delete(user);
+        });
+      });
+    console.log(ret);
+    return ret;
   }
 }
