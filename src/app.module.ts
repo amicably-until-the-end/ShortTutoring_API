@@ -8,6 +8,7 @@ import { ReviewsModule } from './reviews/reviews.module';
 import { ResponsesModule } from './responses/responses.module';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { DynamooseConfigService } from './dynamoose.config';
+import { UploadsModule } from './uploads/uploads.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { DynamooseConfigService } from './dynamoose.config';
     ResponsesModule,
     TutoringsModule,
     ReviewsModule,
+    UploadsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
