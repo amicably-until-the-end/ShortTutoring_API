@@ -6,9 +6,12 @@ import { RequestsModule } from './requests/requests.module';
 import { TutoringsModule } from './tutorings/tutorings.module';
 import { ReviewsModule } from './reviews/reviews.module';
 import { ResponsesModule } from './responses/responses.module';
+import { DynamooseModule } from 'nestjs-dynamoose';
+import { DynamooseConfigService } from './dynamoose.config';
 
 @Module({
   imports: [
+    DynamooseModule.forRootAsync({ useClass: DynamooseConfigService }),
     UsersModule,
     RequestsModule,
     ResponsesModule,
