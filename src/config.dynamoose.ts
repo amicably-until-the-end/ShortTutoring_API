@@ -3,11 +3,8 @@ import {
   DynamooseOptionsFactory,
 } from 'nestjs-dynamoose';
 import * as process from 'process';
-import * as dotenv from 'dotenv';
 
-dotenv.config();
-
-export class DynamooseConfigService implements DynamooseOptionsFactory {
+export class DynamooseConfig implements DynamooseOptionsFactory {
   createDynamooseOptions(): DynamooseModuleOptions {
     return {
       aws: {
