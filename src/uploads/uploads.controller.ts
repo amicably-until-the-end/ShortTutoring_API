@@ -10,8 +10,6 @@ import * as process from 'process';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
 
-const BUCKET_NAME = 'shorttutoring-bucket';
-
 @ApiTags('Upload')
 @Controller('uploads')
 export class UploadsController {
@@ -44,7 +42,7 @@ export class UploadsController {
         .putObject({
           Key: `${Date.now() + file.originalname}`,
           Body: file.buffer,
-          Bucket: BUCKET_NAME,
+          Bucket: process.env.AWS_S3_BUCKET_NAME,
         })
         .promise();
       console.log(upload);
