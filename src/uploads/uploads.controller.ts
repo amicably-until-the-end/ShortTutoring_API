@@ -11,6 +11,7 @@ import * as AWS from 'aws-sdk';
 import * as process from 'process';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
+import { webhook } from '../config.discord-webhook';
 
 @ApiTags('Upload')
 @Controller('uploads')
@@ -69,16 +70,17 @@ export class UploadsController {
     @Body('id') id: string,
     @Body('base64') base64: string,
   ) {
-    try {
-      const base64Data = Buffer.from(base64, 'base64');
-      AWS.config.update({
-        region: process.env.AWS_REGION,
-        credentials: {
-          accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-          secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
-        },
-      });
+    const base64Data = Buffer.from(base64, 'base64');
+    AWS.config.update({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
 
+    try {
+      await webhook.info(`Uploading ${usage}/${id}.${format}`);
       return await new AWS.S3()
         .putObject({
           Key: `${usage}/${id}.${format}`,
