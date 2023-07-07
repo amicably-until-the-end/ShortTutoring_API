@@ -42,7 +42,6 @@ export class UsersService {
           this.userModel.delete(user);
         });
       });
-    console.log(ret);
     return ret;
   }
 }
