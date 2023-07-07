@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  HttpException,
   Post,
   UploadedFile,
   UseInterceptors,
@@ -86,7 +87,8 @@ export class UploadsController {
         })
         .promise();
     } catch (error) {
-      return { error };
+      console.log(error);
+      return HttpException;
     }
   }
 }
