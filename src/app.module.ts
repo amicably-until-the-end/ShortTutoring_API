@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { RequestsModule } from './requests/requests.module';
 import { ResponsesModule } from './responses/responses.module';
+import { SimulationsModule } from './simulations/simulations.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ResponsesModule } from './responses/responses.module';
     UploadsModule,
     RequestsModule,
     ResponsesModule,
+    SimulationsModule,
     // TutoringsModule,
     // ReviewsModule,
   ],

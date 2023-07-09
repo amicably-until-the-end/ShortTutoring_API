@@ -31,6 +31,15 @@ export class RequestsController {
     return this.requestsService.findAll();
   }
 
+  @Delete('removeAll')
+  @ApiOperation({
+    summary: '모든 과외 요청 삭제',
+    description: '`DEV`\n\n모든 과외 요청을 삭제합니다.',
+  })
+  removeAll() {
+    return this.requestsService.removeAll();
+  }
+
   @Delete(':id')
   @ApiOperation({
     summary: '특정 과외 요청 삭제',

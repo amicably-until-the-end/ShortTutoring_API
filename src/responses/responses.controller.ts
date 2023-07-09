@@ -42,6 +42,15 @@ export class ResponsesController {
     return this.responsesService.create(response);
   }
 
+  @Get('findAll')
+  @ApiOperation({
+    summary: '응답 대기열 반환',
+    description: '`DEV`\n\n모든 응답 대기열을 반환합니다.',
+  })
+  findAll() {
+    return this.responsesService.findAll();
+  }
+
   @Get(':request_id')
   @ApiOperation({
     summary: '특정 요청에 대한 선생님들의 응답 반환',

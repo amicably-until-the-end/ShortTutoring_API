@@ -42,4 +42,8 @@ export class ResponsesService {
   remove(id: number) {
     return `This action removes a #${id} response`;
   }
+
+  async findAll() {
+    return await this.responseModel.scan().exec();
+  }
 }

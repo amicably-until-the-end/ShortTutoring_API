@@ -26,10 +26,6 @@ export class UsersService {
     return await this.userModel.update({ id }, updateUserDto);
   }
 
-  remove(id: string) {
-    return this.userModel.delete({ id });
-  }
-
   async removeAll() {
     let ret = 'This action removes all users\n';
 
@@ -43,5 +39,9 @@ export class UsersService {
         });
       });
     return ret;
+  }
+
+  remove(id: string) {
+    return this.userModel.delete({ id });
   }
 }
