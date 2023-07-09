@@ -1,26 +1,23 @@
 import { Injectable } from '@nestjs/common';
-import { CreateRequestDto } from './dto/create-request.dto';
-import { UpdateRequestDto } from './dto/update-request.dto';
+import { InjectModel, Model } from 'nestjs-dynamoose';
+import { Request, RequestKey } from './entities/request.interface';
 
 @Injectable()
 export class RequestsService {
-  create(createRequestDto: CreateRequestDto) {
-    return 'This action adds a new request';
+  constructor(
+    @InjectModel('Request')
+    private requestModel: Model<Request, RequestKey>,
+  ) {}
+
+  async create(request: Request) {
+    return await this.requestModel.create(request);
   }
 
-  findAll() {
-    return `This action returns all requests`;
+  async findAll() {
+    return this.requestModel.scan().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} request`;
-  }
-
-  update(id: number, updateRequestDto: UpdateRequestDto) {
-    return `This action updates a #${id} request`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} request`;
+  remove(id: string) {
+    return this.requestModel.delete({ id });
   }
 }

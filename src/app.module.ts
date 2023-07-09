@@ -5,13 +5,14 @@ import { UsersModule } from './users/users.module';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { DynamooseConfig } from './config.dynamoose';
 import { UploadsModule } from './uploads/uploads.module';
+import { RequestsModule } from './requests/requests.module';
 
 @Module({
   imports: [
     DynamooseModule.forRootAsync({ useClass: DynamooseConfig }),
     UsersModule,
     UploadsModule,
-    // RequestsModule,
+    RequestsModule,
     // ResponsesModule,
     // TutoringsModule,
     // ReviewsModule,
