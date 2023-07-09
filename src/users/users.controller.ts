@@ -32,11 +32,6 @@ export class UsersController {
     return this.usersService.create(user);
   }
 
-  @Patch('update/:id')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
-  }
-
   @Get('findAll')
   findAll() {
     return this.usersService.findAll();
@@ -47,13 +42,18 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
-  @Delete('remove/:id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+  @Patch('update/:id')
+  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.update(id, updateUserDto);
   }
 
   @Delete('removeAll')
   removeAll() {
     return this.usersService.removeAll();
+  }
+
+  @Delete('remove/:id')
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }
