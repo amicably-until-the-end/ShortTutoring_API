@@ -51,10 +51,4 @@ export class CreateUserDto {
   //   default: ['review1', 'review2'],
   // })
   // review_list: string[];
-
-  @ApiProperty({
-    description: 'The created_at of the user.',
-    default: '2023-07-05T12:03:23.195Z',
-  })
-  created_at: string;
 }
