@@ -18,7 +18,8 @@ export class ResponsesController {
   @Post()
   @ApiOperation({
     summary: '응답 대기열 생성',
-    description: '`DEV` 특정 요청에 대한 선생님들의 응답 대기열을 생성합니다.',
+    description:
+      '`DEV`\n\n특정 요청에 대한 선생님들의 응답 대기열을 생성합니다.',
   })
   @ApiBody({
     schema: {
@@ -44,7 +45,7 @@ export class ResponsesController {
   @Get(':request_id')
   @ApiOperation({
     summary: '특정 요청에 대한 선생님들의 응답 반환',
-    description: '`STUDENT` 특정 요청에 대한 선생님의 응답들을 반환합니다.',
+    description: '`STUDENT`\n\n특정 요청에 대한 선생님의 응답들을 반환합니다.',
   })
   findOne(@Param('request_id') request_id: string) {
     return this.responsesService.findOne(request_id);
@@ -53,7 +54,7 @@ export class ResponsesController {
   @Patch(':request_id')
   @ApiOperation({
     summary: '특정 요청에 대한 선생님의 응답 생성',
-    description: '`TEACHER` 특정 요청 대기열에 자신을 추가합니다.',
+    description: '`TEACHER`\n\n특정 요청 대기열에 자신을 추가합니다.',
   })
   @ApiBody({
     schema: {
@@ -73,7 +74,7 @@ export class ResponsesController {
   @Delete('removeAll')
   @ApiOperation({
     summary: '모든 응답 삭제',
-    description: '`DEBUG` 모든 응답을 삭제합니다.',
+    description: '`DEV`\n\n모든 응답을 삭제합니다.',
   })
   removeAll() {
     return this.responsesService.removeAll();
@@ -82,7 +83,7 @@ export class ResponsesController {
   @Delete(':id')
   @ApiOperation({
     summary: '특정 응답 삭제',
-    description: '`DEV` 특정 응답을 삭제합니다.',
+    description: '`DEV`\n\n특정 응답을 삭제합니다.',
   })
   remove(@Param('id') id: string) {
     return this.responsesService.remove(+id);
