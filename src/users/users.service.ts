@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
-import { User, UserKey } from './user.interface';
+import { User, UserKey } from './entities/user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
