@@ -1,23 +1,46 @@
 import { Injectable } from '@nestjs/common';
-import { CreateResponseDto } from './dto/create-response.dto';
-import { UpdateResponseDto } from './dto/update-response.dto';
+import { InjectModel, Model } from 'nestjs-dynamoose';
+import { Response, ResponseKey } from './entities/response.interface';
 
 @Injectable()
 export class ResponsesService {
-  create(createResponseDto: CreateResponseDto) {
-    return 'This action adds a new response';
+  constructor(
+    @InjectModel('Response')
+    private responseModel: Model<Response, ResponseKey>,
+  ) {}
+
+  async create(response: {
+    student_id: string;
+    teacher_ids: any[];
+    request_id: string;
+  }) {
+    return await this.responseModel.create(response);
   }
 
-  findAll() {
-    return `This action returns all responses`;
+  async findAll() {
+    return await this.responseModel.scan().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} response`;
+  async findOne(request_id: string) {
+    return await this.responseModel.get({ request_id });
   }
 
-  update(id: number, updateResponseDto: UpdateResponseDto) {
-    return `This action updates a #${id} response`;
+  async update(request_id: string, teacher_id: string) {
+    return await this.responseModel.get({ request_id }).then((response) => {
+      response.teacher_ids.push(teacher_id);
+      this.responseModel.update(response);
+    });
+  }
+
+  async removeAll() {
+    return await this.responseModel
+      .scan()
+      .exec()
+      .then((responses) => {
+        responses.forEach((response) => {
+          this.responseModel.delete(response);
+        });
+      });
   }
 
   remove(id: number) {
