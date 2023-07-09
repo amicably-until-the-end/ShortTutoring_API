@@ -17,10 +17,6 @@ export class ResponsesService {
     return await this.responseModel.create(response);
   }
 
-  async findAll() {
-    return await this.responseModel.scan().exec();
-  }
-
   async findOne(request_id: string) {
     return await this.responseModel.get({ request_id });
   }
