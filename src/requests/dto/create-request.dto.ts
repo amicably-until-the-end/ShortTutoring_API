@@ -2,14 +2,6 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class CreateRequestDto {
   @ApiProperty({
-    description: 'The id of the student who created the request',
-    type: String,
-    required: true,
-    example: '65183482-6c9d-44f8-8b54-953c329b13c1',
-  })
-  student_id;
-
-  @ApiProperty({
     description: 'The description of the problem',
     type: String,
     example: 'I am having trouble with this problem',
