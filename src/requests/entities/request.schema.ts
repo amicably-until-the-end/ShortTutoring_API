@@ -30,6 +30,6 @@ export const RequestSchema = new Schema({
     schema: [String],
   },
   created_at: {
-    type: Date,
+    type: String,
   },
 });
