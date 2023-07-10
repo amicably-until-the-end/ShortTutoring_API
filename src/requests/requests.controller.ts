@@ -12,7 +12,7 @@ export class RequestsController {
   @Post()
   @ApiOperation({
     summary: '과외 요청 생성',
-    description: '`Student`\n\n요청을 생성합니다.',
+    description: '`STUDENT`\n\n요청을 생성합니다.',
   })
   create(@Body() createRequestDto: CreateRequestDto) {
     const request = {
@@ -31,15 +31,6 @@ export class RequestsController {
   })
   findAll() {
     return this.requestsService.findAll();
-  }
-
-  @Delete('removeAll')
-  @ApiOperation({
-    summary: '모든 과외 요청 삭제',
-    description: '`DEV`\n\n모든 과외 요청을 삭제합니다.',
-  })
-  removeAll() {
-    return this.requestsService.removeAll();
   }
 
   @Delete(':id')

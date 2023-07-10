@@ -17,17 +17,6 @@ export class RequestsService {
     return this.requestModel.scan().exec();
   }
 
-  removeAll() {
-    return this.requestModel
-      .scan()
-      .exec()
-      .then((requests) => {
-        requests.forEach((request) => {
-          this.requestModel.delete(request);
-        });
-      });
-  }
-
   remove(id: string) {
     return this.requestModel.delete({ id });
   }

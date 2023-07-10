@@ -63,15 +63,6 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Delete('removeAll')
-  @ApiOperation({
-    summary: '모든 사용자 삭제',
-    description: '`DEV`\n\n모든 사용자를 삭제합니다.',
-  })
-  removeAll() {
-    return this.usersService.removeAll();
-  }
-
   @Delete(':id')
   @ApiOperation({
     summary: '특정 사용자 삭제',

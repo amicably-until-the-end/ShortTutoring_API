@@ -9,10 +9,6 @@ export class ResponsesService {
     private responseModel: Model<Request, RequestKey>,
   ) {}
 
-  async findOne(request_id: string) {
-    return await this.responseModel.get({ id: request_id });
-  }
-
   async update(id: string, teacher_id: string) {
     await this.responseModel.get({ id }).then(async (request) => {
       console.log(request);

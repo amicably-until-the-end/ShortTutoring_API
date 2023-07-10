@@ -26,21 +26,6 @@ export class UsersService {
     return await this.userModel.update({ id }, updateUserDto);
   }
 
-  async removeAll() {
-    let ret = 'This action removes all users\n';
-
-    await this.userModel
-      .scan()
-      .exec()
-      .then((users) => {
-        users.forEach((user) => {
-          ret += user.id + ' removed\n';
-          this.userModel.delete(user);
-        });
-      });
-    return ret;
-  }
-
   remove(id: string) {
     return this.userModel.delete({ id });
   }
