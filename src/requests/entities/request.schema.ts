@@ -25,4 +25,11 @@ export const RequestSchema = new Schema({
   problem_difficulty: {
     type: String,
   },
+  teacher_ids: {
+    type: Array,
+    schema: [String],
+  },
+  created_at: {
+    type: Date,
+  },
 });
