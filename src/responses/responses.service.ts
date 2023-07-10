@@ -9,6 +9,12 @@ export class ResponsesService {
     private responseModel: Model<Request, RequestKey>,
   ) {}
 
+  async findOne(id: string) {
+    return this.responseModel
+      .get({ id })
+      .then((response) => response.teacher_ids);
+  }
+
   async update(id: string, teacher_id: string) {
     await this.responseModel.get({ id }).then(async (request) => {
       console.log(request);

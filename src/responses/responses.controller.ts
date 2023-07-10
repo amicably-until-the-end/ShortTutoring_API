@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Param, Patch } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
 import { ResponsesService } from './responses.service';
 import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +6,19 @@ import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 @Controller('response')
 export class ResponsesController {
   constructor(private readonly responsesService: ResponsesService) {}
+
+  @Get(':id')
+  @ApiOperation({
+    summary: '특정 요청에 대한 응답 조회',
+    description: '`TEACHER`\n\n특정 요청에 대한 응답을 조회합니다.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: '요청의 id',
+  })
+  findOne(@Param('id') id: string) {
+    return this.responsesService.findOne(id);
+  }
 
   @Patch(':id')
   @ApiOperation({
