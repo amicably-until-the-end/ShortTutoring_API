@@ -2,16 +2,16 @@ import { Module } from '@nestjs/common';
 import { ResponsesService } from './responses.service';
 import { ResponsesController } from './responses.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
-import { ResponseSchema } from './entities/response.schema';
+import { RequestSchema } from '../requests/entities/request.schema';
 
 @Module({
   imports: [
     DynamooseModule.forFeature([
       {
-        name: 'Response',
-        schema: ResponseSchema,
+        name: 'Request',
+        schema: RequestSchema,
         options: {
-          tableName: 'responses',
+          tableName: 'requests',
         },
       },
     ]),

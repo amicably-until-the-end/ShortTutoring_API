@@ -17,6 +17,8 @@ export class RequestsController {
   create(@Body() createRequestDto: CreateRequestDto) {
     const request = {
       id: uuid(),
+      teacher_ids: [],
+      created_at: new Date().toISOString(),
       ...createRequestDto,
     };
     return this.requestsService.create(request);
