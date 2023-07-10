@@ -7,6 +7,9 @@ import { UsersService } from '../users/users.service';
 import { ResponsesService } from '../responses/responses.service';
 import { RequestsService } from '../requests/requests.service';
 import { SimulationsService } from './simulations.service';
+import { UsersController } from '../users/users.controller';
+import { RequestsController } from '../requests/requests.controller';
+import { ResponsesController } from '../responses/responses.controller';
 
 @Module({
   imports: [
@@ -27,7 +30,12 @@ import { SimulationsService } from './simulations.service';
       },
     ]),
   ],
-  controllers: [SimulationsController],
+  controllers: [
+    SimulationsController,
+    UsersController,
+    RequestsController,
+    ResponsesController,
+  ],
   providers: [
     SimulationsService,
     UsersService,
