@@ -10,6 +10,6 @@ export interface Request extends RequestKey {
   problem_school_subject?: string;
   problem_school_chapter?: string;
   problem_difficulty?: string;
-  teacher_ids?: Array<string>;
+  teacher_ids?: string[];
   created_at?: string;
 }

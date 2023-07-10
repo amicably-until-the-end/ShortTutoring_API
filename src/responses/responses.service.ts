@@ -13,6 +13,7 @@ export class ResponsesService {
     await this.responseModel.get({ id }).then(async (request) => {
       console.log(request);
       request.teacher_ids.push(teacher_id);
+      await this.responseModel.update(request);
     });
 
     return await this.responseModel.get({ id });
