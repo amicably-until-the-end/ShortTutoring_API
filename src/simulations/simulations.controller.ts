@@ -7,15 +7,6 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 export class SimulationsController {
   constructor(private readonly testsService: SimulationsService) {}
 
-  @Delete('removeAll')
-  @ApiOperation({
-    summary: '데이터 초기화',
-    description: '`DEV`\n\n모든 데이터를 삭제합니다.',
-  })
-  removeAll() {
-    return this.testsService.removeAll();
-  }
-
   @Post('matching')
   @ApiOperation({
     summary: '매칭 시뮬레이션',
@@ -44,5 +35,14 @@ export class SimulationsController {
     @Body('teacher_name') teacher_name: string,
   ) {
     return this.testsService.matching(student_name, teacher_name);
+  }
+
+  @Delete('removeAll')
+  @ApiOperation({
+    summary: '데이터 초기화',
+    description: '`DEV`\n\n모든 데이터를 삭제합니다.',
+  })
+  removeAll() {
+    return this.testsService.removeAll();
   }
 }
