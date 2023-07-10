@@ -5,23 +5,30 @@ import { Request, RequestKey } from '../requests/entities/request.interface';
 @Injectable()
 export class ResponsesService {
   constructor(
+    @InjectModel('User')
+    private userModel: Model<Request, RequestKey>,
     @InjectModel('Request')
     private responseModel: Model<Request, RequestKey>,
   ) {}
 
   async findOne(id: string) {
-    return this.responseModel
-      .get({ id })
-      .then((response) => response.teacher_ids);
+    const request = await this.responseModel.get({ id });
+    const teachers = [];
+    for (const teacher_id of request.teacher_ids) {
+      const teacher = await this.userModel.get({ id: teacher_id });
+      teachers.push(teacher);
+    }
+    return teachers;
   }
 
   async update(id: string, teacher_id: string) {
     await this.responseModel.get({ id }).then(async (request) => {
-      console.log(request);
+      if (request.teacher_ids.includes(teacher_id)) {
+        return;
+      }
       request.teacher_ids.push(teacher_id);
       await this.responseModel.update(request);
     });
-
     return await this.responseModel.get({ id });
   }
 

@@ -1,27 +1,24 @@
 import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { CreateRequestDto } from './dto/create-request.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { v4 as uuid } from 'uuid';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Request')
 @Controller('request')
 export class RequestsController {
   constructor(private readonly requestsService: RequestsService) {}
 
-  @Post()
+  @Post(':id')
   @ApiOperation({
     summary: '과외 요청 생성',
     description: '`STUDENT`\n\n요청을 생성합니다.',
   })
-  create(@Body() createRequestDto: CreateRequestDto) {
-    const request = {
-      id: uuid(),
-      teacher_ids: [],
-      created_at: new Date().toISOString(),
-      ...createRequestDto,
-    };
-    return this.requestsService.create(request);
+  @ApiParam({
+    name: 'id',
+    description: '과외를 요청한 학생의 ID',
+  })
+  create(@Param('id') id: string, @Body() createRequestDto: CreateRequestDto) {
+    return this.requestsService.create(id, createRequestDto);
   }
 
   @Get()
