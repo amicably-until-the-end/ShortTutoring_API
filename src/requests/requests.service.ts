@@ -38,7 +38,13 @@ export class RequestsService {
     const requests = await this.requestModel.scan().exec();
     for (const request of requests) {
       const student = await this.userModel.get({ id: request.student_id });
-      found.push({ ...request, student });
+      found.push({
+        id: request.id,
+        student,
+        problem: request.problem,
+        teacher_ids: request.teacher_ids,
+        created_at: request.created_at,
+      });
     }
     return found;
   }
