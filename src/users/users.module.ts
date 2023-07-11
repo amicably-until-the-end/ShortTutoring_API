@@ -11,7 +11,7 @@ import { UserSchema } from './entities/user.schema';
         name: 'User',
         schema: UserSchema,
         options: {
-          tableName: 'users',
+          tableName: 'Users',
         },
       },
     ]),
