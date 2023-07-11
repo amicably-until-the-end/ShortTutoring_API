@@ -30,7 +30,7 @@ export class ResponsesController {
   @Get(':id')
   @ApiOperation({
     summary: '특정 요청에 대한 응답 조회',
-    description: '`TEACHER`\n\n특정 요청에 대한 응답을 조회합니다.',
+    description: '`STUDENT`\n\n특정 요청에 대한 응답을 조회합니다.',
   })
   @ApiParam({
     name: 'id',
@@ -38,6 +38,48 @@ export class ResponsesController {
   })
   findOne(@Param('id') id: string) {
     return this.responsesService.findOne(id);
+  }
+
+  @Post('check/:id')
+  @ApiOperation({
+    summary: '특정 요청에 대한 선택 여부 조회',
+    description: '`TEACHER`\n\n특정 요청에 대한 선택 여부를 조회합니다.',
+  })
+  @ApiParam({
+    name: 'id',
+    description: '요청의 id',
+    example: 'test-request-id',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        teacher_id: {
+          type: 'string',
+          description: '선생님의 id',
+          example: 'test-teacher-id',
+        },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 200,
+    description: '해당 선생님이 선택되었습니다.',
+  })
+  @ApiResponse({
+    status: 201,
+    description: '해당 선생님이 선택되지 않았습니다.',
+  })
+  @ApiResponse({
+    status: 202,
+    description: '학생의 선택을 기다리고 있습니다.',
+  })
+  @ApiResponse({
+    status: 404,
+    description: '해당 요청이 존재하지 않습니다.',
+  })
+  check(@Param('id') id: string, @Body('teacher_id') teacher_id: string) {
+    return this.responsesService.check(id, teacher_id);
   }
 
   @Patch(':id')

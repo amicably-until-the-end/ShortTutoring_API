@@ -39,6 +39,9 @@ export const RequestSchema = new Schema({
   status: {
     type: String,
   },
+  tutoring_id: {
+    type: String,
+  },
   created_at: {
     type: String,
   },
