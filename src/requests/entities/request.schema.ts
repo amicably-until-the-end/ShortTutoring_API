@@ -36,6 +36,9 @@ export const RequestSchema = new Schema({
     type: Array,
     schema: [String],
   },
+  status: {
+    type: String,
+  },
   created_at: {
     type: String,
   },

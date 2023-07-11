@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { User, UserKey } from '../users/entities/user.interface';
 import { Request, RequestKey } from '../requests/entities/request.interface';
@@ -8,6 +7,7 @@ import {
   teacherWebhook,
   webhook,
 } from '../config.discord-webhook';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class SimulationsService {
@@ -79,20 +79,18 @@ export class SimulationsService {
     await this.requestModel.get({ id: request_id }).then(async (response) => {
       if (response) {
         response.teacher_ids.push(teacher_id);
-        await this.requestModel.update(response).then(async () => {
-          await teacherWebhook.success(`[Step 3] Teacher Joined request`);
-          await teacherWebhook.send(`> ${request_id} (joined)`);
+        await this.requestModel.update(response);
 
-          await studentWebhook.success(`[Step 3] Student noticed update`);
-          const requestJSON = JSON.stringify(response);
-          await studentWebhook.send(`\`\`\`json\n${requestJSON}\n\`\`\``);
+        await teacherWebhook.success(`[Step 3] Teacher Joined request`);
+        await teacherWebhook.send(`> ${request_id} (joined)`);
 
-          await studentWebhook.warning(
-            `[End] PLEASE TEACH ME ${teacher_name}!`,
-          );
-          await teacherWebhook.warning(`[End] I'LL TUTOR YOU ${student_name}!`);
-          await webhook.success(`Matched ${student_name} and ${teacher_name}`);
-        });
+        await studentWebhook.success(`[Step 3] Student noticed update`);
+        const requestJSON = JSON.stringify(response);
+        await studentWebhook.send(`\`\`\`json\n${requestJSON}\n\`\`\``);
+
+        await studentWebhook.warning(`[End] PLEASE TEACH ME ${teacher_name}!`);
+        await teacherWebhook.warning(`[End] I'LL TUTOR YOU ${student_name}!`);
+        await webhook.success(`Matched ${student_name} and ${teacher_name}`);
       } else {
         await teacherWebhook.error(`Request ${request_id} not found`);
         await webhook.error(`Match failed`);
@@ -100,11 +98,11 @@ export class SimulationsService {
       }
     });
 
-    return 'Matching done';
+    return this.getAll();
   }
 
-  removeAll() {
-    this.userModel
+  async removeAll() {
+    await this.userModel
       .scan()
       .exec()
       .then((users) => {
@@ -112,7 +110,7 @@ export class SimulationsService {
           return this.userModel.delete(user);
         });
       });
-    this.requestModel
+    await this.requestModel
       .scan()
       .exec()
       .then((requests) => {
@@ -120,6 +118,41 @@ export class SimulationsService {
           return this.requestModel.delete(request);
         });
       });
-    return 'All removed';
+    return await this.getAll();
+  }
+
+  async getAll() {
+    const string = {};
+    string['users'] = await this.userModel.scan().exec();
+    string['requests'] = await this.requestModel.scan().exec();
+    return string;
+  }
+
+  async createTest() {
+    try {
+      await this.userModel.create({
+        id: 'test-student-id',
+        name: 'test-student-name',
+        role: 'student',
+      });
+      await this.userModel.create({
+        id: 'test-teacher-id',
+        name: 'test-teacher-name',
+        role: 'teacher',
+      });
+      await this.requestModel
+        .create({
+          id: 'test-request-id',
+          student_id: 'test-student-id',
+          teacher_ids: [],
+          created_at: new Date().toISOString(),
+        })
+        .then(async (response) => {
+          await this.requestModel.update(response);
+        });
+    } catch (e) {
+      return this.getAll();
+    }
+    return this.getAll();
   }
 }

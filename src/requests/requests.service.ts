@@ -18,6 +18,7 @@ export class RequestsService {
     const image_url = 'Decoded image url';
     const request = {
       id: uuid(),
+      status: 'pending',
       student_id,
       teacher_ids: [],
       created_at: new Date().toISOString(),
