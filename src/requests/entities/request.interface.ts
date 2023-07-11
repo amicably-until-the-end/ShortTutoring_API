@@ -15,5 +15,6 @@ export interface Request extends RequestKey {
   student_id?: string;
   problem?: Problem;
   teacher_ids?: string[];
+  status?: string;
   created_at?: string;
 }
