@@ -12,14 +12,14 @@ import { UserSchema } from '../users/entities/user.schema';
         name: 'User',
         schema: UserSchema,
         options: {
-          tableName: 'users',
+          tableName: 'Users',
         },
       },
       {
         name: 'Request',
         schema: RequestSchema,
         options: {
-          tableName: 'requests',
+          tableName: 'Requests',
         },
       },
     ]),
