@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post } from '@nestjs/common';
 import { SimulationsService } from './simulations.service';
 import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 
@@ -6,6 +6,33 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 @Controller('simulations')
 export class SimulationsController {
   constructor(private readonly testsService: SimulationsService) {}
+
+  @Get('createTest')
+  @ApiOperation({
+    summary: '테스트 데이터 생성',
+    description: '`DEV`\n\n테스트 데이터를 생성합니다.',
+  })
+  createTest() {
+    return this.testsService.createTest();
+  }
+
+  @Get('getAll')
+  @ApiOperation({
+    summary: '모든 데이터 반환',
+    description: '`DEV`\n\n모든 데이터를 반환합니다.',
+  })
+  getAll() {
+    return this.testsService.getAll();
+  }
+
+  @Delete('removeAll')
+  @ApiOperation({
+    summary: '데이터 초기화',
+    description: '`DEV`\n\n모든 데이터를 삭제합니다.',
+  })
+  removeAll() {
+    return this.testsService.removeAll();
+  }
 
   @Post('matching')
   @ApiOperation({
@@ -35,14 +62,5 @@ export class SimulationsController {
     @Body('teacher_name') teacher_name: string,
   ) {
     return this.testsService.matching(student_name, teacher_name);
-  }
-
-  @Delete('removeAll')
-  @ApiOperation({
-    summary: '데이터 초기화',
-    description: '`DEV`\n\n모든 데이터를 삭제합니다.',
-  })
-  removeAll() {
-    return this.testsService.removeAll();
   }
 }

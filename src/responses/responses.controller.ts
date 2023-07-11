@@ -1,6 +1,26 @@
-import { Body, Controller, Delete, Get, Param, Patch } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ResponsesService } from './responses.service';
-import { ApiBody, ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import {
+  BadRequestDto as BadRequest_PostSelectDto,
+  PostSelectDto,
+  RequestNotFoundDto as RequestNotFound_PostSelectDto,
+  ResponseDto as Response_PostSelectDto,
+} from './dto/select-response.dto';
 
 @ApiTags('Response')
 @Controller('response')
@@ -60,5 +80,32 @@ export class ResponsesController {
   })
   remove(@Param('id') id: string, @Body('teacher_id') teacher_id: string) {
     return this.responsesService.remove(id, teacher_id);
+  }
+
+  @Post('select')
+  @ApiOperation({
+    summary: '특정 과외 응답 선택',
+    description: '`STUDENT`\n\n특정 과외 응답을 선택합니다.',
+  })
+  @ApiBody({
+    type: PostSelectDto,
+  })
+  @ApiResponse({
+    status: 200,
+    description: '요청이 성공적으로 처리되었습니다.',
+    type: Response_PostSelectDto,
+  })
+  @ApiResponse({
+    status: 400,
+    description: '요청이 잘못되었습니다.',
+    type: BadRequest_PostSelectDto,
+  })
+  @ApiResponse({
+    status: 404,
+    description: '요청한 응답이 존재하지 않습니다.',
+    type: RequestNotFound_PostSelectDto,
+  })
+  select(@Body() selectResponseDto: PostSelectDto) {
+    return this.responsesService.select(selectResponseDto);
   }
 }
