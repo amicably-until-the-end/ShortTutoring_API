@@ -5,9 +5,9 @@ import { User } from '../entities/user.interface';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
-export class Success_UpdateUserDto extends ResponseDto {
+export class Success_DeleteUserDto extends ResponseDto {
   @ApiProperty({
-    default: 'Updated successfully.',
+    default: 'Deleted successfully.',
   })
   message: string;
 
@@ -33,7 +33,7 @@ export class Success_UpdateUserDto extends ResponseDto {
   data: User;
 }
 
-export class BadRequest_UpdateUserDto extends ResponseDto {
+export class BadRequest_DeleteUserDto extends ResponseDto {
   @ApiProperty({
     default: 'Bad request.',
   })

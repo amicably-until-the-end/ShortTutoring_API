@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { User, UserKey } from './entities/user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { ResponseDto } from '../responses/dto';
 
 @Injectable()
 export class UsersService {
@@ -11,7 +12,9 @@ export class UsersService {
   ) {}
 
   async create(user: User) {
-    return await this.userModel.create(user);
+    const response = ResponseDto.Success;
+    response.data = await this.userModel.create(user);
+    return response;
   }
 
   async findAll() {

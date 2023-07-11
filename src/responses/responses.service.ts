@@ -53,14 +53,14 @@ export class ResponsesService {
   async select(postSelectDto: PostSelectDto) {
     let tutoring;
     await this.requestModel
-      .get({ id: postSelectDto.request_id })
+      .get({ id: postSelectDto.data.request_id })
       .then(async (response) => {
         response.teacher_ids = response.teacher_ids.filter(
-          (id) => id === postSelectDto.teacher_id,
+          (id) => id === postSelectDto.data.teacher_id,
         );
 
         const tutoringService = new TutoringsService(this.tutoringModel);
-        tutoring = await tutoringService.create(postSelectDto);
+        tutoring = await tutoringService.create(postSelectDto.data);
 
         response.status = 'selected';
         response.tutoring_id = tutoring.id;

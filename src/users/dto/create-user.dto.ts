@@ -1,9 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ResponseDto } from '../../responses/dto';
+import { User } from '../entities/user.interface';
 
 export class CreateUserDto {
   @ApiProperty({
     description: 'The name of the user.',
-    default: 'shorty',
+    default: 'test-student',
   })
   name: string;
 
@@ -17,12 +19,12 @@ export class CreateUserDto {
     description: 'base64 encoded image',
     default: 'base64',
   })
-  profileImage: string;
+  profileImageBase64: string;
 
   @ApiProperty({
     description: 'The role of the user.',
     default: 'student',
-    examples: ['admin', 'student', 'teacher'],
+    enum: ['admin', 'student', 'teacher'],
   })
   role: string;
 
@@ -51,4 +53,54 @@ export class CreateUserDto {
   //   default: ['review1', 'review2'],
   // })
   // review_list: string[];
+}
+
+export class Created_CreateUserDto extends ResponseDto {
+  @ApiProperty({
+    example: 'Created successfully.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: false,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: 201,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: {
+      id: 'test-id',
+      name: 'test-name',
+      bio: 'test-bio',
+      profileImageURL: 'test-profileImage-url',
+      role: 'student',
+    },
+  })
+  data: User;
+}
+
+export class BadRequest_CreateUserDto extends ResponseDto {
+  @ApiProperty({
+    example: 'Bad request.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: true,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: 400,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: null,
+  })
+  data: User;
 }

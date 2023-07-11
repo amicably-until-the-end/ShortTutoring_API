@@ -19,8 +19,8 @@ import {
   BadRequestDto as BadRequest_PostSelectDto,
   PostSelectDto,
   RequestNotFoundDto as RequestNotFound_PostSelectDto,
-  ResponseDto as Response_PostSelectDto,
 } from './dto/select-response.dto';
+import { ResponseDto } from './dto';
 
 @ApiTags('Response')
 @Controller('response')
@@ -65,6 +65,7 @@ export class ResponsesController {
   @ApiResponse({
     status: 200,
     description: '해당 선생님이 선택되었습니다.',
+    type: ResponseDto,
   })
   @ApiResponse({
     status: 201,
@@ -135,7 +136,7 @@ export class ResponsesController {
   @ApiResponse({
     status: 200,
     description: '요청이 성공적으로 처리되었습니다.',
-    type: Response_PostSelectDto,
+    type: PostSelectDto,
   })
   @ApiResponse({
     status: 400,
