@@ -3,13 +3,8 @@ import { SimulationsController } from './simulations.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from '../users/entities/user.schema';
 import { RequestSchema } from '../requests/entities/request.schema';
-import { UsersService } from '../users/users.service';
-import { ResponsesService } from '../responses/responses.service';
-import { RequestsService } from '../requests/requests.service';
 import { SimulationsService } from './simulations.service';
-import { UsersController } from '../users/users.controller';
-import { RequestsController } from '../requests/requests.controller';
-import { ResponsesController } from '../responses/responses.controller';
+import { TutoringSchema } from '../tutorings/entities/tutoring.schema';
 
 @Module({
   imports: [
@@ -28,19 +23,16 @@ import { ResponsesController } from '../responses/responses.controller';
           tableName: 'Requests',
         },
       },
+      {
+        name: 'Tutoring',
+        schema: TutoringSchema,
+        options: {
+          tableName: 'Tutorings',
+        },
+      },
     ]),
   ],
-  controllers: [
-    SimulationsController,
-    UsersController,
-    RequestsController,
-    ResponsesController,
-  ],
-  providers: [
-    SimulationsService,
-    UsersService,
-    RequestsService,
-    ResponsesService,
-  ],
+  controllers: [SimulationsController],
+  providers: [SimulationsService],
 })
 export class SimulationsModule {}
