@@ -13,8 +13,9 @@ export interface Problem {
 
 export interface Request extends RequestKey {
   student_id?: string;
-  problem?: Problem;
   teacher_ids?: string[];
+  problem?: Problem;
   status?: string;
+  tutoring_id?: string;
   created_at?: string;
 }

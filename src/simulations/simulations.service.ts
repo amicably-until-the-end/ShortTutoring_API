@@ -144,7 +144,7 @@ export class SimulationsService {
         .create({
           id: 'test-request-id',
           student_id: 'test-student-id',
-          teacher_ids: [],
+          teacher_ids: ['test-teacher-id'],
           created_at: new Date().toISOString(),
         })
         .then(async (response) => {

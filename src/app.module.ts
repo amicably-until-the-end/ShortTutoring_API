@@ -8,6 +8,7 @@ import { UploadsModule } from './uploads/uploads.module';
 import { RequestsModule } from './requests/requests.module';
 import { ResponsesModule } from './responses/responses.module';
 import { SimulationsModule } from './simulations/simulations.module';
+import { TutoringsModule } from './tutorings/tutorings.module';
 
 @Module({
   imports: [
@@ -16,8 +17,8 @@ import { SimulationsModule } from './simulations/simulations.module';
     UploadsModule,
     RequestsModule,
     ResponsesModule,
+    TutoringsModule,
     SimulationsModule,
-    // TutoringsModule,
     // ReviewsModule,
   ],
   controllers: [AppController],
