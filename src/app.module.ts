@@ -3,23 +3,23 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { DynamooseConfig } from './config.dynamoose';
-import { UsersModule } from './users/users.module';
-import { UploadsModule } from './uploads/uploads.module';
-import { RequestsModule } from './requests/requests.module';
-import { ResponsesModule } from './responses/responses.module';
-import { SimulationsModule } from './simulations/simulations.module';
-import { TutoringsModule } from './tutorings/tutorings.module';
+import { UserModule } from './user/user.module';
+import { UploadModule } from './upload/upload.module';
+import { RequestModule } from './request/request.module';
+import { ResponseModule } from './response/response.module';
+import { SimulationModule } from './simulation/simulation.module';
+import { TutoringModule } from './tutoring/tutoring.module';
 
 @Module({
   imports: [
     DynamooseModule.forRootAsync({ useClass: DynamooseConfig }),
-    UsersModule,
-    UploadsModule,
-    RequestsModule,
-    ResponsesModule,
-    TutoringsModule,
-    SimulationsModule,
-    // ReviewsModule,
+    UserModule,
+    UploadModule,
+    RequestModule,
+    ResponseModule,
+    TutoringModule,
+    SimulationModule,
+    // ReviewModule,
   ],
   controllers: [AppController],
   providers: [AppService],
