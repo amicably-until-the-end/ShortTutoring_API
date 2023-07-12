@@ -46,9 +46,14 @@ export class CreateRequestDto {
   problem_difficulty;
 }
 
-export class Success_CreateRequestDto extends ResponseDto {
+export class Created_CreateRequestDto extends ResponseDto {
   @ApiProperty({
-    default: 'Create request successfully.',
+    default: 200,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: '과외 요청이 성공적으로 생성되었습니다.',
   })
   message: string;
 
@@ -58,14 +63,37 @@ export class Success_CreateRequestDto extends ResponseDto {
   error: boolean;
 
   @ApiProperty({
-    default: 200,
+    default: null,
+  })
+  data: object;
+
+  constructor() {
+    super(200, '과외 요청이 성공적으로 생성되었습니다.', false);
+  }
+}
+
+export class Unauthorized_CreateRequestDto extends ResponseDto {
+  @ApiProperty({
+    default: 401,
   })
   statusCode: number;
 
   @ApiProperty({
-    default: {
-      id: 'test-request-id',
-    },
+    default: '과외를 요청할 수 있는 권한이 없습니다.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: true,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: null,
   })
   data: object;
+
+  constructor() {
+    super(401, '과외를 요청할 수 있는 권한이 없습니다.', true);
+  }
 }

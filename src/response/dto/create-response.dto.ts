@@ -112,7 +112,7 @@ export class NotFound_SelectResponseDto extends ResponseDto {
   data: object;
 }
 
-export class Success_CreateResponseDto extends ResponseDto {
+export class Created_CreateResponseDto extends ResponseDto {
   @ApiProperty({
     default: 'Append response successfully.',
   })

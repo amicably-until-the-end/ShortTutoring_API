@@ -45,6 +45,10 @@ export class SimulationService {
       id: requestId,
       studentId: studentId,
       teacherIds: [],
+      status: 'pending',
+      problem: {
+        description: 'test-problem',
+      },
       createdAt: new Date().toISOString(),
     });
     await studentWebhook.success(
@@ -142,9 +146,11 @@ export class SimulationService {
       });
       await this.requestModel
         .create({
+          status: 'pending',
           id: 'test-request-id',
           studentId: 'test-student-id',
           teacherIds: ['test-teacher-id'],
+          problem: { description: 'test-problem' },
           createdAt: new Date().toISOString(),
         })
         .then(async (response) => {
