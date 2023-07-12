@@ -19,3 +19,34 @@ export class CreateTutoringDto {
   })
   teacherId: string;
 }
+
+export class Success_CreateTutoringDto {
+  @ApiProperty({
+    default: 'Create tutoring successfully.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: false,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: 201,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: {
+      id: 'test-tutoring-id',
+      studentId: 'test-student-id',
+      requestId: 'test-request-id',
+      teacherId: 'test-teacher-id',
+      matchedAt: '2021-01-01T00:00:00.000Z',
+      createdAt: '2021-01-01T00:00:00.000Z',
+      endedAt: null,
+      status: 'ongoing',
+    },
+  })
+  data: object;
+}
