@@ -4,16 +4,16 @@ export const ProblemSchema = new Schema({
   description: {
     type: String,
   },
-  image_url: {
+  imageUrl: {
     type: String,
   },
-  school_level: {
+  schoolLevel: {
     type: String,
   },
-  school_subject: {
+  schoolSubject: {
     type: String,
   },
-  school_chapter: {
+  schoolChapter: {
     type: String,
   },
   difficulty: {
@@ -25,21 +25,21 @@ export const RequestSchema = new Schema({
   id: {
     type: String,
   },
-  student_id: {
+  studentId: {
     type: String,
   },
   problem: {
     type: Object,
     schema: ProblemSchema,
   },
-  teacher_ids: {
+  teacherIds: {
     type: Array,
     schema: [String],
   },
   status: {
     type: String,
   },
-  tutoring_id: {
+  tutoringId: {
     type: String,
   },
   created_at: {
