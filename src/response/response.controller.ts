@@ -19,11 +19,11 @@ import {
 } from './dto/check-response.dto';
 import {
   BadRequest_SelectResponseDto,
+  Created_CreateResponseDto,
   NotFound_CreateResponseDto,
   NotFound_SelectResponseDto,
   NotModified_SelectResponseDto,
   SelectResponseDto,
-  Success_CreateResponseDto,
   Success_SelectResponseDto,
 } from './dto/create-response.dto';
 import {
@@ -127,7 +127,7 @@ export class ResponseController {
   @ApiResponse({
     status: 200,
     description: '해당 요청에 대한 응답을 성공적으로 생성했습니다.',
-    type: Success_CreateResponseDto,
+    type: Created_CreateResponseDto,
   })
   @ApiResponse({
     status: 404,

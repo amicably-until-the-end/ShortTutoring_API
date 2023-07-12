@@ -3,7 +3,12 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class Success_DeleteRequestDto extends ResponseDto {
   @ApiProperty({
-    default: 'Delete request successfully.',
+    default: 200,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: '과외 요청이 성공적으로 삭제되었습니다.',
   })
   message: string;
 
@@ -13,23 +18,23 @@ export class Success_DeleteRequestDto extends ResponseDto {
   error: boolean;
 
   @ApiProperty({
-    default: 200,
-  })
-  statusCode: number;
-
-  @ApiProperty({
     default: null,
   })
   data: object;
 
   constructor() {
-    super(200, 'Delete request successfully', false, null);
+    super(200, '과외 요청이 성공적으로 삭제되었습니다.', false, null);
   }
 }
 
 export class NotFound_DeleteRequestDto extends ResponseDto {
   @ApiProperty({
-    default: 'Request not found.',
+    default: 404,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: '과외 요청을 찾을 수 없습니다.',
   })
   message: string;
 
@@ -39,16 +44,11 @@ export class NotFound_DeleteRequestDto extends ResponseDto {
   error: boolean;
 
   @ApiProperty({
-    default: 404,
-  })
-  statusCode: number;
-
-  @ApiProperty({
     default: null,
   })
   data: object;
 
   constructor() {
-    super(404, 'Request not found', true, null);
+    super(404, '과외 요청을 찾을 수 없습니다.', true, null);
   }
 }

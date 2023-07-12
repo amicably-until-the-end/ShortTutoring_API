@@ -2,12 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { Request, RequestKey } from './entities/request.interface';
 import { User, UserKey } from '../user/entities/user.interface';
-import { CreateRequestDto } from './dto/create-request.dto';
+import {
+  Created_CreateRequestDto,
+  CreateRequestDto,
+  Unauthorized_CreateRequestDto,
+} from './dto/create-request.dto';
 import { v4 as uuid } from 'uuid';
 import {
   NotFound_DeleteRequestDto,
   Success_DeleteRequestDto,
 } from './dto/delete-request.dto';
+import { Success_GetRequestsDto } from './dto/get-request.dto';
 
 @Injectable()
 export class RequestService {
@@ -19,7 +24,14 @@ export class RequestService {
   ) {}
 
   async create(studentId: string, createRequestDto: CreateRequestDto) {
+    const student = await this.userModel.get({ id: studentId });
+    if (student === undefined) {
+      return new Unauthorized_CreateRequestDto();
+    }
+
+    // TODO: S3에 이미지 업로드
     const imageUrl = 'Decoded image url';
+
     const request = {
       id: uuid(),
       status: 'pending',
@@ -35,7 +47,9 @@ export class RequestService {
         difficulty: createRequestDto.problem_difficulty,
       },
     };
-    return await this.requestModel.create(request);
+    await this.requestModel.create(request);
+
+    return new Created_CreateRequestDto();
   }
 
   async findAll() {
@@ -43,6 +57,8 @@ export class RequestService {
     const requests = await this.requestModel.scan().exec();
     for (const request of requests) {
       const student = await this.userModel.get({ id: request.studentId });
+      if (request.status !== 'pending') continue;
+
       found.push({
         id: request.id,
         student,
@@ -51,16 +67,16 @@ export class RequestService {
         createdAt: request.createdAt,
       });
     }
-    return found;
+    return new Success_GetRequestsDto(found);
   }
 
   async remove(id: string) {
-    await this.requestModel.get({ id }).then(async (value) => {
-      if (value === undefined) {
-        throw new NotFound_DeleteRequestDto();
-      }
-      await this.requestModel.delete({ id });
-    });
+    const request = await this.requestModel.get({ id });
+    if (request === undefined) {
+      return new NotFound_DeleteRequestDto();
+    }
+
+    await this.requestModel.delete({ id });
     return new Success_DeleteRequestDto();
   }
 }

@@ -3,17 +3,17 @@ import { ApiProperty } from '@nestjs/swagger';
 
 export class Success_GetRequestsDto extends ResponseDto {
   @ApiProperty({
-    default: 'Get requests list successfully.',
+    default: 200,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: '과외 요청 목록을 성공적으로 가져왔습니다.',
   })
   @ApiProperty({
     default: false,
   })
   error: boolean;
-
-  @ApiProperty({
-    default: 200,
-  })
-  statusCode: number;
 
   @ApiProperty({
     default: {
@@ -37,4 +37,8 @@ export class Success_GetRequestsDto extends ResponseDto {
     },
   })
   data: object;
+
+  constructor(data: object[]) {
+    super(200, '과외 요청 목록을 성공적으로 가져왔습니다.', false, data);
+  }
 }
