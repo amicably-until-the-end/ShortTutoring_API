@@ -7,7 +7,7 @@ export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
 export class Success_UpdateUserDto extends ResponseDto {
   @ApiProperty({
-    default: 'Updated successfully.',
+    default: '사용자 정보를 성공적으로 업데이트했습니다.',
   })
   message: string;
 
@@ -31,11 +31,15 @@ export class Success_UpdateUserDto extends ResponseDto {
     },
   })
   data: User;
+
+  constructor(data: User) {
+    super(200, '사용자 정보를 성공적으로 업데이트했습니다.', false, data);
+  }
 }
 
-export class BadRequest_UpdateUserDto extends ResponseDto {
+export class NotFound_UpdateUserDto extends ResponseDto {
   @ApiProperty({
-    default: 'Bad request.',
+    default: '사용자를 찾을 수 없습니다.',
   })
   message: string;
 
@@ -45,7 +49,7 @@ export class BadRequest_UpdateUserDto extends ResponseDto {
   error: boolean;
 
   @ApiProperty({
-    default: 400,
+    default: 404,
   })
   statusCode: number;
 
@@ -53,4 +57,8 @@ export class BadRequest_UpdateUserDto extends ResponseDto {
     default: null,
   })
   data: User;
+
+  constructor(data?: UpdateUserDto) {
+    super(404, '사용자를 찾을 수 없습니다.', true, data);
+  }
 }

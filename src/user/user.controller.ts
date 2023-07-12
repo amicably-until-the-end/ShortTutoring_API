@@ -1,25 +1,21 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-} from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.interface';
 import {
   BadRequest_CreateUserDto,
-  Created_CreateUserDto,
   CreateUserDto,
+  Success_CreateUserDto,
 } from './dto/create-user.dto';
-import { Success_UpdateUserDto, UpdateUserDto } from './dto/update-user.dto';
+import {
+  NotFound_UpdateUserDto,
+  Success_UpdateUserDto,
+  UpdateUserDto,
+} from './dto/update-user.dto';
 import { v4 as uuid } from 'uuid';
 import { Success_GetUserDto } from './dto/get-user.dto';
 import {
-  BadRequest_DeleteUserDto,
+  NotFound_DeleteUserDto,
   Success_DeleteUserDto,
 } from './dto/delete-user.dto';
 
@@ -28,7 +24,7 @@ import {
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Post('')
+  @Post('create')
   @ApiOperation({
     summary: '사용자 생성',
     description:
@@ -46,7 +42,7 @@ export class UserController {
   @ApiResponse({
     status: 201,
     description: '사용자 생성 성공',
-    type: Created_CreateUserDto,
+    type: Success_CreateUserDto,
   })
   @ApiResponse({
     status: 400,
@@ -74,24 +70,36 @@ export class UserController {
     return this.userService.findAll();
   }
 
-  @Get(':id')
+  @Get('read/:userId')
   @ApiOperation({
-    summary: '특정 사용자 정보',
-    description: '`USER`\n\n특정 사용자 정보를 반환합니다.',
+    summary: '사용자 정보',
+    description: '`USER`\n\n사용자 정보를 반환합니다.',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: '사용자 id',
+    type: String,
+    example: 'test-student-id',
   })
   @ApiResponse({
     status: 200,
-    description: '특정 사용자 정보 불러오기 성공',
+    description: '사용자 정보 불러오기 성공',
     type: Success_GetUserDto,
   })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('userId') id: string) {
     return this.userService.findOne(id);
   }
 
-  @Patch(':id')
+  @Post('update/:userId')
   @ApiOperation({
     summary: '사용자 정보 업데이트',
     description: '`USER`\n\n사용자 정보를 업데이트합니다.',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: '사용자 id',
+    type: String,
+    example: 'test-student-id',
   })
   @ApiResponse({
     status: 200,
@@ -99,30 +107,36 @@ export class UserController {
     type: Success_UpdateUserDto,
   })
   @ApiResponse({
-    status: 400,
+    status: 404,
     description: '사용자 정보 업데이트 실패',
-    type: BadRequest_CreateUserDto,
+    type: NotFound_UpdateUserDto,
   })
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
+  update(@Param('userId') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
+  @Post('delete/:userId')
   @ApiOperation({
-    summary: '특정 사용자 삭제',
-    description: '`USER`\n\n특정 사용자를 삭제합니다.',
+    summary: '사용자 삭제',
+    description: '`USER`\n\n사용자를 삭제합니다.',
+  })
+  @ApiParam({
+    name: 'userId',
+    description: '사용자 id',
+    type: String,
+    example: 'test-student-id',
   })
   @ApiResponse({
     status: 200,
-    description: '특정 사용자 삭제 성공',
+    description: '사용자 삭제 성공',
     type: Success_DeleteUserDto,
   })
   @ApiResponse({
     status: 400,
-    description: '특정 사용자 삭제 실패',
-    type: BadRequest_DeleteUserDto,
+    description: '사용자 삭제 실패',
+    type: NotFound_DeleteUserDto,
   })
-  remove(@Param('id') id: string) {
+  remove(@Param('userId') id: string) {
     return this.userService.remove(id);
   }
 }
