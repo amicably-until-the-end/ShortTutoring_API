@@ -5,7 +5,7 @@ import { ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
 @ApiTags('Simulation')
 @Controller('simulation')
 export class SimulationController {
-  constructor(private readonly testsService: SimulationService) {}
+  constructor(private readonly testService: SimulationService) {}
 
   @Get('createTest')
   @ApiOperation({
@@ -13,7 +13,7 @@ export class SimulationController {
     description: '`DEV`\n\n테스트 데이터를 생성합니다.',
   })
   createTest() {
-    return this.testsService.createTest();
+    return this.testService.createTest();
   }
 
   @Get('getAll')
@@ -22,7 +22,7 @@ export class SimulationController {
     description: '`DEV`\n\n모든 데이터를 반환합니다.',
   })
   getAll() {
-    return this.testsService.getAll();
+    return this.testService.getAll();
   }
 
   @Delete('removeAll')
@@ -31,7 +31,7 @@ export class SimulationController {
     description: '`DEV`\n\n모든 데이터를 삭제합니다.',
   })
   removeAll() {
-    return this.testsService.removeAll();
+    return this.testService.removeAll();
   }
 
   @Post('matching')
@@ -61,6 +61,6 @@ export class SimulationController {
     @Body('student_name') student_name: string,
     @Body('teacher_name') teacher_name: string,
   ) {
-    return this.testsService.matching(student_name, teacher_name);
+    return this.testService.matching(student_name, teacher_name);
   }
 }

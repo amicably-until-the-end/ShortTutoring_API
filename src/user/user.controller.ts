@@ -26,7 +26,7 @@ import {
 @ApiTags('User')
 @Controller('user')
 export class UserController {
-  constructor(private readonly usersService: UserService) {}
+  constructor(private readonly userService: UserService) {}
 
   @Post('')
   @ApiOperation({
@@ -62,7 +62,7 @@ export class UserController {
       profileImageURL: '',
       created_at: new Date().toISOString(),
     };
-    return this.usersService.create(user);
+    return this.userService.create(user);
   }
 
   @Get('findAll')
@@ -71,7 +71,7 @@ export class UserController {
     description: '`DEV`\n\n모든 사용자를 반환합니다.',
   })
   findAll() {
-    return this.usersService.findAll();
+    return this.userService.findAll();
   }
 
   @Get(':id')
@@ -85,7 +85,7 @@ export class UserController {
     type: Success_GetUserDto,
   })
   findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
+    return this.userService.findOne(id);
   }
 
   @Patch(':id')
@@ -104,7 +104,7 @@ export class UserController {
     type: BadRequest_CreateUserDto,
   })
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(id, updateUserDto);
+    return this.userService.update(id, updateUserDto);
   }
 
   @Delete(':id')
@@ -123,6 +123,6 @@ export class UserController {
     type: BadRequest_DeleteUserDto,
   })
   remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
+    return this.userService.remove(id);
   }
 }

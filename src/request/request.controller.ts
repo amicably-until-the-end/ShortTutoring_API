@@ -12,7 +12,7 @@ import {
 @ApiTags('Request')
 @Controller('request')
 export class RequestController {
-  constructor(private readonly requestsService: RequestService) {}
+  constructor(private readonly requestService: RequestService) {}
 
   @Post(':id')
   @ApiOperation({
@@ -29,7 +29,7 @@ export class RequestController {
     type: Success_CreateResponseDto,
   })
   create(@Param('id') id: string, @Body() createRequestDto: CreateRequestDto) {
-    return this.requestsService.create(id, createRequestDto);
+    return this.requestService.create(id, createRequestDto);
   }
 
   @Get('list')
@@ -43,7 +43,7 @@ export class RequestController {
     type: Success_GetRequestsDto,
   })
   findAll() {
-    return this.requestsService.findAll();
+    return this.requestService.findAll();
   }
 
   @Post('delete/:id')
@@ -66,7 +66,7 @@ export class RequestController {
     type: NotFound_DeleteRequestDto,
   })
   remove(@Param('id') id: string) {
-    return this.requestsService
+    return this.requestService
       .remove(id)
       .then(() => `Request removed successfully\n${id}`);
   }
