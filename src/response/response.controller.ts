@@ -34,7 +34,7 @@ import {
 @ApiTags('Response')
 @Controller('response')
 export class ResponseController {
-  constructor(private readonly responsesService: ResponseService) {}
+  constructor(private readonly responseService: ResponseService) {}
 
   @Get('teacherList/:id')
   @ApiOperation({
@@ -56,7 +56,7 @@ export class ResponseController {
     type: NotFound_GetTeachersDTO,
   })
   findOne(@Param('id') id: string) {
-    return this.responsesService.findOne(id);
+    return this.responseService.findOne(id);
   }
 
   @Post('check/:id')
@@ -102,7 +102,7 @@ export class ResponseController {
     type: NotFound_checkDto,
   })
   check(@Param('id') id: string, @Body('teacher_id') teacher_id: string) {
-    return this.responsesService.check(id, teacher_id);
+    return this.responseService.check(id, teacher_id);
   }
 
   @Post('create/:id')
@@ -135,7 +135,7 @@ export class ResponseController {
     type: NotFound_CreateResponseDto,
   })
   update(@Param('id') id: string, @Body('teacher_id') teacher_id: string) {
-    return this.responsesService.update(id, teacher_id);
+    return this.responseService.update(id, teacher_id);
   }
 
   @Delete(':id')
@@ -166,7 +166,7 @@ export class ResponseController {
     type: NotFound_DeleteResponseDto,
   })
   remove(@Param('id') id: string, @Body('teacher_id') teacher_id: string) {
-    return this.responsesService.remove(id, teacher_id);
+    return this.responseService.remove(id, teacher_id);
   }
 
   @Post('select')
@@ -198,6 +198,6 @@ export class ResponseController {
     type: NotFound_SelectResponseDto,
   })
   select(@Body() selectResponseDto: SelectResponseDto) {
-    return this.responsesService.select(selectResponseDto);
+    return this.responseService.select(selectResponseDto);
   }
 }

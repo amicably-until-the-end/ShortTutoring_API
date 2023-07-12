@@ -15,30 +15,30 @@ import { ApiTags } from '@nestjs/swagger';
 @ApiTags('Review')
 @Controller('review')
 export class ReviewController {
-  constructor(private readonly reviewsService: ReviewService) {}
+  constructor(private readonly reviewService: ReviewService) {}
 
   @Post()
   create(@Body() createReviewDto: CreateReviewDto) {
-    return this.reviewsService.create(createReviewDto);
+    return this.reviewService.create(createReviewDto);
   }
 
   @Get()
   findAll() {
-    return this.reviewsService.findAll();
+    return this.reviewService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.reviewsService.findOne(+id);
+    return this.reviewService.findOne(+id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
-    return this.reviewsService.update(+id, updateReviewDto);
+    return this.reviewService.update(+id, updateReviewDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.reviewsService.remove(+id);
+    return this.reviewService.remove(+id);
   }
 }
