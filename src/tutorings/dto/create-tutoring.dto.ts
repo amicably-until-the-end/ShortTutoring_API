@@ -5,17 +5,17 @@ export class CreateTutoringDto {
     description: '요청의 id',
     example: 'test-request-id',
   })
-  request_id: string;
+  requestId: string;
 
   @ApiProperty({
     description: '학생의 id',
     example: 'test-student-id',
   })
-  student_id: string;
+  studentId: string;
 
   @ApiProperty({
     description: '선생님의 id',
     example: 'test-teacher-id',
   })
-  teacher_id: string;
+  teacherId: string;
 }

@@ -5,22 +5,22 @@ export const TutoringSchema = new Schema({
     type: String,
     hashKey: true,
   },
-  request_id: {
+  requestId: {
     type: String,
   },
-  student_id: {
+  studentId: {
     type: String,
   },
-  teacher_id: {
+  teacherId: {
     type: String,
   },
-  matched_at: {
+  matchedAt: {
     type: String,
   },
-  started_at: {
+  startedAt: {
     type: String,
   },
-  ended_at: {
+  endedAt: {
     type: String,
   },
   status: {

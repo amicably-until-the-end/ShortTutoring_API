@@ -19,36 +19,36 @@ export class SimulationsService {
   ) {}
 
   async matching(student_name: string, teacher_name: string) {
-    const student_id = uuid().toString().slice(0, 8);
-    const teacher_id = uuid().toString().slice(0, 8);
+    const studentId = uuid().toString().slice(0, 8);
+    const teacherId = uuid().toString().slice(0, 8);
 
     await this.userModel.create({
-      id: student_id,
+      id: studentId,
       name: student_name,
       role: 'student',
     });
     await studentWebhook.info(
-      `[Init] Student created\nname: ${student_name}\nid: ${student_id}`,
+      `[Init] Student created\nname: ${student_name}\nid: ${studentId}`,
     );
 
     await this.userModel.create({
-      id: teacher_id,
+      id: teacherId,
       name: teacher_name,
       role: 'teacher',
     });
     await teacherWebhook.info(
-      `[Init] Teacher created\nname: ${teacher_name}\nid: ${teacher_id}`,
+      `[Init] Teacher created\nname: ${teacher_name}\nid: ${teacherId}`,
     );
 
-    const request_id = uuid();
+    const requestId = uuid();
     await this.requestModel.create({
-      id: request_id,
-      student_id: student_id,
-      teacher_ids: [],
-      created_at: new Date().toISOString(),
+      id: requestId,
+      studentId: studentId,
+      teacherIds: [],
+      createdAt: new Date().toISOString(),
     });
     await studentWebhook.success(
-      `[Step 1] Student's Request created\nid: ${request_id}`,
+      `[Step 1] Student's Request created\nid: ${requestId}`,
     );
 
     const found = [];
@@ -64,7 +64,7 @@ export class SimulationsService {
       await teacherWebhook.success(`[Step 2] Teacher found requests`);
       let string = '';
       found.forEach((id) => {
-        if (id == request_id) {
+        if (id == requestId) {
           string += `> ${id} (student's request)\n`;
         } else {
           string += `> ${id}\n`;
@@ -76,13 +76,13 @@ export class SimulationsService {
       return 'No requests found';
     }
 
-    await this.requestModel.get({ id: request_id }).then(async (response) => {
+    await this.requestModel.get({ id: requestId }).then(async (response) => {
       if (response) {
-        response.teacher_ids.push(teacher_id);
+        response.teacherIds.push(teacherId);
         await this.requestModel.update(response);
 
         await teacherWebhook.success(`[Step 3] Teacher Joined request`);
-        await teacherWebhook.send(`> ${request_id} (joined)`);
+        await teacherWebhook.send(`> ${requestId} (joined)`);
 
         await studentWebhook.success(`[Step 3] Student noticed update`);
         const requestJSON = JSON.stringify(response);
@@ -92,7 +92,7 @@ export class SimulationsService {
         await teacherWebhook.warning(`[End] I'LL TUTOR YOU ${student_name}!`);
         await webhook.success(`Matched ${student_name} and ${teacher_name}`);
       } else {
-        await teacherWebhook.error(`Request ${request_id} not found`);
+        await teacherWebhook.error(`Request ${requestId} not found`);
         await webhook.error(`Match failed`);
         return 'Request not found';
       }
@@ -143,9 +143,9 @@ export class SimulationsService {
       await this.requestModel
         .create({
           id: 'test-request-id',
-          student_id: 'test-student-id',
-          teacher_ids: ['test-teacher-id'],
-          created_at: new Date().toISOString(),
+          studentId: 'test-student-id',
+          teacherIds: ['test-teacher-id'],
+          createdAt: new Date().toISOString(),
         })
         .then(async (response) => {
           await this.requestModel.update(response);

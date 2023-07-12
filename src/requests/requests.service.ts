@@ -14,20 +14,20 @@ export class RequestsService {
     private requestModel: Model<Request, RequestKey>,
   ) {}
 
-  async create(student_id: string, createRequestDto: CreateRequestDto) {
-    const image_url = 'Decoded image url';
+  async create(studentId: string, createRequestDto: CreateRequestDto) {
+    const imageUrl = 'Decoded image url';
     const request = {
       id: uuid(),
       status: 'pending',
-      student_id,
-      teacher_ids: [],
-      created_at: new Date().toISOString(),
+      studentId,
+      teacherIds: [],
+      createdAt: new Date().toISOString(),
       problem: {
         description: createRequestDto.problem_description,
-        school_level: createRequestDto.problem_school_level,
-        image_url,
-        school_subject: createRequestDto.problem_school_subject,
-        school_chapter: createRequestDto.problem_school_chapter,
+        schoolLevel: createRequestDto.problem_school_level,
+        imageUrl,
+        schoolSubject: createRequestDto.problem_school_subject,
+        schoolChapter: createRequestDto.problem_school_chapter,
         difficulty: createRequestDto.problem_difficulty,
       },
     };
@@ -38,13 +38,13 @@ export class RequestsService {
     const found = [];
     const requests = await this.requestModel.scan().exec();
     for (const request of requests) {
-      const student = await this.userModel.get({ id: request.student_id });
+      const student = await this.userModel.get({ id: request.studentId });
       found.push({
         id: request.id,
         student,
         problem: request.problem,
-        teacher_ids: request.teacher_ids,
-        created_at: request.created_at,
+        teacherIds: request.teacherIds,
+        createdAt: request.createdAt,
       });
     }
     return found;
