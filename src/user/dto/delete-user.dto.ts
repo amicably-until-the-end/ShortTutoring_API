@@ -19,7 +19,7 @@ export class Success_DeleteUserDto extends ResponseDto {
   @ApiProperty({
     default: 200,
   })
-  status: number;
+  statusCode: number;
 
   @ApiProperty({
     default: {
@@ -47,7 +47,7 @@ export class BadRequest_DeleteUserDto extends ResponseDto {
   @ApiProperty({
     default: 400,
   })
-  status: number;
+  statusCode: number;
 
   @ApiProperty({
     default: null,
