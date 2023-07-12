@@ -21,6 +21,7 @@ export const configSwagger = (app) => {
         '- `401` : Unauthorized (인증 필요)\n\n' +
         '- `403` : Forbidden (권한 없음)\n\n' +
         '- `404` : Not Found (리소스 없음)\n\n' +
+        '- `409` : Conflict (충돌)\n\n' +
         '- `500` : Internal Server Error (서버 오류)',
     )
     .setVersion('0.0')
