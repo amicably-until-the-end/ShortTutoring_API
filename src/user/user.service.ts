@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { User, UserKey } from './entities/user.interface';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { ResponseDto } from '../ResponseDto';
+import { ResponseDto } from '../responseDto';
 
 @Injectable()
 export class UserService {

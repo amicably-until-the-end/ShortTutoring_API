@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../../user/entities/user.interface';
-import { ResponseDto } from '../../ResponseDto';
+import { ResponseDto } from '../../responseDto';
 
 export class Success_GetTeachersDTO extends ResponseDto {
   @ApiProperty({

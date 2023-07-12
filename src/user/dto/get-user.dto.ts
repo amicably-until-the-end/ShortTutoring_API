@@ -1,4 +1,4 @@
-import { ResponseDto } from '../../ResponseDto';
+import { ResponseDto } from '../../responseDto';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../entities/user.interface';
 
