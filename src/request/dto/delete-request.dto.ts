@@ -21,6 +21,10 @@ export class Success_DeleteRequestDto extends ResponseDto {
     default: null,
   })
   data: object;
+
+  constructor() {
+    super('Delete request successfully', false, null, 200);
+  }
 }
 
 export class NotFound_DeleteRequestDto extends ResponseDto {
@@ -43,4 +47,8 @@ export class NotFound_DeleteRequestDto extends ResponseDto {
     default: null,
   })
   data: object;
+
+  constructor() {
+    super('Request not found', true, null, 404);
+  }
 }
