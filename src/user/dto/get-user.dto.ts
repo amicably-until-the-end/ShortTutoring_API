@@ -16,7 +16,7 @@ export class Success_GetUserDto extends ResponseDto {
   @ApiProperty({
     default: 200,
   })
-  status: number;
+  statusCode: number;
 
   @ApiProperty({
     default: {

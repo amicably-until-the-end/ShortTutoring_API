@@ -19,7 +19,7 @@ export class Success_UpdateUserDto extends ResponseDto {
   @ApiProperty({
     default: 200,
   })
-  status: number;
+  statusCode: number;
 
   @ApiProperty({
     default: {
@@ -47,7 +47,7 @@ export class BadRequest_UpdateUserDto extends ResponseDto {
   @ApiProperty({
     default: 400,
   })
-  status: number;
+  statusCode: number;
 
   @ApiProperty({
     default: null,
