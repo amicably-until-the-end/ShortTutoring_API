@@ -55,9 +55,14 @@ export class CreateUserDto {
   // review_list: string[];
 }
 
-export class Created_CreateUserDto extends ResponseDto {
+export class Success_CreateUserDto extends ResponseDto {
   @ApiProperty({
-    example: 'Created successfully.',
+    default: 201,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: '유저 생성이 성공적으로 처리되었습니다.',
   })
   message: string;
 
@@ -65,11 +70,6 @@ export class Created_CreateUserDto extends ResponseDto {
     default: false,
   })
   error: boolean;
-
-  @ApiProperty({
-    default: 201,
-  })
-  statusCode: number;
 
   @ApiProperty({
     default: {
@@ -81,6 +81,10 @@ export class Created_CreateUserDto extends ResponseDto {
     },
   })
   data: User;
+
+  constructor(data: User) {
+    super(201, '사용자 생성이 성공적으로 처리되었습니다.', false, data);
+  }
 }
 
 export class BadRequest_CreateUserDto extends ResponseDto {
