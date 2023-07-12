@@ -54,6 +54,7 @@ export class RequestController {
   @ApiParam({
     name: 'id',
     description: '삭제할 과외 요청의 ID',
+    example: 'test-request-id',
   })
   @ApiResponse({
     status: 200,
@@ -66,8 +67,6 @@ export class RequestController {
     type: NotFound_DeleteRequestDto,
   })
   remove(@Param('id') id: string) {
-    return this.requestService
-      .remove(id)
-      .then(() => `Request removed successfully\n${id}`);
+    return this.requestService.remove(id);
   }
 }

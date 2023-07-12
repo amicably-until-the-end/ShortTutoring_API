@@ -4,6 +4,10 @@ import { Request, RequestKey } from './entities/request.interface';
 import { User, UserKey } from '../user/entities/user.interface';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { v4 as uuid } from 'uuid';
+import {
+  NotFound_DeleteRequestDto,
+  Success_DeleteRequestDto,
+} from './dto/delete-request.dto';
 
 @Injectable()
 export class RequestService {
@@ -50,7 +54,13 @@ export class RequestService {
     return found;
   }
 
-  remove(id: string) {
-    return this.requestModel.delete({ id });
+  async remove(id: string) {
+    await this.requestModel.get({ id }).then(async (value) => {
+      if (value === undefined) {
+        throw new NotFound_DeleteRequestDto();
+      }
+      await this.requestModel.delete({ id });
+    });
+    return new Success_DeleteRequestDto();
   }
 }
