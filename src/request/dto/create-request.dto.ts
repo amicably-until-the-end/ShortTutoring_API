@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ResponseDto } from '../../responseDto';
 
 export class CreateRequestDto {
   @ApiProperty({
@@ -43,4 +44,28 @@ export class CreateRequestDto {
     example: 'Easy',
   })
   problem_difficulty;
+}
+
+export class Success_CreateRequestDto extends ResponseDto {
+  @ApiProperty({
+    default: 'Create request successfully.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: false,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: 200,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: {
+      id: 'test-request-id',
+    },
+  })
+  data: object;
 }

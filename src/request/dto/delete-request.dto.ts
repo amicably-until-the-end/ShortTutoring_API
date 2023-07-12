@@ -1,9 +1,9 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { ResponseDto } from '../../responseDto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class Success_DeleteResponseDto extends ResponseDto {
+export class Success_DeleteRequestDto extends ResponseDto {
   @ApiProperty({
-    default: 'Append response successfully.',
+    default: 'Delete request successfully.',
   })
   message: string;
 
@@ -18,14 +18,12 @@ export class Success_DeleteResponseDto extends ResponseDto {
   statusCode: number;
 
   @ApiProperty({
-    default: {
-      id: 'test-request-id',
-    },
+    default: null,
   })
   data: object;
 }
 
-export class NotFound_DeleteResponseDto extends ResponseDto {
+export class NotFound_DeleteRequestDto extends ResponseDto {
   @ApiProperty({
     default: 'Request not found.',
   })
