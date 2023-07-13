@@ -11,10 +11,10 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class TutoringController {
   constructor(private readonly tutoringService: TutoringService) {}
 
-  @Post()
+  @Post('create')
   @ApiResponse({
     status: 201,
-    description: '과외 생성 완료',
+    description: '과외를 성공적으로 생성했습니다.',
     type: Success_CreateTutoringDto,
   })
   @ApiOperation({

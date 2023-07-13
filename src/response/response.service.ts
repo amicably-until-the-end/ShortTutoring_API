@@ -104,11 +104,22 @@ export class ResponseService {
       return new Conflict_SelectResponseDto();
     }
 
-    const tutoringService = new TutoringService(this.tutoringModel);
-    const tutoring = await tutoringService.create(selectResponseDto);
+    const tutoringService = new TutoringService(
+      this.requestModel,
+      this.tutoringModel,
+    );
+
+    const tempTutoring = await tutoringService.create(selectResponseDto);
+    let tutoringId;
+    if ('id' in tempTutoring.data) {
+      tutoringId = tempTutoring.data.id;
+    }
+
+    const tutoring = await this.tutoringModel.get({ id: tutoringId });
+
     request.status = 'selected';
     request.selectedTeacherId = selectResponseDto.teacherId;
-    request.tutoringId = tutoring.id;
+    request.tutoringId = tutoringId;
     await this.requestModel.update(request);
 
     return new Success_SelectResponseDto({ tutoringId: tutoring.id });

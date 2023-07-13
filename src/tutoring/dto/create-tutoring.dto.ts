@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { ResponseDto } from '../../responseDto';
+import { Tutoring } from '../entities/tutoring.interface';
 
 export class CreateTutoringDto {
   @ApiProperty({
@@ -20,9 +22,9 @@ export class CreateTutoringDto {
   teacherId: string;
 }
 
-export class Success_CreateTutoringDto {
+export class Success_CreateTutoringDto extends ResponseDto {
   @ApiProperty({
-    default: 'Create tutoring successfully.',
+    default: '과외를 성공적으로 생성했습니다.',
   })
   message: string;
 
@@ -40,13 +42,34 @@ export class Success_CreateTutoringDto {
     default: {
       id: 'test-tutoring-id',
       studentId: 'test-student-id',
-      requestId: 'test-request-id',
       teacherId: 'test-teacher-id',
-      matchedAt: '2021-01-01T00:00:00.000Z',
-      createdAt: '2021-01-01T00:00:00.000Z',
-      endedAt: null,
       status: 'ongoing',
     },
   })
-  data: object;
+  data: Tutoring;
+
+  constructor(data: Tutoring) {
+    super(201, '과외를 성공적으로 생성했습니다.', false, data);
+  }
+}
+
+export class NotFound_CreateTutoringDto extends ResponseDto {
+  @ApiProperty({
+    default: '리소스를 찾을 수 없습니다.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: true,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: 404,
+  })
+  statusCode: number;
+
+  constructor(message: string) {
+    super(404, message, true);
+  }
 }
