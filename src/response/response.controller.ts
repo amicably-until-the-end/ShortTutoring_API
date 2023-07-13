@@ -7,29 +7,15 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import {
-  NotFound_GetTeachersDTO,
-  Success_GetTeachersDTO,
-} from './dto/get-response.dto';
-import {
-  NotFound_CheckResponseDto,
-  Success_CheckResponseDto,
-} from './dto/check-response.dto';
+import { SelectResponseDto } from './dto/select-response.dto';
 import {
   Created_CreateResponseDto,
-  NotFound_CreateResponseDto,
-} from './dto/create-response.dto';
-import {
-  NotFound_DeleteResponseDto,
+  Success_CheckResponseDto,
   Success_DeleteResponseDto,
-} from './dto/delete-response.dto';
-import {
-  BadRequest_SelectResponseDto,
-  Conflict_SelectResponseDto,
-  NotFound_SelectResponseDto,
-  SelectResponseDto,
+  Success_GetTeachersDto,
   Success_SelectResponseDto,
-} from './dto/select-response.dto';
+} from './dto/response-response.dto';
+import { NotFoundDto } from '../HttpResponseDto';
 
 @ApiTags('Response')
 @Controller('response')
@@ -57,13 +43,17 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 200,
-    description: '과외 요청에 대한 응답을 성공적으로 생성했습니다.',
+    description: '응답을 성공적으로 추가했습니다.',
     type: Created_CreateResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: '과외 요청이 존재하지 않습니다.',
-    type: NotFound_CreateResponseDto,
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n' +
+      '- 선생님을 찾을 수 없습니다.\n' +
+      '- 이미 응답한 선생님입니다.\n' +
+      '- 이미 매칭된 요청입니다.',
+    type: NotFoundDto,
   })
   create(
     @Param('requestId') requestId: string,
@@ -86,12 +76,12 @@ export class ResponseController {
   @ApiResponse({
     status: 200,
     description: '선생님들의 목록을 성공적으로 조회했습니다.',
-    type: Success_GetTeachersDTO,
+    type: Success_GetTeachersDto,
   })
   @ApiResponse({
     status: 404,
-    description: '과외 요청이 존재하지 않습니다.',
-    type: NotFound_GetTeachersDTO,
+    description: '과외 요청을 찾을 수 없습니다.',
+    type: NotFoundDto,
   })
   getTeachers(@Param('requestId') requestId: string) {
     return this.responseService.getTeachers(requestId);
@@ -107,23 +97,17 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 200,
-    description: '요청이 성공적으로 처리되었습니다.',
+    description:
+      '- 선생님을 선택했습니다.\n' +
+      '- 이미 선택한 선생님입니다.\n' +
+      '- 이미 다른 선생님을 선택했습니다.',
     type: Success_SelectResponseDto,
   })
   @ApiResponse({
-    status: 304,
-    description: '이미 선택된 선생님입니다.',
-    type: Conflict_SelectResponseDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: '과외 요청이 존재하지 않습니다.',
-    type: BadRequest_SelectResponseDto,
-  })
-  @ApiResponse({
     status: 404,
-    description: '과외 선생님이 존재하지 않습니다.',
-    type: NotFound_SelectResponseDto,
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n- 과외 선생님을 찾을 수 없습니다.',
+    type: NotFoundDto,
   })
   select(@Body() selectResponseDto: SelectResponseDto) {
     return this.responseService.select(selectResponseDto);
@@ -153,13 +137,17 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 200,
-    description: '선택 여부를 성공적으로 조회했습니다.',
+    description:
+      '- 학생이 선생님을 선택했습니다. 과외를 시작하세요.\n' +
+      '- 학생이 선생님을 선택하지 않았습니다.\n' +
+      '- 학생의 선택을 기다리고 있습니다.',
     type: Success_CheckResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: '리소스를 찾을 수 없습니다.',
-    type: NotFound_CheckResponseDto,
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n- 과외 선생님을 찾을 수 없습니다.',
+    type: NotFoundDto,
   })
   check(
     @Param('requestId') requestId: string,
@@ -193,8 +181,10 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 404,
-    description: '과외 요청이 존재하지 않습니다.',
-    type: NotFound_DeleteResponseDto,
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n' +
+      '- 해당 요청에서 선생님을 찾을 수 없습니다.',
+    type: NotFoundDto,
   })
   delete(
     @Param('requestId') requestId: string,

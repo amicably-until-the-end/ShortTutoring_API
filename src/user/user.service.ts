@@ -2,16 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { User, UserKey } from './entities/user.interface';
 import {
-  NotFound_UpdateUserDto,
-  Success_UpdateUserDto,
-} from './dto/update-user.dto';
-import { Success_CreateUserDto } from './dto/create-user.dto';
-import { NotFound_GetUserDto, Success_GetUserDto } from './dto/get-user.dto';
-import {
-  NotFound_DeleteUserDto,
+  Success_CreateUserDto,
   Success_DeleteUserDto,
-  UpdateUserDto,
-} from './dto/delete-user.dto';
+  Success_GetUserDto,
+  Success_UpdateUserDto,
+} from './dto/response-user.dto';
+import { NotFoundDto } from '../HttpResponseDto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -36,7 +33,7 @@ export class UserService {
   async findOne(userId: string) {
     const user = await this.userModel.get({ id: userId });
     if (user === undefined) {
-      return new NotFound_GetUserDto();
+      return new NotFoundDto('사용자를 찾을 수 없습니다.');
     }
 
     return new Success_GetUserDto(user);
@@ -45,7 +42,7 @@ export class UserService {
   async update(userId: string, updateUserDto: UpdateUserDto) {
     const user = await this.userModel.get({ id: userId });
     if (user === undefined) {
-      return new NotFound_UpdateUserDto(null);
+      return new NotFoundDto(null);
     }
 
     await this.userModel.update({ id: userId }, updateUserDto);
@@ -55,7 +52,7 @@ export class UserService {
   async remove(userId: string) {
     const user = await this.userModel.get({ id: userId });
     if (user === undefined) {
-      return new NotFound_DeleteUserDto();
+      return new NotFoundDto('사용자를 찾을 수 없습니다.');
     }
 
     await this.userModel.delete({ id: userId });

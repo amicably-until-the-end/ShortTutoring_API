@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ResponseDto } from '../../responseDto';
+import { HttpResponseDto } from '../../HttpResponseDto';
 import { Tutoring } from '../entities/tutoring.interface';
 
 export class CreateTutoringDto {
@@ -22,7 +22,7 @@ export class CreateTutoringDto {
   teacherId: string;
 }
 
-export class Success_CreateTutoringDto extends ResponseDto {
+export class Success_CreateTutoringDto extends HttpResponseDto {
   @ApiProperty({
     default: '과외를 성공적으로 생성했습니다.',
   })
@@ -53,7 +53,7 @@ export class Success_CreateTutoringDto extends ResponseDto {
   }
 }
 
-export class NotFound_CreateTutoringDto extends ResponseDto {
+export class NotFound_CreateTutoringDto extends HttpResponseDto {
   @ApiProperty({
     default: '리소스를 찾을 수 없습니다.',
   })

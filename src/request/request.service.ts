@@ -2,17 +2,14 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { Request, RequestKey } from './entities/request.interface';
 import { User, UserKey } from '../user/entities/user.interface';
+import { CreateRequestDto } from './dto/create-request.dto';
+import { v4 as uuid } from 'uuid';
+import { NotFoundDto } from '../HttpResponseDto';
 import {
   Created_CreateRequestDto,
-  CreateRequestDto,
-  Unauthorized_CreateRequestDto,
-} from './dto/create-request.dto';
-import { v4 as uuid } from 'uuid';
-import {
-  NotFound_DeleteRequestDto,
   Success_DeleteRequestDto,
-} from './dto/delete-request.dto';
-import { Success_GetRequestsDto } from './dto/get-request.dto';
+  Success_GetRequestsDto,
+} from './dto/response-request.dto';
 
 @Injectable()
 export class RequestService {
@@ -26,7 +23,7 @@ export class RequestService {
   async create(studentId: string, createRequestDto: CreateRequestDto) {
     const student = await this.userModel.get({ id: studentId });
     if (student === undefined) {
-      return new Unauthorized_CreateRequestDto();
+      return new NotFoundDto('학생을 찾을 수 없습니다.');
     }
 
     // TODO: S3에 이미지 업로드
@@ -74,7 +71,7 @@ export class RequestService {
   async remove(requestId: string) {
     const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
-      return new NotFound_DeleteRequestDto();
+      return new NotFoundDto('요청을 찾을 수 없습니다.');
     }
 
     await this.requestModel.delete({ id: requestId });
