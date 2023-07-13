@@ -39,6 +39,9 @@ export const RequestSchema = new Schema({
   status: {
     type: String,
   },
+  selectedTeacherId: {
+    type: String,
+  },
   tutoringId: {
     type: String,
   },

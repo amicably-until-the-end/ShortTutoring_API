@@ -65,8 +65,8 @@ export class Conflict_SelectResponseDto extends ResponseDto {
   })
   statusCode: number;
 
-  constructor() {
-    super(304, '이미 선생님을 선택했습니다.', true);
+  constructor(message: string) {
+    super(304, message, true);
   }
 }
 

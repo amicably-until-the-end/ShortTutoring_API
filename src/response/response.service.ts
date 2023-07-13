@@ -54,6 +54,10 @@ export class ResponseService {
       return new Conflict_CreateResponseDto('이미 응답한 선생님입니다.');
     }
 
+    if (request.status !== 'pending') {
+      return new Conflict_CreateResponseDto('이미 매칭된 요청입니다.');
+    }
+
     request.teacherIds.push(teacherId);
     await this.requestModel.update(request);
 
@@ -101,7 +105,17 @@ export class ResponseService {
     }
 
     if (request.status === 'selected') {
-      return new Conflict_SelectResponseDto();
+      if (request.selectedTeacherId === selectResponseDto.teacherId) {
+        return new Conflict_SelectResponseDto('이미 선택된 선생님입니다.');
+      } else {
+        return new Conflict_SelectResponseDto(
+          '이미 다른 선생님을 선택했습니다.',
+        );
+      }
+    }
+
+    if (!request.teacherIds.includes(selectResponseDto.teacherId)) {
+      return new NotFound_SelectResponseDto('선생님을 찾을 수 없습니다.');
     }
 
     const tutoringService = new TutoringService(
@@ -119,6 +133,7 @@ export class ResponseService {
 
     request.status = 'selected';
     request.selectedTeacherId = selectResponseDto.teacherId;
+    console.log(tutoringId, selectResponseDto.teacherId);
     request.tutoringId = tutoringId;
     await this.requestModel.update(request);
 
