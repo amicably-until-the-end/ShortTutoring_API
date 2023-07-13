@@ -4,7 +4,7 @@ import { ResponseDto } from '../../responseDto';
 
 export class Success_GetTeachersDTO extends ResponseDto {
   @ApiProperty({
-    default: 'Get teachers successfully.',
+    default: '응답한 선생님 목록을 성공적으로 가져왔습니다.',
   })
   message: string;
 
@@ -31,11 +31,15 @@ export class Success_GetTeachersDTO extends ResponseDto {
     ],
   })
   data: User[];
+
+  constructor(data: User[]) {
+    super(200, '응답한 선생님 목록을 성공적으로 가져왔습니다.', false, data);
+  }
 }
 
 export class NotFound_GetTeachersDTO extends ResponseDto {
   @ApiProperty({
-    default: 'Request not found.',
+    default: '과외 요청을 찾을 수 없습니다.',
   })
   message: string;
 
@@ -48,4 +52,8 @@ export class NotFound_GetTeachersDTO extends ResponseDto {
     default: 404,
   })
   statusCode: number;
+
+  constructor() {
+    super(404, '과외 요청을 찾을 수 없습니다.', true);
+  }
 }

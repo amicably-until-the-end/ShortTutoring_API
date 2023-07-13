@@ -1,10 +1,32 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { User, UserKey } from '../user/entities/user.interface';
 import { Request, RequestKey } from '../request/entities/request.interface';
 import { Tutoring, TutoringKey } from '../tutoring/entities/tutoring.interface';
-import { SelectResponseDto } from './dto/create-response.dto';
+import {
+  Conflict_CreateResponseDto,
+  Created_CreateResponseDto,
+  NotFound_CreateResponseDto,
+  NotFound_SelectResponseDto,
+} from './dto/create-response.dto';
+import {
+  Conflict_SelectResponseDto,
+  SelectResponseDto,
+  Success_SelectResponseDto,
+} from './dto/select-response.dto';
+import {
+  NotFound_GetTeachersDTO,
+  Success_GetTeachersDTO,
+} from './dto/get-response.dto';
+import {
+  NotFound_DeleteResponseDto,
+  Success_DeleteResponseDto,
+} from './dto/delete-response.dto';
 import { TutoringService } from '../tutoring/tutoring.service';
+import {
+  NotFound_CheckResponseDto,
+  Success_CheckResponseDto,
+} from './dto/check-response.dto';
 
 @Injectable()
 export class ResponseService {
@@ -17,87 +39,111 @@ export class ResponseService {
     private tutoringModel: Model<Tutoring, TutoringKey>,
   ) {}
 
-  async findOne(id: string) {
-    const request = await this.requestModel.get({ id });
+  async create(requestId: string, teacherId: string) {
+    const request = await this.requestModel.get({ id: requestId });
+    if (request === undefined) {
+      return new NotFound_CreateResponseDto('과외 요청을 찾을 수 없습니다.');
+    }
+
+    const teacher = await this.userModel.get({ id: teacherId });
+    if (teacher === undefined) {
+      return new NotFound_CreateResponseDto('선생님을 찾을 수 없습니다.');
+    }
+
+    if (request.teacherIds.includes(teacherId)) {
+      return new Conflict_CreateResponseDto('이미 응답한 선생님입니다.');
+    }
+
+    request.teacherIds.push(teacherId);
+    await this.requestModel.update(request);
+
+    return new Created_CreateResponseDto();
+  }
+
+  async getTeachers(requestId: string) {
+    const request = await this.requestModel.get({ id: requestId });
+    if (request === undefined) {
+      return new NotFound_GetTeachersDTO();
+    }
+
     const teachers = [];
     for (const teacherId of request.teacherIds) {
       teachers.push(await this.userModel.get({ id: teacherId }));
     }
-    return teachers;
+
+    return new Success_GetTeachersDTO(teachers);
   }
 
-  async update(id: string, teacherId: string) {
-    await this.requestModel.get({ id }).then(async (response) => {
-      if (response.teacherIds.includes(teacherId)) {
-        throw new HttpException('Already selected', 304);
-      } else {
-        response.teacherIds.push(teacherId);
-        await this.requestModel.update(response);
-      }
-    });
-    return await this.requestModel.get({ id });
-  }
+  async delete(requestId: string, teacherId: string) {
+    const request = await this.requestModel.get({ id: requestId });
+    if (request === undefined) {
+      return new NotFound_DeleteResponseDto('과외 요청을 찾을 수 없습니다.');
+    }
 
-  async remove(id: string, teacherId: string) {
-    return await this.requestModel.get({ id }).then((response) => {
-      response.teacherIds = response.teacherIds.filter(
-        (id) => id !== teacherId,
+    if (!request.teacherIds.includes(teacherId)) {
+      return new NotFound_DeleteResponseDto(
+        '해당 요청에서 선생님을 찾을 수 없습니다.',
       );
-      this.requestModel.update(response);
-    });
+    }
+
+    request.teacherIds = request.teacherIds.filter((id) => id !== teacherId);
+    await this.requestModel.update(request);
+
+    return new Success_DeleteResponseDto();
   }
 
   async select(selectResponseDto: SelectResponseDto) {
-    let tutoring;
-    await this.requestModel
-      .get({ id: selectResponseDto.requestId })
-      .then(async (response) => {
-        response.teacherIds = response.teacherIds.filter(
-          (id) => id === selectResponseDto.teacherId,
-        );
+    const request = await this.requestModel.get({
+      id: selectResponseDto.requestId,
+    });
+    if (request === undefined) {
+      return new NotFound_SelectResponseDto('과외 요청을 찾을 수 없습니다.');
+    }
 
-        const tutoringService = new TutoringService(this.tutoringModel);
-        tutoring = await tutoringService.create(selectResponseDto);
+    if (request.status === 'selected') {
+      return new Conflict_SelectResponseDto();
+    }
 
-        response.status = 'selected';
-        response.tutoringId = tutoring.id;
-        await this.requestModel.update(response);
-      });
+    const tutoringService = new TutoringService(this.tutoringModel);
+    const tutoring = await tutoringService.create(selectResponseDto);
+    request.status = 'selected';
+    request.selectedTeacherId = selectResponseDto.teacherId;
+    request.tutoringId = tutoring.id;
+    await this.requestModel.update(request);
 
-    return {
-      message: 'Selected',
-      error: false,
-      data: {
-        tutoring,
-      },
-    };
+    return new Success_SelectResponseDto({ tutoringId: tutoring.id });
   }
 
-  async check(id: string, teacherId: string) {
-    let request;
-    try {
-      request = await this.requestModel.get({ id });
-    } catch (e) {
-      throw new HttpException('Not found', 404);
+  async check(requestId: string, teacherId: string) {
+    const request = await this.requestModel.get({ id: requestId });
+    if (request === undefined) {
+      return new NotFound_CheckResponseDto('과외 요청을 찾을 수 없습니다.');
     }
+
     if (request.status === 'pending') {
-      throw new HttpException('Yet selected', 200);
-    } else if (request.status === 'selected') {
-      const tutoring = await this.tutoringModel.get({
-        id: request.tutoringId,
+      return new Success_CheckResponseDto('학생의 선택을 기다리는 중입니다.', {
+        status: 'yet selected',
       });
-
-      if (tutoring.teacherId !== teacherId) {
-        throw new HttpException('Not selected', 200);
-      }
-
-      return {
-        message: 'Selected',
-        error: false,
-        data: {
-          tutoring,
-        },
-      };
     }
+
+    if (teacherId !== request.selectedTeacherId) {
+      return new Success_CheckResponseDto(
+        '학생이 다른 선생님과 과외를 시작하였습니다.',
+        { status: 'not selected' },
+      );
+    }
+
+    const tutoring = await this.tutoringModel.get({ id: request.tutoringId });
+    if (tutoring === undefined) {
+      return new NotFound_CheckResponseDto('과외를 찾을 수 없습니다.');
+    }
+
+    return new Success_CheckResponseDto(
+      '학생이 선생님을 선택했습니다. 과외를 시작하세요.',
+      {
+        status: request.status,
+        tutoringId: tutoring.id,
+      },
+    );
   }
 }

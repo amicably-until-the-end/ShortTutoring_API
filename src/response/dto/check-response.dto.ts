@@ -1,9 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ResponseDto } from '../../responseDto';
 
-export class Success_CheckDto extends ResponseDto {
+export class Success_CheckResponseDto extends ResponseDto {
   @ApiProperty({
-    default: 'Get selected successfully.',
+    default: '학생이 선생님을 선택했습니다. 과외를 시작하세요.',
   })
   message: string;
 
@@ -19,66 +19,20 @@ export class Success_CheckDto extends ResponseDto {
 
   @ApiProperty({
     default: {
-      id: 'test-request-id',
-      student_id: 'test-student-id',
       status: 'selected',
-      tutoring_id: 'test-tutoring-id',
+      tutoringId: 'test-tutoring-id',
     },
   })
   data: object;
+
+  constructor(message: string, data: object) {
+    super(200, message, false, data);
+  }
 }
 
-export class Not_checkDto extends ResponseDto {
+export class NotFound_CheckResponseDto extends ResponseDto {
   @ApiProperty({
-    default: 'Get selected successfully.',
-  })
-  message: string;
-
-  @ApiProperty({
-    default: false,
-  })
-  error: boolean;
-
-  @ApiProperty({
-    default: 200,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    default: {
-      status: 'not selected',
-    },
-  })
-  data: object;
-}
-
-export class Yet_checkDto extends ResponseDto {
-  @ApiProperty({
-    default: 'Get selected successfully.',
-  })
-  message: string;
-
-  @ApiProperty({
-    default: false,
-  })
-  error: boolean;
-
-  @ApiProperty({
-    default: 200,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    default: {
-      status: 'pending',
-    },
-  })
-  data: object;
-}
-
-export class NotFound_checkDto extends ResponseDto {
-  @ApiProperty({
-    default: 'Request not found.',
+    default: '리소스를 찾을 수 없습니다.',
   })
   message: string;
 
@@ -91,4 +45,8 @@ export class NotFound_checkDto extends ResponseDto {
     default: 404,
   })
   statusCode: number;
+
+  constructor(message: string) {
+    super(404, message, true);
+  }
 }

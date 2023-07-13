@@ -3,7 +3,7 @@ import { ResponseDto } from '../../responseDto';
 
 export class Success_DeleteResponseDto extends ResponseDto {
   @ApiProperty({
-    default: 'Append response successfully.',
+    default: '응답을 성공적으로 삭제했습니다.',
   })
   message: string;
 
@@ -17,17 +17,14 @@ export class Success_DeleteResponseDto extends ResponseDto {
   })
   statusCode: number;
 
-  @ApiProperty({
-    default: {
-      id: 'test-request-id',
-    },
-  })
-  data: object;
+  constructor() {
+    super(200, '응답을 성공적으로 삭제했습니다.', false);
+  }
 }
 
 export class NotFound_DeleteResponseDto extends ResponseDto {
   @ApiProperty({
-    default: 'Request not found.',
+    default: '리소스를 찾을 수 없습니다.',
   })
   message: string;
 
@@ -41,8 +38,7 @@ export class NotFound_DeleteResponseDto extends ResponseDto {
   })
   statusCode: number;
 
-  @ApiProperty({
-    default: null,
-  })
-  data: object;
+  constructor(message: string) {
+    super(404, message, true);
+  }
 }
