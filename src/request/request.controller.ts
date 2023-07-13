@@ -3,11 +3,11 @@ import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Created_CreateResponseDto } from '../response/dto/create-response.dto';
-import { Success_GetRequestsDto } from './dto/get-request.dto';
+import { NotFoundDto } from '../responseDto';
 import {
-  NotFound_DeleteRequestDto,
   Success_DeleteRequestDto,
-} from './dto/delete-request.dto';
+  Success_GetRequestsDto,
+} from './request.response';
 
 @ApiTags('Request')
 @Controller('request')
@@ -28,6 +28,11 @@ export class RequestController {
     status: 201,
     description: '과외 요청을 성공적으로 생성했습니다.',
     type: Created_CreateResponseDto,
+  })
+  @ApiResponse({
+    status: 401,
+    description: '해당 학생이 존재하지 않습니다.',
+    type: NotFoundDto,
   })
   create(
     @Param('studentId') studentId: string,
@@ -68,7 +73,7 @@ export class RequestController {
   @ApiResponse({
     status: 404,
     description: '해당 과외 요청이 존재하지 않습니다.',
-    type: NotFound_DeleteRequestDto,
+    type: NotFoundDto,
   })
   remove(@Param('requestId') requestId: string) {
     return this.requestService.remove(requestId);

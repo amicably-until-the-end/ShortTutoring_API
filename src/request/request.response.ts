@@ -1,5 +1,27 @@
-import { ResponseDto } from '../../responseDto';
+import { ResponseDto } from '../responseDto';
 import { ApiProperty } from '@nestjs/swagger';
+import { RequestSchema } from './entities/request.schema';
+
+export class Created_CreateRequestDto extends ResponseDto {
+  @ApiProperty({
+    default: 200,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: '과외 요청이 성공적으로 생성되었습니다.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: false,
+  })
+  error: boolean;
+
+  constructor() {
+    super(200, '과외 요청이 성공적으로 생성되었습니다.', false);
+  }
+}
 
 export class Success_GetRequestsDto extends ResponseDto {
   @ApiProperty({
@@ -16,6 +38,7 @@ export class Success_GetRequestsDto extends ResponseDto {
   error: boolean;
 
   @ApiProperty({
+    type: RequestSchema,
     default: {
       requests: [
         {
@@ -36,9 +59,30 @@ export class Success_GetRequestsDto extends ResponseDto {
       ],
     },
   })
-  data: object;
+  data: typeof RequestSchema;
 
   constructor(data: object[]) {
     super(200, '과외 요청 목록을 성공적으로 가져왔습니다.', false, data);
+  }
+}
+
+export class Success_DeleteRequestDto extends ResponseDto {
+  @ApiProperty({
+    default: 200,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    default: '과외 요청이 성공적으로 삭제되었습니다.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: false,
+  })
+  error: boolean;
+
+  constructor() {
+    super(200, '과외 요청이 성공적으로 삭제되었습니다.', false);
   }
 }

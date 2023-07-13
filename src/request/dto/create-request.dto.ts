@@ -1,5 +1,4 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ResponseDto } from '../../responseDto';
 
 export class CreateRequestDto {
   @ApiProperty({
@@ -44,56 +43,4 @@ export class CreateRequestDto {
     example: 'Easy',
   })
   problem_difficulty;
-}
-
-export class Created_CreateRequestDto extends ResponseDto {
-  @ApiProperty({
-    default: 200,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    default: '과외 요청이 성공적으로 생성되었습니다.',
-  })
-  message: string;
-
-  @ApiProperty({
-    default: false,
-  })
-  error: boolean;
-
-  @ApiProperty({
-    default: null,
-  })
-  data: object;
-
-  constructor() {
-    super(200, '과외 요청이 성공적으로 생성되었습니다.', false);
-  }
-}
-
-export class Unauthorized_CreateRequestDto extends ResponseDto {
-  @ApiProperty({
-    default: 401,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    default: '과외를 요청할 수 있는 권한이 없습니다.',
-  })
-  message: string;
-
-  @ApiProperty({
-    default: true,
-  })
-  error: boolean;
-
-  @ApiProperty({
-    default: null,
-  })
-  data: object;
-
-  constructor() {
-    super(401, '과외를 요청할 수 있는 권한이 없습니다.', true);
-  }
 }
