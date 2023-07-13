@@ -1,8 +1,8 @@
-import { ResponseDto } from '../../responseDto';
+import { HttpResponseDto } from '../../HttpResponseDto';
 import { ApiProperty } from '@nestjs/swagger';
 import { User } from '../entities/user.interface';
 
-export class Success_GetUserDto extends ResponseDto {
+export class Success_GetUserDto extends HttpResponseDto {
   @ApiProperty({
     default: '사용자 정보를 성공적으로 가져왔습니다.',
   })
@@ -35,7 +35,7 @@ export class Success_GetUserDto extends ResponseDto {
   }
 }
 
-export class NotFound_GetUserDto extends ResponseDto {
+export class NotFound_GetUserDto extends HttpResponseDto {
   @ApiProperty({
     default: '사용자를 찾을 수 없습니다.',
   })

@@ -3,30 +3,16 @@ import { InjectModel, Model } from 'nestjs-dynamoose';
 import { User, UserKey } from '../user/entities/user.interface';
 import { Request, RequestKey } from '../request/entities/request.interface';
 import { Tutoring, TutoringKey } from '../tutoring/entities/tutoring.interface';
-import {
-  Conflict_CreateResponseDto,
-  Created_CreateResponseDto,
-  NotFound_CreateResponseDto,
-} from './dto/create-response.dto';
-import {
-  Conflict_SelectResponseDto,
-  NotFound_SelectResponseDto,
-  SelectResponseDto,
-  Success_SelectResponseDto,
-} from './dto/select-response.dto';
-import {
-  NotFound_GetTeachersDTO,
-  Success_GetTeachersDTO,
-} from './dto/get-response.dto';
-import {
-  NotFound_DeleteResponseDto,
-  Success_DeleteResponseDto,
-} from './dto/delete-response.dto';
+import { SelectResponseDto } from './dto/select-response.dto';
 import { TutoringService } from '../tutoring/tutoring.service';
+import { ConflictDto, NotFoundDto } from '../HttpResponseDto';
 import {
-  NotFound_CheckResponseDto,
+  Created_CreateResponseDto,
   Success_CheckResponseDto,
-} from './dto/check-response.dto';
+  Success_DeleteResponseDto,
+  Success_GetTeachersDto,
+  Success_SelectResponseDto,
+} from './response.http-response.dto';
 
 @Injectable()
 export class ResponseService {
@@ -42,20 +28,20 @@ export class ResponseService {
   async create(requestId: string, teacherId: string) {
     const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
-      return new NotFound_CreateResponseDto('과외 요청을 찾을 수 없습니다.');
+      return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
     }
 
     const teacher = await this.userModel.get({ id: teacherId });
     if (teacher === undefined) {
-      return new NotFound_CreateResponseDto('선생님을 찾을 수 없습니다.');
+      return new NotFoundDto('선생님을 찾을 수 없습니다.');
     }
 
     if (request.teacherIds.includes(teacherId)) {
-      return new Conflict_CreateResponseDto('이미 응답한 선생님입니다.');
+      return new ConflictDto('이미 응답한 선생님입니다.');
     }
 
     if (request.status !== 'pending') {
-      return new Conflict_CreateResponseDto('이미 매칭된 요청입니다.');
+      return new ConflictDto('이미 매칭된 요청입니다.');
     }
 
     request.teacherIds.push(teacherId);
@@ -67,7 +53,7 @@ export class ResponseService {
   async getTeachers(requestId: string) {
     const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
-      return new NotFound_GetTeachersDTO();
+      return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
     }
 
     const teachers = [];
@@ -75,19 +61,17 @@ export class ResponseService {
       teachers.push(await this.userModel.get({ id: teacherId }));
     }
 
-    return new Success_GetTeachersDTO(teachers);
+    return new Success_GetTeachersDto(teachers);
   }
 
   async delete(requestId: string, teacherId: string) {
     const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
-      return new NotFound_DeleteResponseDto('과외 요청을 찾을 수 없습니다.');
+      return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
     }
 
     if (!request.teacherIds.includes(teacherId)) {
-      return new NotFound_DeleteResponseDto(
-        '해당 요청에서 선생님을 찾을 수 없습니다.',
-      );
+      return new NotFoundDto('해당 요청에서 선생님을 찾을 수 없습니다.');
     }
 
     request.teacherIds = request.teacherIds.filter((id) => id !== teacherId);
@@ -101,21 +85,19 @@ export class ResponseService {
       id: selectResponseDto.requestId,
     });
     if (request === undefined) {
-      return new NotFound_SelectResponseDto('과외 요청을 찾을 수 없습니다.');
+      return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
     }
 
     if (request.status === 'selected') {
       if (request.selectedTeacherId === selectResponseDto.teacherId) {
-        return new Conflict_SelectResponseDto('이미 선택된 선생님입니다.');
+        return new ConflictDto('이미 선택된 선생님입니다.');
       } else {
-        return new Conflict_SelectResponseDto(
-          '이미 다른 선생님을 선택했습니다.',
-        );
+        return new ConflictDto('이미 다른 선생님을 선택했습니다.');
       }
     }
 
     if (!request.teacherIds.includes(selectResponseDto.teacherId)) {
-      return new NotFound_SelectResponseDto('선생님을 찾을 수 없습니다.');
+      return new NotFoundDto('선생님을 찾을 수 없습니다.');
     }
 
     const tutoringService = new TutoringService(
@@ -143,7 +125,7 @@ export class ResponseService {
   async check(requestId: string, teacherId: string) {
     const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
-      return new NotFound_CheckResponseDto('과외 요청을 찾을 수 없습니다.');
+      return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
     }
 
     if (request.status === 'pending') {
@@ -161,7 +143,7 @@ export class ResponseService {
 
     const tutoring = await this.tutoringModel.get({ id: request.tutoringId });
     if (tutoring === undefined) {
-      return new NotFound_CheckResponseDto('과외를 찾을 수 없습니다.');
+      return new NotFoundDto('과외를 찾을 수 없습니다.');
     }
 
     return new Success_CheckResponseDto(

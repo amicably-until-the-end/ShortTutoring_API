@@ -4,12 +4,12 @@ import { Request, RequestKey } from './entities/request.interface';
 import { User, UserKey } from '../user/entities/user.interface';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { v4 as uuid } from 'uuid';
-import { NotFoundDto } from '../responseDto';
+import { NotFoundDto } from '../HttpResponseDto';
 import {
   Created_CreateRequestDto,
   Success_DeleteRequestDto,
   Success_GetRequestsDto,
-} from './request.response';
+} from './request.http-response';
 
 @Injectable()
 export class RequestService {

@@ -1,8 +1,8 @@
-import { ResponseDto } from '../responseDto';
+import { HttpResponseDto } from '../HttpResponseDto';
 import { ApiProperty } from '@nestjs/swagger';
 import { RequestSchema } from './entities/request.schema';
 
-export class Created_CreateRequestDto extends ResponseDto {
+export class Created_CreateRequestDto extends HttpResponseDto {
   @ApiProperty({
     default: 200,
   })
@@ -23,7 +23,7 @@ export class Created_CreateRequestDto extends ResponseDto {
   }
 }
 
-export class Success_GetRequestsDto extends ResponseDto {
+export class Success_GetRequestsDto extends HttpResponseDto {
   @ApiProperty({
     default: 200,
   })
@@ -66,7 +66,7 @@ export class Success_GetRequestsDto extends ResponseDto {
   }
 }
 
-export class Success_DeleteRequestDto extends ResponseDto {
+export class Success_DeleteRequestDto extends HttpResponseDto {
   @ApiProperty({
     default: 200,
   })

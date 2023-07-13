@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { ResponseDto } from '../../responseDto';
+import { HttpResponseDto } from '../../HttpResponseDto';
 import { User } from '../entities/user.interface';
 
 export class CreateUserDto {
@@ -55,7 +55,7 @@ export class CreateUserDto {
   // review_list: string[];
 }
 
-export class Success_CreateUserDto extends ResponseDto {
+export class Success_CreateUserDto extends HttpResponseDto {
   @ApiProperty({
     default: 201,
   })
@@ -87,7 +87,7 @@ export class Success_CreateUserDto extends ResponseDto {
   }
 }
 
-export class BadRequest_CreateUserDto extends ResponseDto {
+export class BadRequest_CreateUserDto extends HttpResponseDto {
   @ApiProperty({
     example: 'Bad request.',
   })

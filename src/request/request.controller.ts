@@ -2,12 +2,12 @@ import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Created_CreateResponseDto } from '../response/dto/create-response.dto';
-import { NotFoundDto } from '../responseDto';
+import { NotFoundDto } from '../HttpResponseDto';
 import {
   Success_DeleteRequestDto,
   Success_GetRequestsDto,
-} from './request.response';
+} from './request.http-response';
+import { Created_CreateResponseDto } from '../response/response.http-response.dto';
 
 @ApiTags('Request')
 @Controller('request')

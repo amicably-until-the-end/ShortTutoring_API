@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 
-export class ResponseDto {
+export class HttpResponseDto {
   statusCode?: number;
   message: string;
   error: boolean;
@@ -19,7 +19,7 @@ export class ResponseDto {
   }
 }
 
-export class BadRequestDto extends ResponseDto {
+export class BadRequestDto extends HttpResponseDto {
   @ApiProperty({
     example: 400,
   })
@@ -40,7 +40,7 @@ export class BadRequestDto extends ResponseDto {
   }
 }
 
-export class UnauthorizedDto extends ResponseDto {
+export class UnauthorizedDto extends HttpResponseDto {
   @ApiProperty({
     example: 401,
   })
@@ -61,7 +61,7 @@ export class UnauthorizedDto extends ResponseDto {
   }
 }
 
-export class ForbiddenDto extends ResponseDto {
+export class ForbiddenDto extends HttpResponseDto {
   @ApiProperty({
     example: 403,
   })
@@ -82,7 +82,7 @@ export class ForbiddenDto extends ResponseDto {
   }
 }
 
-export class NotFoundDto extends ResponseDto {
+export class NotFoundDto extends HttpResponseDto {
   @ApiProperty({
     example: 404,
   })
@@ -103,7 +103,7 @@ export class NotFoundDto extends ResponseDto {
   }
 }
 
-export class ConflictDto extends ResponseDto {
+export class ConflictDto extends HttpResponseDto {
   @ApiProperty({
     example: 409,
   })

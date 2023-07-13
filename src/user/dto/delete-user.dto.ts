@@ -1,11 +1,11 @@
 import { ApiProperty, PartialType } from '@nestjs/swagger';
 import { CreateUserDto } from './create-user.dto';
-import { ResponseDto } from '../../responseDto';
+import { HttpResponseDto } from '../../HttpResponseDto';
 import { User } from '../entities/user.interface';
 
 export class UpdateUserDto extends PartialType(CreateUserDto) {}
 
-export class Success_DeleteUserDto extends ResponseDto {
+export class Success_DeleteUserDto extends HttpResponseDto {
   @ApiProperty({
     default: '사용자 정보를 성공적으로 삭제했습니다.',
   })
@@ -37,7 +37,7 @@ export class Success_DeleteUserDto extends ResponseDto {
   }
 }
 
-export class NotFound_DeleteUserDto extends ResponseDto {
+export class NotFound_DeleteUserDto extends HttpResponseDto {
   @ApiProperty({
     default: '사용자를 찾을 수 없습니다.',
   })
