@@ -1,46 +1,6 @@
+import { ApiProperty } from '@nestjs/swagger';
+
 export class ResponseDto {
-  static readonly Success = new ResponseDto(
-    200,
-    '요청이 성공적으로 처리되었습니다.',
-    false,
-    null,
-  );
-
-  static readonly Created = new ResponseDto(
-    201,
-    '요청이 성공적으로 처리되었으며, 새로운 자원이 생성되었습니다.',
-    false,
-    null,
-  );
-
-  static readonly BadRequest = new ResponseDto(
-    400,
-    '요청이 잘못되었습니다.',
-    true,
-    null,
-  );
-
-  static readonly Unauthorized = new ResponseDto(
-    401,
-    '인증이 필요합니다.',
-    true,
-    null,
-  );
-
-  static readonly Forbidden = new ResponseDto(
-    403,
-    '권한이 없습니다.',
-    true,
-    null,
-  );
-
-  static readonly NotFound = new ResponseDto(
-    404,
-    '리소스가 존재하지 않습니다.',
-    true,
-    null,
-  );
-
   statusCode?: number;
   message: string;
   error: boolean;
@@ -56,5 +16,110 @@ export class ResponseDto {
     this.message = message;
     this.error = error;
     this.data = data;
+  }
+}
+
+export class BadRequestDto extends ResponseDto {
+  @ApiProperty({
+    example: 400,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: 'Bad Request',
+  })
+  message: string;
+
+  @ApiProperty({
+    example: true,
+  })
+  error: boolean;
+
+  constructor(message: string) {
+    super(400, message, true);
+  }
+}
+
+export class UnauthorizedDto extends ResponseDto {
+  @ApiProperty({
+    example: 401,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: 'Unauthorized',
+  })
+  message: string;
+
+  @ApiProperty({
+    example: true,
+  })
+  error: boolean;
+
+  constructor(message: string) {
+    super(401, message, true);
+  }
+}
+
+export class ForbiddenDto extends ResponseDto {
+  @ApiProperty({
+    example: 403,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: 'Forbidden',
+  })
+  message: string;
+
+  @ApiProperty({
+    example: true,
+  })
+  error: boolean;
+
+  constructor(message: string) {
+    super(403, message, true);
+  }
+}
+
+export class NotFoundDto extends ResponseDto {
+  @ApiProperty({
+    example: 404,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: 'Not Found',
+  })
+  message: string;
+
+  @ApiProperty({
+    example: true,
+  })
+  error: boolean;
+
+  constructor(message: string) {
+    super(404, message, true);
+  }
+}
+
+export class ConflictDto extends ResponseDto {
+  @ApiProperty({
+    example: 409,
+  })
+  statusCode: number;
+
+  @ApiProperty({
+    example: 'Conflict',
+  })
+  message: string;
+
+  @ApiProperty({
+    example: true,
+  })
+  error: boolean;
+
+  constructor(message: string) {
+    super(409, message, true);
   }
 }
