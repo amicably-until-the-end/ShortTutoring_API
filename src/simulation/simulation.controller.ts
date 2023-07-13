@@ -9,16 +9,24 @@ export class SimulationController {
 
   @Get('createTest')
   @ApiOperation({
-    summary: '테스트 데이터 생성',
+    summary: '[DEV] 테스트 데이터 생성',
     description: '`DEV`\n\n테스트 데이터를 생성합니다.',
   })
   createTest() {
     return this.testService.createTest();
   }
 
+  @Get('onlyTest')
+  @ApiOperation({
+    summary: '[DEV] 초기화 후 테스트 데이터 생성',
+  })
+  onlyTest() {
+    return this.testService.onlyTest();
+  }
+
   @Get('getAll')
   @ApiOperation({
-    summary: '모든 데이터 반환',
+    summary: '[DEV] 모든 데이터 반환',
     description: '`DEV`\n\n모든 데이터를 반환합니다.',
   })
   getAll() {
@@ -27,7 +35,7 @@ export class SimulationController {
 
   @Delete('removeAll')
   @ApiOperation({
-    summary: '데이터 초기화',
+    summary: '[DEV] 데이터 초기화',
     description: '`DEV`\n\n모든 데이터를 삭제합니다.',
   })
   removeAll() {
@@ -36,7 +44,7 @@ export class SimulationController {
 
   @Post('matching')
   @ApiOperation({
-    summary: '매칭 시뮬레이션',
+    summary: '[DEV] 매칭 시뮬레이션',
     description:
       '학생과 선생님의 이름을 입력하면 매칭 과정을 디스코드에서 보여줍니다.',
   })

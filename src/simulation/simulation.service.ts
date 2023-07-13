@@ -161,4 +161,12 @@ export class SimulationService {
     }
     return this.getAll();
   }
+
+  async onlyTest() {
+    await this.removeAll().then(async () => {
+      await this.createTest();
+    });
+
+    return await this.getAll();
+  }
 }
