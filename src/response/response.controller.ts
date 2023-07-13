@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { ResponseService } from './response.service';
 import {
   ApiBody,
@@ -38,8 +38,8 @@ export class ResponseController {
 
   @Post('create/:requestId')
   @ApiOperation({
-    summary: '특정 요청에 대한 선생님의 응답 생성 (대기열 참가)',
-    description: '`TEACHER`\n\n특정 요청 대기열에 자신을 추가합니다.',
+    summary: '과외 요청에 대한 선생님의 응답 생성 (대기열 참가)',
+    description: '`TEACHER`\n\n과외 요청 대기열에 자신을 추가합니다.',
   })
   @ApiParam({
     name: 'requestId',
@@ -57,12 +57,12 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 200,
-    description: '해당 요청에 대한 응답을 성공적으로 생성했습니다.',
+    description: '과외 요청에 대한 응답을 성공적으로 생성했습니다.',
     type: Created_CreateResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: '해당 요청이 존재하지 않습니다.',
+    description: '과외 요청이 존재하지 않습니다.',
     type: NotFound_CreateResponseDto,
   })
   create(
@@ -74,12 +74,14 @@ export class ResponseController {
 
   @Get('teacherList/:requestId')
   @ApiOperation({
-    summary: '특정 요청에 대한 선생님들의 목록 조회',
-    description: '`STUDENT`\n\n특정 요청에 대한 선생님들의 목록을 조회합니다.',
+    summary: '과외 요청에 대한 선생님들의 응답 목록 조회',
+    description:
+      '`STUDENT`\n\n과외 요청에 대한 선생님들의 응답 목록을 조회합니다.',
   })
   @ApiParam({
     name: 'requestId',
     description: '요청의 id',
+    example: 'test-request-id',
   })
   @ApiResponse({
     status: 200,
@@ -88,7 +90,7 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 404,
-    description: '해당 과외 요청이 존재하지 않습니다.',
+    description: '과외 요청이 존재하지 않습니다.',
     type: NotFound_GetTeachersDTO,
   })
   getTeachers(@Param('requestId') requestId: string) {
@@ -97,8 +99,8 @@ export class ResponseController {
 
   @Post('select')
   @ApiOperation({
-    summary: '특정 과외 응답 선택',
-    description: '`STUDENT`\n\n특정 과외 응답을 선택합니다.',
+    summary: '학생의 과외 선생님 선택',
+    description: '`STUDENT`\n\n과외 응답 중 선생님을 선택합니다.',
   })
   @ApiBody({
     type: SelectResponseDto,
@@ -115,12 +117,12 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 400,
-    description: '해당 요청이 존재하지 않습니다.',
+    description: '과외 요청이 존재하지 않습니다.',
     type: BadRequest_SelectResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: '해당 선생님이 존재하지 않습니다.',
+    description: '과외 선생님이 존재하지 않습니다.',
     type: NotFound_SelectResponseDto,
   })
   select(@Body() selectResponseDto: SelectResponseDto) {
@@ -129,7 +131,7 @@ export class ResponseController {
 
   @Post('check/:requestId')
   @ApiOperation({
-    summary: '특정 요청에 대한 선택 여부 조회',
+    summary: '과외 요청에 대한 본인 선택 여부 조회',
     description: '`TEACHER`\n\n특정 요청에 대한 선택 여부를 조회합니다.',
   })
   @ApiParam({
@@ -166,14 +168,15 @@ export class ResponseController {
     return this.responseService.check(requestId, teacherId);
   }
 
-  @Delete('delete/:requestId')
+  @Post('delete/:requestId')
   @ApiOperation({
-    summary: '특정 응답 삭제',
+    summary: '과외 응답 삭제',
     description: '`TEACHER`\n\n특정 응답을 삭제합니다.',
   })
   @ApiParam({
     name: 'requestId',
     description: '요청 id',
+    example: 'test-request-id',
   })
   @ApiBody({
     schema: {
@@ -190,7 +193,7 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 404,
-    description: '해당 요청이 존재하지 않습니다.',
+    description: '과외 요청이 존재하지 않습니다.',
     type: NotFound_DeleteResponseDto,
   })
   delete(

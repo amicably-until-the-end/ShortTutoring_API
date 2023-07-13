@@ -38,8 +38,15 @@ export class Created_CreateResponseDto extends ResponseDto {
   })
   statusCode: number;
 
-  constructor() {
-    super(200, '응답을 성공적으로 추가했습니다.', false);
+  @ApiProperty({
+    default: {
+      requestId: 'test-request-id',
+    },
+  })
+  data: object;
+
+  constructor(data: object) {
+    super(200, '응답을 성공적으로 추가했습니다.', false, data);
   }
 }
 

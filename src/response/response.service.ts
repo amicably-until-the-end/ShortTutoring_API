@@ -57,7 +57,7 @@ export class ResponseService {
     request.teacherIds.push(teacherId);
     await this.requestModel.update(request);
 
-    return new Created_CreateResponseDto();
+    return new Created_CreateResponseDto({ requestId: requestId });
   }
 
   async getTeachers(requestId: string) {
