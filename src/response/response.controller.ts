@@ -15,7 +15,7 @@ import {
   Success_GetTeachersDto,
   Success_SelectResponseDto,
 } from './dto/response-response.dto';
-import { BadRequestDto, ConflictDto, NotFoundDto } from '../HttpResponseDto';
+import { NotFoundDto } from '../HttpResponseDto';
 
 @ApiTags('Response')
 @Controller('response')
@@ -43,12 +43,16 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 200,
-    description: '과외 요청에 대한 응답을 성공적으로 생성했습니다.',
+    description: '응답을 성공적으로 추가했습니다.',
     type: Created_CreateResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: '과외 요청이 존재하지 않습니다.',
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n' +
+      '- 선생님을 찾을 수 없습니다.\n' +
+      '- 이미 응답한 선생님입니다.\n' +
+      '- 이미 매칭된 요청입니다.',
     type: NotFoundDto,
   })
   create(
@@ -76,7 +80,7 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 404,
-    description: '과외 요청이 존재하지 않습니다.',
+    description: '과외 요청을 찾을 수 없습니다.',
     type: NotFoundDto,
   })
   getTeachers(@Param('requestId') requestId: string) {
@@ -93,22 +97,16 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 200,
-    description: '요청이 성공적으로 처리되었습니다.',
+    description:
+      '- 선생님을 선택했습니다.\n' +
+      '- 이미 선택한 선생님입니다.\n' +
+      '- 이미 다른 선생님을 선택했습니다.',
     type: Success_SelectResponseDto,
   })
   @ApiResponse({
-    status: 304,
-    description: '이미 선택된 선생님입니다.',
-    type: ConflictDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: '과외 요청이 존재하지 않습니다.',
-    type: BadRequestDto,
-  })
-  @ApiResponse({
     status: 404,
-    description: '과외 선생님이 존재하지 않습니다.',
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n- 과외 선생님을 찾을 수 없습니다.',
     type: NotFoundDto,
   })
   select(@Body() selectResponseDto: SelectResponseDto) {
@@ -139,12 +137,16 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 200,
-    description: '선택 여부를 성공적으로 조회했습니다.',
+    description:
+      '- 학생이 선생님을 선택했습니다. 과외를 시작하세요.\n' +
+      '- 학생이 선생님을 선택하지 않았습니다.\n' +
+      '- 학생의 선택을 기다리고 있습니다.',
     type: Success_CheckResponseDto,
   })
   @ApiResponse({
     status: 404,
-    description: '리소스를 찾을 수 없습니다.',
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n- 과외 선생님을 찾을 수 없습니다.',
     type: NotFoundDto,
   })
   check(
@@ -179,7 +181,9 @@ export class ResponseController {
   })
   @ApiResponse({
     status: 404,
-    description: '과외 요청이 존재하지 않습니다.',
+    description:
+      '- 과외 요청을 찾을 수 없습니다.\n' +
+      '- 해당 요청에서 선생님을 찾을 수 없습니다.',
     type: NotFoundDto,
   })
   delete(

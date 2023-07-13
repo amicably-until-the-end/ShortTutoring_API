@@ -87,7 +87,7 @@ export class UserController {
   })
   @ApiResponse({
     status: 404,
-    description: '사용자 정보 업데이트 실패',
+    description: '사용자를 찾을 수 없습니다.',
     type: NotFoundDto,
   })
   update(

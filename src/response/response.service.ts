@@ -64,22 +64,6 @@ export class ResponseService {
     return new Success_GetTeachersDto(teachers);
   }
 
-  async delete(requestId: string, teacherId: string) {
-    const request = await this.requestModel.get({ id: requestId });
-    if (request === undefined) {
-      return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
-    }
-
-    if (!request.teacherIds.includes(teacherId)) {
-      return new NotFoundDto('해당 요청에서 선생님을 찾을 수 없습니다.');
-    }
-
-    request.teacherIds = request.teacherIds.filter((id) => id !== teacherId);
-    await this.requestModel.update(request);
-
-    return new Success_DeleteResponseDto();
-  }
-
   async select(selectResponseDto: SelectResponseDto) {
     const request = await this.requestModel.get({
       id: selectResponseDto.requestId,
@@ -90,7 +74,7 @@ export class ResponseService {
 
     if (request.status === 'selected') {
       if (request.selectedTeacherId === selectResponseDto.teacherId) {
-        return new ConflictDto('이미 선택된 선생님입니다.');
+        return new ConflictDto('이미 선택한 선생님입니다.');
       } else {
         return new ConflictDto('이미 다른 선생님을 선택했습니다.');
       }
@@ -153,5 +137,21 @@ export class ResponseService {
         tutoringId: tutoring.id,
       },
     );
+  }
+
+  async delete(requestId: string, teacherId: string) {
+    const request = await this.requestModel.get({ id: requestId });
+    if (request === undefined) {
+      return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
+    }
+
+    if (!request.teacherIds.includes(teacherId)) {
+      return new NotFoundDto('해당 요청에서 선생님을 찾을 수 없습니다.');
+    }
+
+    request.teacherIds = request.teacherIds.filter((id) => id !== teacherId);
+    await this.requestModel.update(request);
+
+    return new Success_DeleteResponseDto();
   }
 }
