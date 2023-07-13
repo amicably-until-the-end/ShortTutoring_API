@@ -1,98 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ResponseDto } from '../../responseDto';
 
-export class SelectResponseDto {
-  @ApiProperty({
-    description: '요청의 id',
-    default: 'test-request-id',
-  })
-  requestId: string;
-
-  @ApiProperty({
-    description: '학생의 id',
-    default: 'test-student-id',
-  })
-  studentId: string;
-
-  @ApiProperty({
-    description: '선생님의 id',
-    default: 'test-teacher-id',
-  })
-  teacherId: string;
-}
-
-export class NotModified_SelectResponseDto extends ResponseDto {
-  @ApiProperty({
-    default: 'Already selected.',
-  })
-  message: string;
-
-  @ApiProperty({
-    default: true,
-  })
-  error: boolean;
-
-  @ApiProperty({
-    default: 304,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    default: null,
-  })
-  data: object;
-}
-
-export class Success_SelectResponseDto extends ResponseDto {
-  @ApiProperty({
-    default: 'Select response successfully.',
-  })
-  message: string;
-
-  @ApiProperty({
-    default: false,
-  })
-  error: boolean;
-
-  @ApiProperty({
-    default: 200,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    default: {
-      requestId: 'test-request-id',
-      tutoringId: 'test-tutoring-id',
-    },
-  })
-  data: SelectResponseDto;
-}
-
-export class BadRequest_SelectResponseDto extends ResponseDto {
-  @ApiProperty({
-    default: 'Request not found.',
-  })
-  message: string;
-
-  @ApiProperty({
-    default: true,
-  })
-  error: boolean;
-
-  @ApiProperty({
-    default: 400,
-  })
-  statusCode: number;
-
-  @ApiProperty({
-    default: null,
-  })
-  data: object;
-}
-
 export class NotFound_SelectResponseDto extends ResponseDto {
   @ApiProperty({
-    default: 'Teacher not found.',
+    default: '리소스를 찾을 수 없습니다.',
   })
   message: string;
 
@@ -106,15 +17,14 @@ export class NotFound_SelectResponseDto extends ResponseDto {
   })
   statusCode: number;
 
-  @ApiProperty({
-    default: null,
-  })
-  data: object;
+  constructor(message: string) {
+    super(404, message, true);
+  }
 }
 
 export class Created_CreateResponseDto extends ResponseDto {
   @ApiProperty({
-    default: 'Append response successfully.',
+    default: '응답을 성공적으로 추가했습니다.',
   })
   message: string;
 
@@ -128,17 +38,14 @@ export class Created_CreateResponseDto extends ResponseDto {
   })
   statusCode: number;
 
-  @ApiProperty({
-    default: {
-      id: 'test-request-id',
-    },
-  })
-  data: object;
+  constructor() {
+    super(200, '응답을 성공적으로 추가했습니다.', false);
+  }
 }
 
 export class NotFound_CreateResponseDto extends ResponseDto {
   @ApiProperty({
-    default: 'Request not found.',
+    default: '리소스를 찾을 수 없습니다.',
   })
   message: string;
 
@@ -152,8 +59,28 @@ export class NotFound_CreateResponseDto extends ResponseDto {
   })
   statusCode: number;
 
+  constructor(message: string) {
+    super(404, message, true);
+  }
+}
+
+export class Conflict_CreateResponseDto extends ResponseDto {
   @ApiProperty({
-    default: null,
+    default: '이미 답변이 존재합니다.',
   })
-  data: object;
+  message: string;
+
+  @ApiProperty({
+    default: true,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: 409,
+  })
+  statusCode: number;
+
+  constructor(message: string) {
+    super(409, message, true);
+  }
 }
