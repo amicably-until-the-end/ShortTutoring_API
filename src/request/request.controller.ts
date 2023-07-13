@@ -7,7 +7,7 @@ import {
   Success_DeleteRequestDto,
   Success_GetRequestsDto,
 } from './request.http-response';
-import { Created_CreateResponseDto } from '../response/response.http-response.dto';
+import { Created_CreateResponseDto } from '../response/response.http-response';
 
 @ApiTags('Request')
 @Controller('request')

@@ -12,7 +12,7 @@ import {
   Success_DeleteResponseDto,
   Success_GetTeachersDto,
   Success_SelectResponseDto,
-} from './response.http-response.dto';
+} from './response.http-response';
 
 @Injectable()
 export class ResponseService {
