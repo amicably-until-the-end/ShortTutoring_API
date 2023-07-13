@@ -18,26 +18,26 @@ export class SimulationService {
     private requestModel: Model<Request, RequestKey>,
   ) {}
 
-  async matching(student_name: string, teacher_name: string) {
+  async matching(studentName: string, teacherName: string) {
     const studentId = uuid().toString().slice(0, 8);
     const teacherId = uuid().toString().slice(0, 8);
 
     await this.userModel.create({
       id: studentId,
-      name: student_name,
+      name: studentName,
       role: 'student',
     });
     await studentWebhook.info(
-      `[Init] Student created\nname: ${student_name}\nid: ${studentId}`,
+      `[Init] Student created\nname: ${studentName}\nid: ${studentId}`,
     );
 
     await this.userModel.create({
       id: teacherId,
-      name: teacher_name,
+      name: teacherName,
       role: 'teacher',
     });
     await teacherWebhook.info(
-      `[Init] Teacher created\nname: ${teacher_name}\nid: ${teacherId}`,
+      `[Init] Teacher created\nname: ${teacherName}\nid: ${teacherId}`,
     );
 
     const requestId = uuid();
@@ -92,9 +92,9 @@ export class SimulationService {
         const requestJSON = JSON.stringify(response);
         await studentWebhook.send(`\`\`\`json\n${requestJSON}\n\`\`\``);
 
-        await studentWebhook.warning(`[End] PLEASE TEACH ME ${teacher_name}!`);
-        await teacherWebhook.warning(`[End] I'LL TUTOR YOU ${student_name}!`);
-        await webhook.success(`Matched ${student_name} and ${teacher_name}`);
+        await studentWebhook.warning(`[End] PLEASE TEACH ME ${teacherName}!`);
+        await teacherWebhook.warning(`[End] I'LL TUTOR YOU ${studentName}!`);
+        await webhook.success(`Matched ${studentName} and ${teacherName}`);
       } else {
         await teacherWebhook.error(`Request ${requestId} not found`);
         await webhook.error(`Match failed`);

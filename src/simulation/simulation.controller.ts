@@ -58,9 +58,9 @@ export class SimulationController {
     },
   })
   matching(
-    @Body('student_name') student_name: string,
-    @Body('teacher_name') teacher_name: string,
+    @Body('studentName') studentName: string,
+    @Body('teacherName') teacherName: string,
   ) {
-    return this.testService.matching(student_name, teacher_name);
+    return this.testService.matching(studentName, teacherName);
   }
 }

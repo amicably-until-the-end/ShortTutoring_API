@@ -20,7 +20,7 @@ export class RequestController {
     description: '`STUDENT`\n\n요청을 생성합니다.',
   })
   @ApiParam({
-    name: 'requestId',
+    name: 'studentId',
     description: '과외를 요청한 학생의 ID',
     example: 'test-student-id',
   })
@@ -30,10 +30,10 @@ export class RequestController {
     type: Created_CreateResponseDto,
   })
   create(
-    @Param('requestId') id: string,
+    @Param('studentId') studentId: string,
     @Body() createRequestDto: CreateRequestDto,
   ) {
-    return this.requestService.create(id, createRequestDto);
+    return this.requestService.create(studentId, createRequestDto);
   }
 
   @Get('list')
@@ -70,7 +70,7 @@ export class RequestController {
     description: '해당 과외 요청이 존재하지 않습니다.',
     type: NotFound_DeleteRequestDto,
   })
-  remove(@Param('requestId') id: string) {
-    return this.requestService.remove(id);
+  remove(@Param('requestId') requestId: string) {
+    return this.requestService.remove(requestId);
   }
 }

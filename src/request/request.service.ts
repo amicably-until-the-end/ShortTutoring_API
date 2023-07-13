@@ -70,13 +70,13 @@ export class RequestService {
     return new Success_GetRequestsDto(found);
   }
 
-  async remove(id: string) {
-    const request = await this.requestModel.get({ id });
+  async remove(requestId: string) {
+    const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
       return new NotFound_DeleteRequestDto();
     }
 
-    await this.requestModel.delete({ id });
+    await this.requestModel.delete({ id: requestId });
     return new Success_DeleteRequestDto();
   }
 }

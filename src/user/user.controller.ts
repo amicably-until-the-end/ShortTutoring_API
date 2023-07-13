@@ -1,6 +1,12 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import {
+  ApiHeader,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { User } from './entities/user.interface';
 import {
   BadRequest_CreateUserDto,
@@ -38,6 +44,11 @@ export class UserController {
       '    "role": "사용자 역할 [admin | student | teacher]",\n' +
       '}\n' +
       '````',
+  })
+  @ApiHeader({
+    name: 'Authorization',
+    description: 'Bearer {accessToken}',
+    example: 'Bearer test-access-token',
   })
   @ApiResponse({
     status: 201,
@@ -86,8 +97,8 @@ export class UserController {
     description: '사용자 정보 불러오기 성공',
     type: Success_GetUserDto,
   })
-  findOne(@Param('userId') id: string) {
-    return this.userService.findOne(id);
+  findOne(@Param('userId') userId: string) {
+    return this.userService.findOne(userId);
   }
 
   @Post('update/:userId')
@@ -111,8 +122,11 @@ export class UserController {
     description: '사용자 정보 업데이트 실패',
     type: NotFound_UpdateUserDto,
   })
-  update(@Param('userId') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(id, updateUserDto);
+  update(
+    @Param('userId') userId: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.update(userId, updateUserDto);
   }
 
   @Post('delete/:userId')
@@ -136,7 +150,7 @@ export class UserController {
     description: '사용자 삭제 실패',
     type: NotFound_DeleteUserDto,
   })
-  remove(@Param('userId') id: string) {
-    return this.userService.remove(id);
+  remove(@Param('userId') userId: string) {
+    return this.userService.remove(userId);
   }
 }

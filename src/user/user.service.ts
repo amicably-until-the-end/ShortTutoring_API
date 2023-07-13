@@ -33,8 +33,8 @@ export class UserService {
     return this.userModel.scan().exec();
   }
 
-  async findOne(id: string) {
-    const user = await this.userModel.get({ id });
+  async findOne(userId: string) {
+    const user = await this.userModel.get({ id: userId });
     if (user === undefined) {
       return new NotFound_GetUserDto();
     }
@@ -42,23 +42,23 @@ export class UserService {
     return new Success_GetUserDto(user);
   }
 
-  async update(id: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userModel.get({ id });
+  async update(userId: string, updateUserDto: UpdateUserDto) {
+    const user = await this.userModel.get({ id: userId });
     if (user === undefined) {
       return new NotFound_UpdateUserDto(null);
     }
 
-    await this.userModel.update({ id }, updateUserDto);
-    return new Success_UpdateUserDto(await this.userModel.get({ id }));
+    await this.userModel.update({ id: userId }, updateUserDto);
+    return new Success_UpdateUserDto(await this.userModel.get({ id: userId }));
   }
 
-  async remove(id: string) {
-    const user = await this.userModel.get({ id });
+  async remove(userId: string) {
+    const user = await this.userModel.get({ id: userId });
     if (user === undefined) {
       return new NotFound_DeleteUserDto();
     }
 
-    await this.userModel.delete({ id });
+    await this.userModel.delete({ id: userId });
     return new Success_DeleteUserDto();
   }
 }
