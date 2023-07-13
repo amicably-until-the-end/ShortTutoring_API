@@ -27,17 +27,7 @@ export class UserController {
   @Post('create')
   @ApiOperation({
     summary: '사용자 생성',
-    description:
-      '`USER`\n\n사용자를 생성합니다.\n\n' +
-      '```json\n' +
-      '// create-request.dto\n' +
-      '{\n' +
-      '    "name": "사용자 이름",\n' +
-      '    "bio": "사용자 자기소개",\n' +
-      '    "profileImage": "사용자 프로필 이미지의 base64 인코드 데이터",\n' +
-      '    "role": "사용자 역할 [admin | student | teacher]",\n' +
-      '}\n' +
-      '````',
+    description: '`USER`\n\n사용자를 생성합니다.\n\n',
   })
   @ApiHeader({
     name: 'Authorization',
