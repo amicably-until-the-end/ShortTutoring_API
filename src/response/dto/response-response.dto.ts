@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { User } from '../user/entities/user.interface';
-import { HttpResponseDto } from '../HttpResponseDto';
+import { User } from '../../user/entities/user.interface';
+import { HttpResponseDto } from '../../HttpResponseDto';
 
 export class Created_CreateResponseDto extends HttpResponseDto {
   @ApiProperty({

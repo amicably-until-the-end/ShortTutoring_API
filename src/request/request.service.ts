@@ -9,7 +9,7 @@ import {
   Created_CreateRequestDto,
   Success_DeleteRequestDto,
   Success_GetRequestsDto,
-} from './request.http-response';
+} from './dto/response-request.dto';
 
 @Injectable()
 export class RequestService {

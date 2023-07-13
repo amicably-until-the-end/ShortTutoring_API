@@ -1,6 +1,6 @@
-import { HttpResponseDto } from '../HttpResponseDto';
+import { HttpResponseDto } from '../../HttpResponseDto';
 import { ApiProperty } from '@nestjs/swagger';
-import { RequestSchema } from './entities/request.schema';
+import { RequestSchema } from '../entities/request.schema';
 
 export class Created_CreateRequestDto extends HttpResponseDto {
   @ApiProperty({

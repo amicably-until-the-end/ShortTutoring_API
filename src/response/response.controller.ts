@@ -14,7 +14,7 @@ import {
   Success_DeleteResponseDto,
   Success_GetTeachersDto,
   Success_SelectResponseDto,
-} from './response.http-response';
+} from './dto/response-response.dto';
 import { BadRequestDto, ConflictDto, NotFoundDto } from '../HttpResponseDto';
 
 @ApiTags('Response')

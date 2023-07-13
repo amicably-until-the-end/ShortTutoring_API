@@ -6,8 +6,8 @@ import { NotFoundDto } from '../HttpResponseDto';
 import {
   Success_DeleteRequestDto,
   Success_GetRequestsDto,
-} from './request.http-response';
-import { Created_CreateResponseDto } from '../response/response.http-response';
+} from './dto/response-request.dto';
+import { Created_CreateResponseDto } from '../response/dto/response-response.dto';
 
 @ApiTags('Request')
 @Controller('request')

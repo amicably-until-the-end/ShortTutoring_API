@@ -8,22 +8,16 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { User } from './entities/user.interface';
-import {
-  BadRequest_CreateUserDto,
-  CreateUserDto,
-  Success_CreateUserDto,
-} from './dto/create-user.dto';
-import {
-  NotFound_UpdateUserDto,
-  Success_UpdateUserDto,
-  UpdateUserDto,
-} from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { v4 as uuid } from 'uuid';
-import { Success_GetUserDto } from './dto/get-user.dto';
 import {
-  NotFound_DeleteUserDto,
+  Success_CreateUserDto,
   Success_DeleteUserDto,
-} from './dto/delete-user.dto';
+  Success_GetUserDto,
+  Success_UpdateUserDto,
+} from './dto/response-user.dto';
+import { NotFoundDto } from '../HttpResponseDto';
 
 @ApiTags('User')
 @Controller('user')
@@ -54,11 +48,6 @@ export class UserController {
     status: 201,
     description: '사용자 생성 성공',
     type: Success_CreateUserDto,
-  })
-  @ApiResponse({
-    status: 400,
-    description: '사용자 생성 실패',
-    type: BadRequest_CreateUserDto,
   })
   create(@Body() createUsersDto: CreateUserDto) {
     const user: User = {
@@ -120,7 +109,7 @@ export class UserController {
   @ApiResponse({
     status: 404,
     description: '사용자 정보 업데이트 실패',
-    type: NotFound_UpdateUserDto,
+    type: NotFoundDto,
   })
   update(
     @Param('userId') userId: string,
@@ -142,13 +131,13 @@ export class UserController {
   })
   @ApiResponse({
     status: 200,
-    description: '사용자 삭제 성공',
+    description: '사용자 정보를 성공적으로 삭제했습니다.',
     type: Success_DeleteUserDto,
   })
   @ApiResponse({
     status: 400,
-    description: '사용자 삭제 실패',
-    type: NotFound_DeleteUserDto,
+    description: '사용자를 찾을 수 없습니다.',
+    type: NotFoundDto,
   })
   remove(@Param('userId') userId: string) {
     return this.userService.remove(userId);
