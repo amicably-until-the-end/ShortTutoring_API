@@ -91,3 +91,24 @@ export class BadRequest_SelectResponseDto extends ResponseDto {
   })
   data: object;
 }
+
+export class NotFound_SelectResponseDto extends ResponseDto {
+  @ApiProperty({
+    default: '리소스를 찾을 수 없습니다.',
+  })
+  message: string;
+
+  @ApiProperty({
+    default: true,
+  })
+  error: boolean;
+
+  @ApiProperty({
+    default: 404,
+  })
+  statusCode: number;
+
+  constructor(message: string) {
+    super(404, message, true);
+  }
+}
