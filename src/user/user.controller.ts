@@ -1,12 +1,6 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
-import {
-  ApiHeader,
-  ApiOperation,
-  ApiParam,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './entities/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -28,11 +22,6 @@ export class UserController {
   @ApiOperation({
     summary: '사용자 생성',
     description: '`USER`\n\n사용자를 생성합니다.\n\n',
-  })
-  @ApiHeader({
-    name: 'Authorization',
-    description: 'Bearer {accessToken}',
-    example: 'Bearer test-access-token',
   })
   @ApiResponse({
     status: 201,
