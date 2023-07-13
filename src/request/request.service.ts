@@ -37,7 +37,6 @@ export class RequestService {
       status: 'pending',
       studentId,
       teacherIds: [],
-      createdAt: new Date().toISOString(),
       problem: {
         description: createRequestDto.problem_description,
         schoolLevel: createRequestDto.problem_school_level,
@@ -46,6 +45,8 @@ export class RequestService {
         schoolChapter: createRequestDto.problem_school_chapter,
         difficulty: createRequestDto.problem_difficulty,
       },
+      selectedTeacherId: '',
+      createdAt: new Date().toISOString(),
     };
     await this.requestModel.create(request);
 
