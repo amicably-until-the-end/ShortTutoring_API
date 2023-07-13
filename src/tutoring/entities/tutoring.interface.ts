@@ -3,11 +3,11 @@ export interface TutoringKey {
 }
 
 export interface Tutoring extends TutoringKey {
-  requestId: string;
+  requestId?: string;
   studentId: string;
   teacherId: string;
-  matchedAt: string;
-  startedAt: string;
-  endedAt: string;
+  matchedAt?: string;
+  startedAt?: string;
+  endedAt?: string;
   status: string;
 }
