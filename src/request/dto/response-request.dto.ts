@@ -18,8 +18,17 @@ export class Created_CreateRequestDto extends HttpResponseDto {
   })
   error: boolean;
 
-  constructor() {
-    super(200, '과외 요청이 성공적으로 생성되었습니다.', false);
+  @ApiProperty({
+    default: {
+      requestId: 'test-request-id',
+    },
+  })
+  data: {
+    requestId: string;
+  };
+
+  constructor(data: object) {
+    super(200, '과외 요청이 성공적으로 생성되었습니다.', false, data);
   }
 }
 
