@@ -35,19 +35,19 @@ export class RequestService {
       studentId,
       teacherIds: [],
       problem: {
-        description: createRequestDto.problem_description,
-        schoolLevel: createRequestDto.problem_school_level,
+        description: createRequestDto.problemDescription,
+        schoolLevel: createRequestDto.problemSchoolLevel,
         imageUrl,
-        schoolSubject: createRequestDto.problem_school_subject,
-        schoolChapter: createRequestDto.problem_school_chapter,
-        difficulty: createRequestDto.problem_difficulty,
+        schoolSubject: createRequestDto.problemSchoolSubject,
+        schoolChapter: createRequestDto.problemSchoolChapter,
+        difficulty: createRequestDto.problemDifficulty,
       },
       selectedTeacherId: '',
       createdAt: new Date().toISOString(),
     };
     await this.requestModel.create(request);
 
-    return new Created_CreateRequestDto();
+    return new Created_CreateRequestDto({ requestId: request.id });
   }
 
   async findAll() {

@@ -14,7 +14,7 @@ import { Created_CreateResponseDto } from '../response/dto/response-response.dto
 export class RequestController {
   constructor(private readonly requestService: RequestService) {}
 
-  @Post('create/:requestId')
+  @Post('create/:studentId')
   @ApiOperation({
     summary: '과외 요청 생성',
     description: '`STUDENT`\n\n요청을 생성합니다.',
