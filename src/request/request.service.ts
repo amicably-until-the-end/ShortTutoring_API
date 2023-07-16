@@ -4,7 +4,7 @@ import { Request, RequestKey } from './entities/request.interface';
 import { User, UserKey } from '../user/entities/user.interface';
 import { CreateRequestDto } from './dto/create-request.dto';
 import { v4 as uuid } from 'uuid';
-import { NotFoundDto } from '../HttpResponseDto';
+import { ForbiddenDto, NotFoundDto } from '../HttpResponseDto';
 import {
   Created_CreateRequestDto,
   Success_DeleteRequestDto,
@@ -24,6 +24,10 @@ export class RequestService {
     const student = await this.userModel.get({ id: studentId });
     if (student === undefined) {
       return new NotFoundDto('학생을 찾을 수 없습니다.');
+    }
+
+    if (student.role === 'teacher') {
+      return new ForbiddenDto('선생님은 과외 요청을 할 수 없습니다.');
     }
 
     // TODO: S3에 이미지 업로드
@@ -71,7 +75,7 @@ export class RequestService {
   async remove(requestId: string) {
     const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
-      return new NotFoundDto('요청을 찾을 수 없습니다.');
+      return new NotFoundDto('해당 과외 요청이 존재하지 않습니다.');
     }
 
     await this.requestModel.delete({ id: requestId });
