@@ -52,12 +52,12 @@ export class SimulationController {
     schema: {
       type: 'object',
       properties: {
-        student_name: {
+        studentName: {
           type: 'string',
           description: '학생의 이름',
           example: '난 학생이고',
         },
-        teacher_name: {
+        teacherName: {
           type: 'string',
           description: '선생님의 이름',
           example: '난 선생이야',

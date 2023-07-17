@@ -1,13 +1,20 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { RequestService } from './request.service';
 import { CreateRequestDto } from './dto/create-request.dto';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { NotFoundDto } from '../HttpResponseDto';
+import {
+  ApiBody,
+  ApiOperation,
+  ApiParam,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
+import { ForbiddenDto, NotFoundDto } from '../HttpResponseDto';
 import {
   Success_DeleteRequestDto,
   Success_GetRequestsDto,
 } from './dto/response-request.dto';
 import { Created_CreateResponseDto } from '../response/dto/response-response.dto';
+import { DeleteRequestDto } from './dto/delete-request.dto';
 
 @ApiTags('Request')
 @Controller('request')
@@ -33,6 +40,11 @@ export class RequestController {
     status: 401,
     description: '해당 학생이 존재하지 않습니다.',
     type: NotFoundDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: '선생님은 과외 요청을 할 수 없습니다.',
+    type: ForbiddenDto,
   })
   create(
     @Param('studentId') studentId: string,
@@ -64,6 +76,10 @@ export class RequestController {
     name: 'requestId',
     description: '삭제할 과외 요청의 ID',
     example: 'test-request-id',
+  })
+  @ApiBody({
+    description: '과외 요청을 삭제하는 학생의 ID',
+    type: DeleteRequestDto,
   })
   @ApiResponse({
     status: 200,
