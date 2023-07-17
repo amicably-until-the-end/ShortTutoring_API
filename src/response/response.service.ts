@@ -5,7 +5,12 @@ import { Request, RequestKey } from '../request/entities/request.interface';
 import { Tutoring, TutoringKey } from '../tutoring/entities/tutoring.interface';
 import { SelectResponseDto } from './dto/select-response.dto';
 import { TutoringService } from '../tutoring/tutoring.service';
-import { ConflictDto, NotFoundDto } from '../HttpResponseDto';
+import {
+  BadRequestDto,
+  ConflictDto,
+  ForbiddenDto,
+  NotFoundDto,
+} from '../HttpResponseDto';
 import {
   Created_CreateResponseDto,
   Success_CheckResponseDto,
@@ -34,6 +39,8 @@ export class ResponseService {
     const teacher = await this.userModel.get({ id: teacherId });
     if (teacher === undefined) {
       return new NotFoundDto('선생님을 찾을 수 없습니다.');
+    } else if (teacher.role === 'student') {
+      return new ForbiddenDto('학생은 과외 요청에 응답할 수 없습니다.');
     }
 
     if (request.teacherIds.includes(teacherId)) {
@@ -56,6 +63,8 @@ export class ResponseService {
       return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
     }
 
+    // TODO: 학생 본인 확인
+
     const teachers = [];
     for (const teacherId of request.teacherIds) {
       teachers.push(await this.userModel.get({ id: teacherId }));
@@ -65,11 +74,27 @@ export class ResponseService {
   }
 
   async select(selectResponseDto: SelectResponseDto) {
+    const student = await this.userModel.get({
+      id: selectResponseDto.studentId,
+    });
+    if (student === undefined) {
+      return new NotFoundDto('학생을 찾을 수 없습니다.');
+    }
+
+    const teacher = await this.userModel.get({
+      id: selectResponseDto.teacherId,
+    });
+    if (teacher === undefined) {
+      return new NotFoundDto('선생님을 찾을 수 없습니다.');
+    }
+
     const request = await this.requestModel.get({
       id: selectResponseDto.requestId,
     });
     if (request === undefined) {
       return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
+    } else if (request.studentId !== selectResponseDto.studentId) {
+      return new ForbiddenDto('다른 학생의 과외 요청입니다.');
     }
 
     if (request.status === 'selected') {
@@ -81,7 +106,7 @@ export class ResponseService {
     }
 
     if (!request.teacherIds.includes(selectResponseDto.teacherId)) {
-      return new NotFoundDto('선생님을 찾을 수 없습니다.');
+      return new NotFoundDto('해당 요청에서 선생님을 찾을 수 없습니다.');
     }
 
     const tutoringService = new TutoringService(
@@ -110,15 +135,16 @@ export class ResponseService {
     const request = await this.requestModel.get({ id: requestId });
     if (request === undefined) {
       return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
-    }
-
-    if (request.status === 'pending') {
+    } else if (request.status === 'pending') {
       return new Success_CheckResponseDto('학생의 선택을 기다리는 중입니다.', {
         status: 'yet selected',
       });
     }
 
-    if (teacherId !== request.selectedTeacherId) {
+    const teacher = await this.userModel.get({ id: teacherId });
+    if (teacher === undefined) {
+      return new NotFoundDto('선생님을 찾을 수 없습니다.');
+    } else if (teacherId !== request.selectedTeacherId) {
       return new Success_CheckResponseDto(
         '학생이 다른 선생님과 과외를 시작하였습니다.',
         { status: 'not selected' },
@@ -145,7 +171,12 @@ export class ResponseService {
       return new NotFoundDto('과외 요청을 찾을 수 없습니다.');
     }
 
-    if (!request.teacherIds.includes(teacherId)) {
+    const teacher = await this.userModel.get({ id: teacherId });
+    if (teacher === undefined) {
+      return new NotFoundDto('선생님을 찾을 수 없습니다.');
+    } else if (teacher.role === 'student') {
+      return new BadRequestDto('학생은 과외 요청에 응답할 수 없습니다.');
+    } else if (!request.teacherIds.includes(teacherId)) {
       return new NotFoundDto('해당 요청에서 선생님을 찾을 수 없습니다.');
     }
 

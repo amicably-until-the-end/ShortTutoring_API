@@ -15,7 +15,7 @@ import {
   Success_GetTeachersDto,
   Success_SelectResponseDto,
 } from './dto/response-response.dto';
-import { NotFoundDto } from '../HttpResponseDto';
+import { ForbiddenDto, NotFoundDto } from '../HttpResponseDto';
 
 @ApiTags('Response')
 @Controller('response')
@@ -45,6 +45,11 @@ export class ResponseController {
     status: 200,
     description: '응답을 성공적으로 추가했습니다.',
     type: Created_CreateResponseDto,
+  })
+  @ApiResponse({
+    status: 403,
+    description: '학생은 과외 요청에 응답할 수 없습니다.',
+    type: ForbiddenDto,
   })
   @ApiResponse({
     status: 404,
@@ -104,10 +109,22 @@ export class ResponseController {
     type: Success_SelectResponseDto,
   })
   @ApiResponse({
+    status: 403,
+    description: '다른 학생의 과외 요청입니다.',
+    type: ForbiddenDto,
+  })
+  @ApiResponse({
     status: 404,
     description:
-      '- 과외 요청을 찾을 수 없습니다.\n- 과외 선생님을 찾을 수 없습니다.',
+      '- 학생을 찾을 수 없습니다\n' +
+      '- 과외 요청을 찾을 수 없습니다.\n' +
+      '- 해당 요청에서 선생님을 찾을 수 없습니다.',
     type: NotFoundDto,
+  })
+  @ApiResponse({
+    status: 409,
+    description:
+      '- 이미 선택한 선생님입니다.\n' + '- 이미 다른 선생님을 선택했습니다.',
   })
   select(@Body() selectResponseDto: SelectResponseDto) {
     return this.responseService.select(selectResponseDto);
@@ -139,14 +156,16 @@ export class ResponseController {
     status: 200,
     description:
       '- 학생이 선생님을 선택했습니다. 과외를 시작하세요.\n' +
-      '- 학생이 선생님을 선택하지 않았습니다.\n' +
-      '- 학생의 선택을 기다리고 있습니다.',
+      '- 학생의 선택을 기다리고 있습니다.\n' +
+      '- 학생이 다른 선생님과 과외를 시작하였습니다..\n',
     type: Success_CheckResponseDto,
   })
   @ApiResponse({
     status: 404,
     description:
-      '- 과외 요청을 찾을 수 없습니다.\n- 과외 선생님을 찾을 수 없습니다.',
+      '- 과외 요청을 찾을 수 없습니다.\n' +
+      '- 선생님을 찾을 수 없습니다.\n' +
+      '- 과외를 찾을 수 없습니다.',
     type: NotFoundDto,
   })
   check(
@@ -183,6 +202,7 @@ export class ResponseController {
     status: 404,
     description:
       '- 과외 요청을 찾을 수 없습니다.\n' +
+      '- 선생님을 찾을 수 없습니다.\n' +
       '- 해당 요청에서 선생님을 찾을 수 없습니다.',
     type: NotFoundDto,
   })
