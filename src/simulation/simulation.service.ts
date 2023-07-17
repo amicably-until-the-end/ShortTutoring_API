@@ -8,6 +8,8 @@ import {
   webhook,
 } from '../config.discord-webhook';
 import { v4 as uuid } from 'uuid';
+import { ResponseService } from '../response/response.service';
+import { Tutoring, TutoringKey } from '../tutoring/entities/tutoring.interface';
 
 @Injectable()
 export class SimulationService {
@@ -16,6 +18,8 @@ export class SimulationService {
     private userModel: Model<User, UserKey>,
     @InjectModel('Request')
     private requestModel: Model<Request, RequestKey>,
+    @InjectModel('Tutoring')
+    private tutoringModel: Model<Tutoring, TutoringKey>,
   ) {}
 
   async matching(studentName: string, teacherName: string) {
@@ -165,6 +169,58 @@ export class SimulationService {
   async onlyTest() {
     await this.removeAll().then(async () => {
       await this.createTest();
+    });
+
+    return await this.getAll();
+  }
+
+  async selecting(studentName: string, n: number) {
+    const studentId = 'S_' + uuid().toString().slice(0, 4);
+    await this.userModel.create({
+      id: studentId,
+      name: studentName,
+      role: 'student',
+    });
+
+    const teachers = [];
+    for (let i = 0; i < n; i++) {
+      const uid = uuid().toString().slice(0, 4);
+      const teacher = {
+        id: 'T_' + uid,
+        name: 'teacher_' + uid,
+        role: 'teacher',
+      };
+
+      await this.userModel.create(teacher);
+      teachers.push(teacher);
+    }
+
+    const requestId = 'R_' + uuid().toString().slice(0, 4);
+    await this.requestModel.create({
+      id: requestId,
+      studentId: studentId,
+      problem: {
+        description: 'test-problem-description',
+      },
+      status: 'pending',
+      teacherIds: [],
+    });
+    console.log(await this.getAll());
+
+    const responseService = new ResponseService(
+      this.userModel,
+      this.requestModel,
+      this.tutoringModel,
+    );
+    for (const teacher of teachers) {
+      await responseService.create(requestId, teacher.id);
+    }
+    console.log(await this.getAll());
+
+    await responseService.select({
+      requestId,
+      studentId,
+      teacherId: teachers[0].id,
     });
 
     return await this.getAll();

@@ -71,4 +71,34 @@ export class SimulationController {
   ) {
     return this.testService.matching(studentName, teacherName);
   }
+
+  @Post('selecting')
+  @ApiOperation({
+    summary: '[DEV] 선택 매칭 시뮬레이션',
+    description:
+      '학생의 이름과 선생님의 수 n을 입력하면 매칭 과정을 디스코드에서 보여줍니다.',
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        studentName: {
+          type: 'string',
+          description: '학생의 이름',
+          example: 'student',
+        },
+        teacherCount: {
+          type: 'number',
+          description: '선생님의 수',
+          example: '2',
+        },
+      },
+    },
+  })
+  selecting(
+    @Body('studentName') studentName: string,
+    @Body('teacherCount') n: number,
+  ) {
+    return this.testService.selecting(studentName, n);
+  }
 }
