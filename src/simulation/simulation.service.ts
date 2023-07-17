@@ -8,6 +8,8 @@ import {
   webhook,
 } from '../config.discord-webhook';
 import { v4 as uuid } from 'uuid';
+import { ResponseService } from '../response/response.service';
+import { Tutoring, TutoringKey } from '../tutoring/entities/tutoring.interface';
 
 @Injectable()
 export class SimulationService {
@@ -16,6 +18,8 @@ export class SimulationService {
     private userModel: Model<User, UserKey>,
     @InjectModel('Request')
     private requestModel: Model<Request, RequestKey>,
+    @InjectModel('Tutoring')
+    private tutoringModel: Model<Tutoring, TutoringKey>,
   ) {}
 
   async matching(studentName: string, teacherName: string) {
@@ -168,5 +172,97 @@ export class SimulationService {
     });
 
     return await this.getAll();
+  }
+
+  async selecting(studentName: string, n: number) {
+    const studentId = 'S_' + uuid().toString().slice(0, 4);
+    await this.userModel.create({
+      id: studentId,
+      name: studentName,
+      role: 'student',
+    });
+
+    const teachers = [];
+    for (let i = 0; i < n; i++) {
+      const uid = uuid().toString().slice(0, 4);
+      const teacher = {
+        id: 'T_' + uid,
+        name: 'teacher_' + uid,
+        role: 'teacher',
+      };
+
+      await this.userModel.create(teacher);
+      teachers.push(teacher);
+    }
+
+    const users = await this.userModel.scan().exec();
+    await webhook.info(
+      `[Init]\n학생 ${studentName}(${studentId}) 생성\n선생님 ${n}명 생성`,
+    );
+    await webhook.send(`\`\`\`json\n${JSON.stringify(users, null, 2)}\n\`\`\``);
+
+    const requestId = 'R_' + uuid().toString().slice(0, 4);
+    await this.requestModel.create({
+      id: requestId,
+      studentId: studentId,
+      problem: {
+        description: 'test-problem-description',
+      },
+      status: 'pending',
+      teacherIds: [],
+    });
+    await webhook.success(`[Request]\n과외 요청 생성!\nid: ${requestId}`);
+
+    const responseService = new ResponseService(
+      this.userModel,
+      this.requestModel,
+      this.tutoringModel,
+    );
+    for (const teacher of teachers) {
+      await teacherWebhook.success(
+        `[Response Create]\n선생님 ${teacher.name}(${teacher.id})이 요청에 응답함`,
+      );
+      await responseService.create(requestId, teacher.id);
+    }
+    await studentWebhook.success(
+      `[Response TeacherList]\n학생 ${studentName}(${studentId})이 ${n}개의 응답을 확인함`,
+    );
+    await webhook.send(
+      `\`\`\`json\n//[Response TeacherList]\n${JSON.stringify(
+        teachers,
+        null,
+        2,
+      )}\n\`\`\``,
+    );
+
+    const tutoring = await responseService.select({
+      requestId,
+      studentId,
+      teacherId: teachers[0].id,
+    });
+    await webhook.info(
+      `[Response Select]\n학생 ${studentName}(${studentId})이 선생님 ${teachers[0].name}(${teachers[0].id})을 선택함`,
+    );
+    await studentWebhook.send(
+      `\`\`\`json\n//[Response Select]\n${JSON.stringify(
+        tutoring,
+        null,
+        2,
+      )}\n\`\`\``,
+    );
+
+    for (const teacher of teachers) {
+      await teacherWebhook.send(
+        `\`\`\`json\n//[Response Check]\n${JSON.stringify(
+          await responseService.check(requestId, teacher.id),
+          null,
+          2,
+        )}\n\`\`\``,
+      );
+    }
+
+    await webhook.info(
+      `[Tutoring Create]\n학생 ${studentName}(${studentId})과 선생님 ${teachers[0].name}(${teachers[0].id})의 과외 생성`,
+    );
   }
 }
