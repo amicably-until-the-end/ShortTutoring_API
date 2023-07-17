@@ -195,6 +195,12 @@ export class SimulationService {
       teachers.push(teacher);
     }
 
+    const users = await this.userModel.scan().exec();
+    await webhook.info(
+      `[Init]\n학생 ${studentName}(${studentId}) 생성\n선생님 ${n}명 생성`,
+    );
+    await webhook.send(`\`\`\`json\n${JSON.stringify(users, null, 2)}\n\`\`\``);
+
     const requestId = 'R_' + uuid().toString().slice(0, 4);
     await this.requestModel.create({
       id: requestId,
@@ -205,7 +211,7 @@ export class SimulationService {
       status: 'pending',
       teacherIds: [],
     });
-    console.log(await this.getAll());
+    await webhook.success(`[Request]\n과외 요청 생성!\nid: ${requestId}`);
 
     const responseService = new ResponseService(
       this.userModel,
@@ -213,16 +219,50 @@ export class SimulationService {
       this.tutoringModel,
     );
     for (const teacher of teachers) {
+      await teacherWebhook.success(
+        `[Response Create]\n선생님 ${teacher.name}(${teacher.id})이 요청에 응답함`,
+      );
       await responseService.create(requestId, teacher.id);
     }
-    console.log(await this.getAll());
+    await studentWebhook.success(
+      `[Response TeacherList]\n학생 ${studentName}(${studentId})이 ${n}개의 응답을 확인함`,
+    );
+    await webhook.send(
+      `\`\`\`json\n//[Response TeacherList]\n${JSON.stringify(
+        teachers,
+        null,
+        2,
+      )}\n\`\`\``,
+    );
 
-    await responseService.select({
+    const tutoring = await responseService.select({
       requestId,
       studentId,
       teacherId: teachers[0].id,
     });
+    await webhook.info(
+      `[Response Select]\n학생 ${studentName}(${studentId})이 선생님 ${teachers[0].name}(${teachers[0].id})을 선택함`,
+    );
+    await studentWebhook.send(
+      `\`\`\`json\n//[Response Select]\n${JSON.stringify(
+        tutoring,
+        null,
+        2,
+      )}\n\`\`\``,
+    );
 
-    return await this.getAll();
+    for (const teacher of teachers) {
+      await teacherWebhook.send(
+        `\`\`\`json\n//[Response Check]\n${JSON.stringify(
+          await responseService.check(requestId, teacher.id),
+          null,
+          2,
+        )}\n\`\`\``,
+      );
+    }
+
+    await webhook.info(
+      `[Tutoring Create]\n학생 ${studentName}(${studentId})과 선생님 ${teachers[0].name}(${teachers[0].id})의 과외 생성`,
+    );
   }
 }
