@@ -2,26 +2,19 @@ import {
   Body,
   Controller,
   HttpException,
-  Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import * as AWS from 'aws-sdk';
 import * as process from 'process';
-import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
 import { webhook } from '../config.discord-webhook';
 
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
-  @Post('file')
-  @ApiOperation({
-    summary: '파일 업로드',
-    description:
-      '`USER`\n\n파일을 업로드합니다.`file` 필드에 파일을 첨부해주세요.\n\n해당 파일은 S3에 업로드됩니다.',
-  })
   @UseInterceptors(FileInterceptor('file'))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -56,12 +49,6 @@ export class UploadController {
     }
   }
 
-  @Post('base64Image')
-  @ApiOperation({
-    summary: 'base64 이미지 업로드',
-    description:
-      '`USER`\n\nbase64로 변환된 이미지 데이터와 관련 형식을 업로드합니다.\n\n해당 이미지는 S3에 업로드됩니다.',
-  })
   @ApiBody({
     schema: {
       type: 'string',
