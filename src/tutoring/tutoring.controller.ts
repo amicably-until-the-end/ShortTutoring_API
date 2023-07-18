@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller } from '@nestjs/common';
 import { TutoringService } from './tutoring.service';
 import {
   CreateTutoringDto,
@@ -11,7 +11,6 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 export class TutoringController {
   constructor(private readonly tutoringService: TutoringService) {}
 
-  @Post('create')
   @ApiResponse({
     status: 201,
     description: '과외를 성공적으로 생성했습니다.',
