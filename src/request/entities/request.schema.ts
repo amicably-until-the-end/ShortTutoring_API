@@ -45,7 +45,7 @@ export const RequestSchema = new Schema({
   tutoringId: {
     type: String,
   },
-  created_at: {
+  createdAt: {
     type: String,
   },
 });
