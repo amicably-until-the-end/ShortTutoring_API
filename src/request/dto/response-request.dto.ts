@@ -52,7 +52,14 @@ export class Success_GetRequestsDto extends HttpResponseDto {
       requests: [
         {
           id: 'test-request-id',
-          studentId: 'test-student-id',
+          student: {
+            id: 'test-student-id',
+            name: 'test-student-name',
+            bio: 'test-student-bio',
+            role: 'student',
+            profileImageURL: 'test-student-profile-image-url',
+            createdAt: '2021-01-01T00:00:00.000Z',
+          },
           problem: {
             description: 'test-description',
             base64Image: 'test-base64-image',
