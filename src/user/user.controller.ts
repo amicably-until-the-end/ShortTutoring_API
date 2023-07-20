@@ -35,7 +35,7 @@ export class UserController {
       bio: createUsersDto.bio,
       role: createUsersDto.role,
       profileImageURL: '',
-      created_at: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
     };
     return this.userService.create(user);
   }

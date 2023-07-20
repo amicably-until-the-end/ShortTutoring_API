@@ -17,7 +17,7 @@ export const UserSchema = new Schema({
   role: {
     type: String,
   },
-  created_at: {
+  createdAt: {
     type: String,
   },
 });

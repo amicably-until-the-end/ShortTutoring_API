@@ -7,5 +7,5 @@ export interface User extends UserKey {
   bio?: string;
   profileImageURL?: string;
   role?: string;
-  created_at?: string;
+  createdAt?: string;
 }

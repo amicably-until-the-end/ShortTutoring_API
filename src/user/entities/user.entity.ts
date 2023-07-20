@@ -4,7 +4,7 @@ export class UserEntity {
   bio?: string;
   profileImageURL?: string;
   role?: string;
-  created_at?: string;
+  createdAt?: string;
 
   readonly Student = new UserEntity(
     'test-student-id',
@@ -12,7 +12,7 @@ export class UserEntity {
     'test-student-bio',
     'test-student-profileImageURL',
     'student',
-    'test-student-created_at',
+    'test-student-createdAt',
   );
 
   readonly Teacher = new UserEntity(
@@ -21,7 +21,7 @@ export class UserEntity {
     'test-teacher-bio',
     'test-teacher-profileImageURL',
     'teacher',
-    'test-teacher-created_at',
+    'test-teacher-createdAt',
   );
 
   constructor(
@@ -30,13 +30,13 @@ export class UserEntity {
     bio?: string,
     profileImageURL?: string,
     role?: string,
-    created_at?: string,
+    createdAt?: string,
   ) {
     this.id = id;
     this.name = name;
     this.bio = bio;
     this.profileImageURL = profileImageURL;
     this.role = role;
-    this.created_at = created_at;
+    this.createdAt = createdAt;
   }
 }
