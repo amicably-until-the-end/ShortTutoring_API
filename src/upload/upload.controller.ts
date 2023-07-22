@@ -11,6 +11,7 @@ import * as process from 'process';
 import { ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
 import { Express } from 'express';
 import { webhook } from '../config.discord-webhook';
+import { MessageBuilder } from 'discord-webhook-node';
 
 @ApiTags('Upload')
 @Controller('upload')
@@ -62,9 +63,9 @@ export class UploadController {
     },
   })
   async uploadBase64(
-    @Body('format') format: string,
-    @Body('usage') usage: string,
     @Body('id') id: string,
+    @Body('usage') usage: string,
+    @Body('format') format: string,
     @Body('base64') base64: string,
   ) {
     const base64Data = Buffer.from(base64, 'base64');
@@ -77,14 +78,20 @@ export class UploadController {
     });
 
     try {
-      await webhook.info(`Uploading ${usage}/${id}.${format}`);
-      return await new AWS.S3()
+      const imagePath = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${id}/${usage}.${format}`;
+      await webhook.info(`Uploading ${id}/${usage}.${format}`);
+      await new AWS.S3()
         .putObject({
-          Key: `${usage}/${id}.${format}`,
+          Key: `${id}/${usage}.${format}`,
           Body: base64Data,
           Bucket: process.env.AWS_S3_BUCKET_NAME,
         })
         .promise();
+
+      const embed = new MessageBuilder().setImage(imagePath);
+      await webhook.send(embed);
+
+      return imagePath;
     } catch (error) {
       console.log(error);
       return HttpException;

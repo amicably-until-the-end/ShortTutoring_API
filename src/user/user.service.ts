@@ -9,6 +9,9 @@ import {
 } from './dto/response-user.dto';
 import { NotFoundDto } from '../HttpResponseDto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { v4 as uuid } from 'uuid';
+import { UploadController } from '../upload/upload.controller';
 
 @Injectable()
 export class UserService {
@@ -17,13 +20,32 @@ export class UserService {
     private userModel: Model<User, UserKey>,
   ) {}
 
-  async create(user: User) {
-    await this.userModel.create(user);
-    const response = new Success_CreateUserDto(user);
-    response.data = user;
+  async create(createUserDto: CreateUserDto) {
+    const uploadController = new UploadController();
 
+    const userId = uuid();
+    const profileImageURL = await uploadController
+      .uploadBase64(
+        userId,
+        'profile',
+        createUserDto.profileImage.format,
+        createUserDto.profileImage.data,
+      )
+      .then((res) => res.toString());
+
+    const user: User = {
+      id: uuid(),
+      name: createUserDto.name,
+      bio: createUserDto.bio,
+      role: createUserDto.role,
+      profileImageURL,
+      createdAt: new Date().toISOString(),
+    };
+
+    await this.userModel.create(user);
     //TODO 인증 예외처리
-    return response;
+
+    return new Success_CreateUserDto(user);
   }
 
   async findAll() {
