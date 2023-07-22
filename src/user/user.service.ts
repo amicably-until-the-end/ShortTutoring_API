@@ -50,14 +50,14 @@ export class UserService {
   async create(createUserDto: CreateUserDto) {
     const userId = uuid();
 
-    const profileImageURL = await this.profileImage(userId, createUserDto);
+    const profileImage = await this.profileImage(userId, createUserDto);
 
     const user: User = {
       id: userId,
       name: createUserDto.name,
       bio: createUserDto.bio,
       role: createUserDto.role,
-      profileImageURL,
+      profileImage,
       createdAt: new Date().toISOString(),
     };
 
@@ -80,14 +80,32 @@ export class UserService {
     return new Success_GetUserDto(user);
   }
 
+  /*
+  사용자 정보를 업데이트합니다.
+  @param userId 사용자 ID
+  @param updateUserDto 업데이트할 사용자 정보
+  @return 업데이트된 사용자 정보
+   */
   async update(userId: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userModel.get({ id: userId });
+    let user = await this.userModel.get({ id: userId });
     if (user === undefined) {
       return new NotFoundDto(null);
     }
 
-    await this.userModel.update({ id: userId }, updateUserDto);
-    return new Success_UpdateUserDto(await this.userModel.get({ id: userId }));
+    const profileImage = await this.profileImage(
+      userId,
+      updateUserDto as CreateUserDto,
+    );
+
+    const updateUser = {
+      name: updateUserDto.name,
+      bio: updateUserDto.bio,
+      role: updateUserDto.role,
+      profileImage,
+    };
+
+    user = await this.userModel.update({ id: userId }, updateUser);
+    return new Success_UpdateUserDto(user);
   }
 
   async remove(userId: string) {
