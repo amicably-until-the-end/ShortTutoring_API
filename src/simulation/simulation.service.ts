@@ -28,8 +28,12 @@ export class SimulationService {
 
     await this.userModel.create({
       id: studentId,
+      bio: 'test-student',
       name: studentName,
       role: 'student',
+      profileImage:
+        'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+      createdAt: new Date().toISOString(),
     });
     await studentWebhook.info(
       `[Init] Student created\nname: ${studentName}\nid: ${studentId}`,
@@ -37,8 +41,12 @@ export class SimulationService {
 
     await this.userModel.create({
       id: teacherId,
+      bio: 'test-teacher',
       name: teacherName,
       role: 'teacher',
+      profileImage:
+        'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+      createdAt: new Date().toISOString(),
     });
     await teacherWebhook.info(
       `[Init] Teacher created\nname: ${teacherName}\nid: ${teacherId}`,
@@ -140,13 +148,21 @@ export class SimulationService {
     try {
       await this.userModel.create({
         id: 'test-student-id',
+        bio: 'test-student',
         name: 'test-student-name',
         role: 'student',
+        profileImage:
+          'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+        createdAt: new Date().toISOString(),
       });
       await this.userModel.create({
         id: 'test-teacher-id',
+        bio: 'test-teacher',
         name: 'test-teacher-name',
         role: 'teacher',
+        profileImage:
+          'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+        createdAt: new Date().toISOString(),
       });
       await this.requestModel
         .create({
@@ -178,8 +194,12 @@ export class SimulationService {
     const studentId = 'S_' + uuid().toString().slice(0, 4);
     await this.userModel.create({
       id: studentId,
+      bio: 'test-student',
       name: studentName,
       role: 'student',
+      profileImage:
+        'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+      createdAt: new Date().toISOString(),
     });
 
     const teachers = [];
@@ -187,8 +207,12 @@ export class SimulationService {
       const uid = uuid().toString().slice(0, 4);
       const teacher = {
         id: 'T_' + uid,
+        bio: 'test-teacher',
         name: 'teacher_' + uid,
         role: 'teacher',
+        profileImage:
+          'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+        createdAt: new Date().toISOString(),
       };
 
       await this.userModel.create(teacher);
