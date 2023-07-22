@@ -36,8 +36,7 @@ export class UserService {
     return await uploadController
       .uploadBase64(
         userId,
-        'profile',
-        createUserDto.profileImage.format,
+        `profile.${createUserDto.profileImage.format}`,
         createUserDto.profileImage.data,
       )
       .then((res) => res.toString());
