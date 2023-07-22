@@ -20,11 +20,20 @@ export class UserService {
     private userModel: Model<User, UserKey>,
   ) {}
 
-  async create(createUserDto: CreateUserDto) {
-    const uploadController = new UploadController();
+  /*
+  createdUserDto의 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
+  @param userId 사용자 ID
+  @param createdUserDto 사용자 정보
+  @exception 프로필 이미지 데이터가 존재하지 않을 경우 기본 이미지 URL을 반환합니다.
+  @return profileImage URL
+   */
+  async profileImage(userId: string, createUserDto: CreateUserDto) {
+    if (createUserDto.profileImage.data === undefined) {
+      return 'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png';
+    }
 
-    const userId = uuid();
-    const profileImageURL = await uploadController
+    const uploadController = new UploadController();
+    return await uploadController
       .uploadBase64(
         userId,
         'profile',
@@ -32,9 +41,20 @@ export class UserService {
         createUserDto.profileImage.data,
       )
       .then((res) => res.toString());
+  }
+
+  /*
+  사용자를 생성합니다.
+  @param createUserDto 사용자 정보
+  @return 사용자 정보
+   */
+  async create(createUserDto: CreateUserDto) {
+    const userId = uuid();
+
+    const profileImageURL = await this.profileImage(userId, createUserDto);
 
     const user: User = {
-      id: uuid(),
+      id: userId,
       name: createUserDto.name,
       bio: createUserDto.bio,
       role: createUserDto.role,
