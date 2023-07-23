@@ -10,6 +10,7 @@ import {
   Success_DeleteRequestDto,
   Success_GetRequestsDto,
 } from './dto/response-request.dto';
+import { UploadController } from '../upload/upload.controller';
 
 @Injectable()
 export class RequestService {
@@ -20,6 +21,34 @@ export class RequestService {
     private requestModel: Model<Request, RequestKey>,
   ) {}
 
+  /*
+  createdRequestDto의 문제 이미지를 S3에 업로드하고, URL을 반환합니다.
+  @param requestId 과외 요청 ID
+  @param createdRequestDto 과외 요청 정보
+  @exception 문제 이미지 데이터가 존재하지 않을 경우 기본 이미지 URL을 반환합니다.
+  @return problemImage URL
+   */
+  async problemImage(requestId: string, createRequestDto: CreateRequestDto) {
+    if (createRequestDto.imageBase64 === undefined) {
+      return 'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/problem.png';
+    }
+
+    const uploadController = new UploadController();
+    return await uploadController
+      .uploadBase64(
+        requestId,
+        `problem.${createRequestDto.imageFormat}`,
+        createRequestDto.imageBase64,
+      )
+      .then((res) => res.toString());
+  }
+
+  /*
+  과외 요청을 생성합니다.
+  @param studentId 학생 ID
+  @param createRequestDto 과외 요청 정보
+  @return 과외 요청 정보
+   */
   async create(studentId: string, createRequestDto: CreateRequestDto) {
     const student = await this.userModel.get({ id: studentId });
     if (student === undefined) {
@@ -30,21 +59,21 @@ export class RequestService {
       return new ForbiddenDto('선생님은 과외 요청을 할 수 없습니다.');
     }
 
-    // TODO: S3에 이미지 업로드
-    const imageUrl = 'Decoded image url';
+    const requestId = uuid();
+    const problemImage = await this.problemImage(requestId, createRequestDto);
 
     const request = {
-      id: uuid(),
+      id: requestId,
       status: 'pending',
       studentId,
       teacherIds: [],
       problem: {
-        description: createRequestDto.problemDescription,
-        schoolLevel: createRequestDto.problemSchoolLevel,
-        imageUrl,
-        schoolSubject: createRequestDto.problemSchoolSubject,
-        schoolChapter: createRequestDto.problemSchoolChapter,
-        difficulty: createRequestDto.problemDifficulty,
+        image: problemImage,
+        description: createRequestDto.description,
+        schoolLevel: createRequestDto.schoolLevel,
+        schoolSubject: createRequestDto.schoolSubject,
+        schoolChapter: createRequestDto.schoolChapter,
+        difficulty: createRequestDto.difficulty,
       },
       selectedTeacherId: '',
       createdAt: new Date().toISOString(),

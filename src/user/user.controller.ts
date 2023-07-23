@@ -1,10 +1,8 @@
 import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 import { UserService } from './user.service';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { User } from './entities/user.interface';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { v4 as uuid } from 'uuid';
 import {
   Success_CreateUserDto,
   Success_DeleteUserDto,
@@ -28,16 +26,8 @@ export class UserController {
     description: '사용자 생성 성공',
     type: Success_CreateUserDto,
   })
-  create(@Body() createUsersDto: CreateUserDto) {
-    const user: User = {
-      id: uuid(),
-      name: createUsersDto.name,
-      bio: createUsersDto.bio,
-      role: createUsersDto.role,
-      profileImageURL: '',
-      createdAt: new Date().toISOString(),
-    };
-    return this.userService.create(user);
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.userService.create(createUserDto);
   }
 
   @Get('findAll')

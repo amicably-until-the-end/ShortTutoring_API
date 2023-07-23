@@ -5,7 +5,7 @@ export interface UserKey {
 export interface User extends UserKey {
   name: string;
   bio?: string;
-  profileImageURL?: string;
+  profileImage?: string;
   role?: string;
   createdAt?: string;
 }

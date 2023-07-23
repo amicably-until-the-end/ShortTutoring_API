@@ -23,7 +23,7 @@ export class Success_CreateUserDto extends HttpResponseDto {
       id: 'test-id',
       name: 'test-name',
       bio: 'test-bio',
-      profileImageURL: 'test-profileImage-url',
+      profileImage: 'test-profileImage-url',
       role: 'student',
     },
   })
@@ -55,7 +55,7 @@ export class Success_GetUserDto extends HttpResponseDto {
       id: 'test-id',
       name: 'test-name',
       bio: 'test-bio',
-      profileImageURL: 'test-profileImage-url',
+      profileImage: 'test-profileImage-url',
       role: 'student',
       createdAt: 'test-created-at',
     },
@@ -88,7 +88,7 @@ export class Success_UpdateUserDto extends HttpResponseDto {
       id: 'test-id',
       name: 'test-name',
       bio: 'test-bio',
-      profileImageURL: 'test-profileImage-url',
+      profileImage: 'test-profileImage-url',
       role: 'student',
     },
   })
@@ -120,7 +120,7 @@ export class Success_DeleteUserDto extends HttpResponseDto {
       id: 'test-id',
       name: 'test-name',
       bio: 'test-bio',
-      profileImageURL: 'test-profileImage-url',
+      profileImage: 'test-profileImage-url',
       role: 'student',
     },
   })

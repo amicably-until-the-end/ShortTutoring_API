@@ -52,7 +52,7 @@ export class Success_GetTeachersDto extends HttpResponseDto {
         id: 'test-teacher-id',
         name: 'test-teacher-name',
         bio: 'test-teacher-bio',
-        profileImageURL: 'test-teacher-profileImage-url',
+        profileImage: 'test-teacher-profileImage-url',
         role: 'teacher',
         createdAt: 'test-teacher-created-at',
       },

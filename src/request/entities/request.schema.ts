@@ -1,10 +1,10 @@
 import { Schema } from 'dynamoose';
 
 export const ProblemSchema = new Schema({
-  description: {
+  image: {
     type: String,
   },
-  imageUrl: {
+  description: {
     type: String,
   },
   schoolLevel: {

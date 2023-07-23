@@ -3,8 +3,8 @@ export interface RequestKey {
 }
 
 export interface Problem {
+  image?: string;
   description: string;
-  imageUrl?: string;
   schoolLevel?: string;
   schoolSubject?: string;
   schoolChapter?: string;

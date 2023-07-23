@@ -11,7 +11,7 @@ export const UserSchema = new Schema({
   bio: {
     type: String,
   },
-  profileImageURL: {
+  profileImage: {
     type: String,
   },
   role: {

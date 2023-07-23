@@ -9,6 +9,9 @@ import {
 } from './dto/response-user.dto';
 import { NotFoundDto } from '../HttpResponseDto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { CreateUserDto } from './dto/create-user.dto';
+import { v4 as uuid } from 'uuid';
+import { UploadController } from '../upload/upload.controller';
 
 @Injectable()
 export class UserService {
@@ -17,13 +20,51 @@ export class UserService {
     private userModel: Model<User, UserKey>,
   ) {}
 
-  async create(user: User) {
-    await this.userModel.create(user);
-    const response = new Success_CreateUserDto(user);
-    response.data = user;
+  /*
+  createdUserDto의 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
+  @param userId 사용자 ID
+  @param createdUserDto 사용자 정보
+  @exception 프로필 이미지 데이터가 존재하지 않을 경우 기본 이미지 URL을 반환합니다.
+  @return profileImage URL
+   */
+  async profileImage(userId: string, createUserDto: CreateUserDto) {
+    if (createUserDto.profileImageBase64 === undefined) {
+      return 'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png';
+    }
 
+    const uploadController = new UploadController();
+    return await uploadController
+      .uploadBase64(
+        userId,
+        `profile.${createUserDto.profileImageFormat}`,
+        createUserDto.profileImageBase64,
+      )
+      .then((res) => res.toString());
+  }
+
+  /*
+  사용자를 생성합니다.
+  @param createUserDto 사용자 정보
+  @return 사용자 정보
+   */
+  async create(createUserDto: CreateUserDto) {
+    const userId = uuid();
+
+    const profileImage = await this.profileImage(userId, createUserDto);
+
+    const user: User = {
+      id: userId,
+      name: createUserDto.name,
+      bio: createUserDto.bio,
+      role: createUserDto.role,
+      profileImage,
+      createdAt: new Date().toISOString(),
+    };
+
+    await this.userModel.create(user);
     //TODO 인증 예외처리
-    return response;
+
+    return new Success_CreateUserDto(user);
   }
 
   async findAll() {
@@ -39,14 +80,32 @@ export class UserService {
     return new Success_GetUserDto(user);
   }
 
+  /*
+  사용자 정보를 업데이트합니다.
+  @param userId 사용자 ID
+  @param updateUserDto 업데이트할 사용자 정보
+  @return 업데이트된 사용자 정보
+   */
   async update(userId: string, updateUserDto: UpdateUserDto) {
-    const user = await this.userModel.get({ id: userId });
+    let user = await this.userModel.get({ id: userId });
     if (user === undefined) {
       return new NotFoundDto(null);
     }
 
-    await this.userModel.update({ id: userId }, updateUserDto);
-    return new Success_UpdateUserDto(await this.userModel.get({ id: userId }));
+    const profileImage = await this.profileImage(
+      userId,
+      updateUserDto as CreateUserDto,
+    );
+
+    const updateUser = {
+      name: updateUserDto.name,
+      bio: updateUserDto.bio,
+      role: updateUserDto.role,
+      profileImage,
+    };
+
+    user = await this.userModel.update({ id: userId }, updateUser);
+    return new Success_UpdateUserDto(user);
   }
 
   async remove(userId: string) {

@@ -2,7 +2,7 @@ export class UserEntity {
   id: string;
   name: string;
   bio?: string;
-  profileImageURL?: string;
+  profileImage?: string;
   role?: string;
   createdAt?: string;
 
@@ -28,14 +28,14 @@ export class UserEntity {
     id: string,
     name: string,
     bio?: string,
-    profileImageURL?: string,
+    profileImage?: string,
     role?: string,
     createdAt?: string,
   ) {
     this.id = id;
     this.name = name;
     this.bio = bio;
-    this.profileImageURL = profileImageURL;
+    this.profileImage = profileImage;
     this.role = role;
     this.createdAt = createdAt;
   }
