@@ -57,7 +57,7 @@ export class Success_GetRequestsDto extends HttpResponseDto {
             name: 'test-student-name',
             bio: 'test-student-bio',
             role: 'student',
-            profileImageURL: 'test-student-profile-image-url',
+            profileImage: 'test-student-profile-image-url',
             createdAt: '2021-01-01T00:00:00.000Z',
           },
           problem: {
