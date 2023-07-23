@@ -28,7 +28,7 @@ export class UserService {
   @return profileImage URL
    */
   async profileImage(userId: string, createUserDto: CreateUserDto) {
-    if (createUserDto.profileImage.base64 === undefined) {
+    if (createUserDto.profileImageBase64 === undefined) {
       return 'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png';
     }
 
@@ -36,8 +36,8 @@ export class UserService {
     return await uploadController
       .uploadBase64(
         userId,
-        `profile.${createUserDto.profileImage.format}`,
-        createUserDto.profileImage.base64,
+        `profile.${createUserDto.profileImageFormat}`,
+        createUserDto.profileImageBase64,
       )
       .then((res) => res.toString());
   }
