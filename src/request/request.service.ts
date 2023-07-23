@@ -29,7 +29,7 @@ export class RequestService {
   @return problemImage URL
    */
   async problemImage(requestId: string, createRequestDto: CreateRequestDto) {
-    if (createRequestDto.problemImage.data === undefined) {
+    if (createRequestDto.imageBase64 === undefined) {
       return 'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/problem.png';
     }
 
@@ -37,8 +37,8 @@ export class RequestService {
     return await uploadController
       .uploadBase64(
         requestId,
-        `problem.${createRequestDto.problemImage.format}`,
-        createRequestDto.problemImage.data,
+        `problem.${createRequestDto.imageFormat}`,
+        createRequestDto.imageBase64,
       )
       .then((res) => res.toString());
   }
@@ -69,11 +69,11 @@ export class RequestService {
       teacherIds: [],
       problem: {
         image: problemImage,
-        description: createRequestDto.problemDescription,
-        schoolLevel: createRequestDto.problemSchoolLevel,
-        schoolSubject: createRequestDto.problemSchoolSubject,
-        schoolChapter: createRequestDto.problemSchoolChapter,
-        difficulty: createRequestDto.problemDifficulty,
+        description: createRequestDto.description,
+        schoolLevel: createRequestDto.schoolLevel,
+        schoolSubject: createRequestDto.schoolSubject,
+        schoolChapter: createRequestDto.schoolChapter,
+        difficulty: createRequestDto.difficulty,
       },
       selectedTeacherId: '',
       createdAt: new Date().toISOString(),
