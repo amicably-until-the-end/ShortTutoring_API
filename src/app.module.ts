@@ -9,6 +9,7 @@ import { RequestModule } from './request/request.module';
 import { ResponseModule } from './response/response.module';
 import { SimulationModule } from './simulation/simulation.module';
 import { TutoringModule } from './tutoring/tutoring.module';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TutoringModule } from './tutoring/tutoring.module';
     ResponseModule,
     TutoringModule,
     SimulationModule,
+    AuthModule,
     // ReviewModule,
   ],
   controllers: [AppController],
