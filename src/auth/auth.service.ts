@@ -12,6 +12,12 @@ export class AuthService {
     private readonly userService: Model<User, UserKey>,
   ) {}
 
+  /*
+   * 토큰 정보 보기
+   * @param vendor OAuth2 제공자
+   * @param token OAuth2 토큰
+   * @returns OAuth2 토큰 정보
+   */
   async accessTokenInfo(vendor: string, token: string) {
     if (vendor === 'kakao') {
       const { data } = await firstValueFrom(
@@ -30,6 +36,12 @@ export class AuthService {
     return 'Not implemented';
   }
 
+  /*
+   * 토큰으로 카카오 사용자 정보 조회
+   * @param vendor OAuth2 제공자
+   * @param token OAuth2 토큰
+   * @returns 카카오 사용자 정보
+   */
   async accessTokenUser(vendor: string, token: string) {
     if (vendor === 'kakao') {
       const { data } = await firstValueFrom(
@@ -44,6 +56,12 @@ export class AuthService {
     }
   }
 
+  /*
+   * 토큰으로 숏과외 사용자 조회
+   * @param vendor OAuth2 제공자
+   * @param token OAuth2 토큰
+   * @returns 숏과외 사용자 정보
+   */
   async getUserFromAccessToken(vendor: string, token: string) {
     if (vendor === 'kakao') {
       const { data } = await firstValueFrom(
