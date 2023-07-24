@@ -25,6 +25,13 @@ export const configSwagger = (app) => {
         '- `500` : Internal Server Error (서버 오류)',
     )
     .setVersion('0.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+      },
+      'Authorization',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('', app, document);
