@@ -10,6 +10,7 @@ import {
 import { v4 as uuid } from 'uuid';
 import { ResponseService } from '../response/response.service';
 import { Tutoring, TutoringKey } from '../tutoring/entities/tutoring.interface';
+import { MessageBuilder } from 'discord-webhook-node';
 
 @Injectable()
 export class SimulationService {
@@ -117,6 +118,14 @@ export class SimulationService {
     return this.getAll();
   }
 
+  async getAll() {
+    const string = {};
+    string['user'] = await this.userModel.scan().exec();
+    string['request'] = await this.requestModel.scan().exec();
+    string['tutoring'] = await this.tutoringModel.scan().exec();
+    return string;
+  }
+
   async removeAll() {
     await this.userModel
       .scan()
@@ -134,14 +143,15 @@ export class SimulationService {
           return this.requestModel.delete(request);
         });
       });
+    await this.tutoringModel
+      .scan()
+      .exec()
+      .then((tutorings) => {
+        tutorings.forEach((tutoring) => {
+          return this.tutoringModel.delete(tutoring);
+        });
+      });
     return await this.getAll();
-  }
-
-  async getAll() {
-    const string = {};
-    string['user'] = await this.userModel.scan().exec();
-    string['request'] = await this.requestModel.scan().exec();
-    return string;
   }
 
   async createTest() {
@@ -201,6 +211,15 @@ export class SimulationService {
         'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
       createdAt: new Date().toISOString(),
     });
+    const embedStudent = new MessageBuilder()
+      .setTitle('학생 생성')
+      .setColor(Number('#00ff00'))
+      .addField('이름', studentName)
+      .addField('ID  ', studentId)
+      .setImage(
+        'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+      );
+    await studentWebhook.send(embedStudent);
 
     const teachers = [];
     for (let i = 0; i < n; i++) {
@@ -217,6 +236,14 @@ export class SimulationService {
 
       await this.userModel.create(teacher);
       teachers.push(teacher);
+      const embedTeacher = new MessageBuilder()
+        .setTitle('선생님 생성')
+        .setColor(Number('#00ff00'))
+        .addField('이름', teacher.name)
+        .setImage(
+          'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
+        );
+      await teacherWebhook.send(embedTeacher);
     }
 
     const users = await this.userModel.scan().exec();
