@@ -118,6 +118,14 @@ export class SimulationService {
     return this.getAll();
   }
 
+  async getAll() {
+    const string = {};
+    string['user'] = await this.userModel.scan().exec();
+    string['request'] = await this.requestModel.scan().exec();
+    string['tutoring'] = await this.tutoringModel.scan().exec();
+    return string;
+  }
+
   async removeAll() {
     await this.userModel
       .scan()
@@ -135,14 +143,15 @@ export class SimulationService {
           return this.requestModel.delete(request);
         });
       });
+    await this.tutoringModel
+      .scan()
+      .exec()
+      .then((tutorings) => {
+        tutorings.forEach((tutoring) => {
+          return this.tutoringModel.delete(tutoring);
+        });
+      });
     return await this.getAll();
-  }
-
-  async getAll() {
-    const string = {};
-    string['user'] = await this.userModel.scan().exec();
-    string['request'] = await this.requestModel.scan().exec();
-    return string;
   }
 
   async createTest() {
