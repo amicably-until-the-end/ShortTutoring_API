@@ -5,6 +5,7 @@ import { UserSchema } from '../user/entities/user.schema';
 import { RequestSchema } from '../request/entities/request.schema';
 import { SimulationService } from './simulation.service';
 import { TutoringSchema } from '../tutoring/entities/tutoring.schema';
+import {ResponseModule} from "../response/response.module";
 
 @Module({
   imports: [
@@ -30,9 +31,10 @@ import { TutoringSchema } from '../tutoring/entities/tutoring.schema';
           tableName: 'Tutorings',
         },
       },
-    ]),
+    ]),ResponseModule
   ],
   controllers: [SimulationController],
   providers: [SimulationService],
+
 })
 export class SimulationModule {}

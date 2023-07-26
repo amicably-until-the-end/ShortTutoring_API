@@ -26,4 +26,13 @@ export const TutoringSchema = new Schema({
   status: {
     type: String,
   },
+  whiteBoardToken: {
+    type: String,
+  },
+  whiteBoardUUID: {
+    type: String,
+  },
+  whiteBoardAppId: {
+    type: String,
+  },
 });

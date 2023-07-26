@@ -18,6 +18,7 @@ import {
   Success_GetTeachersDto,
   Success_SelectResponseDto,
 } from './dto/response-response.dto';
+import { Success_CreateTutoringDto } from '../tutoring/dto/create-tutoring.dto';
 
 @Injectable()
 export class ResponseService {
@@ -28,6 +29,7 @@ export class ResponseService {
     private requestModel: Model<Request, RequestKey>,
     @InjectModel('Tutoring')
     private tutoringModel: Model<Tutoring, TutoringKey>,
+    private tutoringService: TutoringService,
   ) {}
 
   async create(requestId: string, teacherId: string) {
@@ -109,26 +111,27 @@ export class ResponseService {
       return new NotFoundDto('해당 요청에서 선생님을 찾을 수 없습니다.');
     }
 
-    const tutoringService = new TutoringService(
-      this.requestModel,
-      this.tutoringModel,
-    );
-
-    const tempTutoring = await tutoringService.create(selectResponseDto);
-    let tutoringId;
-    if ('id' in tempTutoring.data) {
-      tutoringId = tempTutoring.data.id;
+    const tutoringDto = await this.tutoringService.create(selectResponseDto);
+    if (!(tutoringDto instanceof Success_CreateTutoringDto)) {
+      //내부 에러는 어떤식으로 처리해야하는지.
+      return new ConflictDto('과외 방 생성 실패');
     }
 
-    const tutoring = await this.tutoringModel.get({ id: tutoringId });
+    const tutoringInfo = await this.tutoringModel.get({
+      id: tutoringDto.data.id,
+    });
 
     request.status = 'selected';
     request.selectedTeacherId = selectResponseDto.teacherId;
-    console.log(tutoringId, selectResponseDto.teacherId);
-    request.tutoringId = tutoringId;
+    request.tutoringId = tutoringInfo.id;
     await this.requestModel.update(request);
 
-    return new Success_SelectResponseDto({ tutoringId: tutoring.id });
+    return new Success_SelectResponseDto({
+      tutoringId: tutoringInfo.id,
+      whiteBoardToken: tutoringInfo.whiteBoardToken!!,
+      whiteBoardUUID: tutoringInfo.whiteBoardUUID!!,
+      whiteBoardAppId: tutoringInfo.whiteBoardAppId!!,
+    });
   }
 
   async check(requestId: string, teacherId: string) {
@@ -161,6 +164,9 @@ export class ResponseService {
       {
         status: request.status,
         tutoringId: tutoring.id,
+        whiteBoardAppId: tutoring.whiteBoardAppId,
+        whiteBoardUUID: tutoring.whiteBoardUUID,
+        whiteBoardToken: tutoring.whiteBoardToken,
       },
     );
   }

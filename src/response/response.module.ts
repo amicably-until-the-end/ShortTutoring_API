@@ -5,7 +5,7 @@ import { DynamooseModule } from 'nestjs-dynamoose';
 import { RequestSchema } from '../request/entities/request.schema';
 import { UserSchema } from '../user/entities/user.schema';
 import { TutoringSchema } from '../tutoring/entities/tutoring.schema';
-import { TutoringService } from '../tutoring/tutoring.service';
+import { TutoringModule } from '../tutoring/tutoring.module';
 
 @Module({
   imports: [
@@ -32,8 +32,10 @@ import { TutoringService } from '../tutoring/tutoring.service';
         },
       },
     ]),
+    TutoringModule,
   ],
   controllers: [ResponseController],
-  providers: [ResponseService, TutoringService],
+  providers: [ResponseService],
+  exports: [ResponseService],
 })
 export class ResponseModule {}
