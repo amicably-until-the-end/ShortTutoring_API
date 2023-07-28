@@ -21,6 +21,7 @@ export class SimulationService {
     private requestModel: Model<Request, RequestKey>,
     @InjectModel('Tutoring')
     private tutoringModel: Model<Tutoring, TutoringKey>,
+    private responseService: ResponseService
   ) {}
 
   async matching(studentName: string, teacherName: string) {
@@ -264,16 +265,11 @@ export class SimulationService {
     });
     await webhook.success(`[Request]\n과외 요청 생성!\nid: ${requestId}`);
 
-    const responseService = new ResponseService(
-      this.userModel,
-      this.requestModel,
-      this.tutoringModel,
-    );
     for (const teacher of teachers) {
       await teacherWebhook.success(
         `[Response Create]\n선생님 ${teacher.name}(${teacher.id})이 요청에 응답함`,
       );
-      await responseService.create(requestId, teacher.id);
+      await this.responseService.create(requestId, teacher.id);
     }
     await studentWebhook.success(
       `[Response TeacherList]\n학생 ${studentName}(${studentId})이 ${n}개의 응답을 확인함`,
@@ -286,7 +282,7 @@ export class SimulationService {
       )}\n\`\`\``,
     );
 
-    const tutoring = await responseService.select({
+    const tutoring = await this.responseService.select({
       requestId,
       studentId,
       teacherId: teachers[0].id,
@@ -305,7 +301,7 @@ export class SimulationService {
     for (const teacher of teachers) {
       await teacherWebhook.send(
         `\`\`\`json\n//[Response Check]\n${JSON.stringify(
-          await responseService.check(requestId, teacher.id),
+          await this.responseService.check(requestId, teacher.id),
           null,
           2,
         )}\n\`\`\``,

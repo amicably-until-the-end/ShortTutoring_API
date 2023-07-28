@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from './entities/user.schema';
+import {AgoraModule} from "../agora/agora.module";
 
 @Module({
   imports: [
@@ -14,7 +15,7 @@ import { UserSchema } from './entities/user.schema';
           tableName: 'Users',
         },
       },
-    ]),
+    ]),AgoraModule
   ],
   controllers: [UserController],
   providers: [UserService],
