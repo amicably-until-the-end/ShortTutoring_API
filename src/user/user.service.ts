@@ -1,99 +1,98 @@
 import { Injectable } from '@nestjs/common';
-import { InjectModel, Model } from 'nestjs-dynamoose';
-import { User, UserKey } from './entities/user.interface';
-import {
-  Success_CreateUserDto,
-  Success_DeleteUserDto,
-  Success_GetUserDto,
-  Success_UpdateUserDto,
-} from './dto/response-user.dto';
-import { NotFoundDto } from '../HttpResponseDto';
+import { User } from './entities/user.interface';
+import { Created, NotFound, Success } from '../http.response';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { v4 as uuid } from 'uuid';
-import { UploadController } from '../upload/upload.controller';
+import { UploadRepository } from '../upload/upload.repository';
+import { UserRepository } from './user.repository';
 
 @Injectable()
 export class UserService {
   constructor(
-    @InjectModel('User')
-    private userModel: Model<User, UserKey>,
+    private readonly userRepository: UserRepository,
+    private readonly uploadRepository: UploadRepository,
   ) {}
 
-  /*
-  createdUserDto의 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
-  @param userId 사용자 ID
-  @param createdUserDto 사용자 정보
-  @exception 프로필 이미지 데이터가 존재하지 않을 경우 기본 이미지 URL을 반환합니다.
-  @return profileImage URL
+  /**
+   createdUserDto의 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
+   @param userId 사용자 ID
+   @param createUserDto 사용자 정보
+   @return profileImage URL
    */
   async profileImage(userId: string, createUserDto: CreateUserDto) {
-    if (createUserDto.profileImageBase64 === undefined) {
-      return 'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png';
-    }
-
-    const uploadController = new UploadController();
-    return await uploadController
+    return await this.uploadRepository
       .uploadBase64(
-        userId,
+        `user/${userId}`,
         `profile.${createUserDto.profileImageFormat}`,
         createUserDto.profileImageBase64,
       )
       .then((res) => res.toString());
   }
 
-  /*
-  사용자를 생성합니다.
-  @param createUserDto 사용자 정보
-  @return 사용자 정보
+  /**
+   사용자를 생성합니다.
+   @param userKey
+   @param createUserDto 사용자 정보
+   @return 사용자 정보
    */
-  async create(createUserDto: CreateUserDto) {
-    const userId = uuid();
+  async signup(
+    userKey: { vendor: string; userId: string },
+    createUserDto: CreateUserDto,
+  ) {
+    const profileImage = await this.profileImage(userKey.userId, createUserDto);
 
-    const profileImage = await this.profileImage(userId, createUserDto);
-
-    const user: User = {
-      id: userId,
-      name: createUserDto.name,
-      bio: createUserDto.bio,
-      role: createUserDto.role,
-      profileImage,
-      createdAt: new Date().toISOString(),
-    };
-
-    await this.userModel.create(user);
-    //TODO 인증 예외처리
-
-    return new Success_CreateUserDto(user);
-  }
-
-  async findAll() {
-    return this.userModel.scan().exec();
-  }
-
-  async findOne(userId: string) {
-    const user = await this.userModel.get({ id: userId });
-    if (user === undefined) {
-      return new NotFoundDto('사용자를 찾을 수 없습니다.');
+    try {
+      const user: User = await this.userRepository.create(
+        userKey,
+        createUserDto,
+        profileImage,
+      );
+      return new Created('성공적으로 회원가입했습니다.', user);
+    } catch (error) {
+      return new NotFound(error.message);
     }
-
-    return new Success_GetUserDto(user);
   }
 
-  /*
-  사용자 정보를 업데이트합니다.
-  @param userId 사용자 ID
-  @param updateUserDto 업데이트할 사용자 정보
-  @return 업데이트된 사용자 정보
+  /**
+   * 로그인합니다.
+   * 로그인 성공 시, 사용자 정보를 반환합니다.
+   * 로그인 실패 시, NotFound 예외를 반환합니다.
+   * @param userKey
    */
-  async update(userId: string, updateUserDto: UpdateUserDto) {
-    let user = await this.userModel.get({ id: userId });
-    if (user === undefined) {
-      return new NotFoundDto(null);
+  async login(userKey: { vendor: string; userId: string }) {
+    try {
+      const user: User = await this.userRepository.get(userKey);
+      return new Success('성공적으로 로그인했습니다.', user);
+    } catch (error) {
+      return new NotFound(error.message);
     }
+  }
 
+  /**
+   * 내 프로필을 조회합니다.
+   * @returns User 나의 프로필
+   */
+  async profile(userKey: { vendor: string; userId: string }) {
+    try {
+      const user: User = await this.userRepository.get(userKey);
+      return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
+    } catch (error) {
+      return new NotFound(error.message);
+    }
+  }
+
+  /**
+   사용자 정보를 업데이트합니다.
+   @param userKey 업데이트할 사용자의 키
+   @param updateUserDto 업데이트할 사용자 정보
+   @return 업데이트된 사용자 정보
+   */
+  async update(
+    userKey: { vendor: string; userId: string },
+    updateUserDto: UpdateUserDto,
+  ) {
     const profileImage = await this.profileImage(
-      userId,
+      userKey.userId,
       updateUserDto as CreateUserDto,
     );
 
@@ -102,19 +101,38 @@ export class UserService {
       bio: updateUserDto.bio,
       role: updateUserDto.role,
       profileImage,
-    };
+    } as User;
 
-    user = await this.userModel.update({ id: userId }, updateUser);
-    return new Success_UpdateUserDto(user);
+    try {
+      const user = await this.userRepository.update(userKey, updateUser);
+      return new Success('성공적으로 사용자 프로필을 업데이트했습니다.', user);
+    } catch (error) {
+      return new NotFound(error.message);
+    }
   }
 
-  async remove(userId: string) {
-    const user = await this.userModel.get({ id: userId });
-    if (user === undefined) {
-      return new NotFoundDto('사용자를 찾을 수 없습니다.');
+  /**
+   * 사용자 정보를 조회합니다.
+   * @param userKey
+   */
+  async otherProfile(userKey: { userId: string; vendor: string }) {
+    try {
+      return new Success(
+        '사용자 프로필을 성공적으로 가져왔습니다.',
+        await this.userRepository.get(userKey),
+      );
+    } catch (error) {
+      return new NotFound(error.message);
     }
+  }
 
-    await this.userModel.delete({ id: userId });
-    return new Success_DeleteUserDto();
+  async withdraw(userKey: { userId: string; vendor: string }) {
+    try {
+      await this.userRepository.get(userKey);
+      await this.userRepository.delete(userKey);
+      return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', userKey);
+    } catch (error) {
+      return new NotFound(error.message);
+    }
   }
 }

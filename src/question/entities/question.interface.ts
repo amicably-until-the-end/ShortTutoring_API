@@ -1,4 +1,4 @@
-export interface RequestKey {
+export interface QuestionKey {
   id: string;
 }
 
@@ -7,16 +7,18 @@ export interface Problem {
   description: string;
   schoolLevel?: string;
   schoolSubject?: string;
-  schoolChapter?: string;
   difficulty?: string;
 }
 
-export interface Request extends RequestKey {
+export interface Question extends QuestionKey {
   status: string;
-  studentId: string;
+  student: {
+    vendor: string;
+    id: string;
+  };
   teacherIds: string[];
   problem: Problem;
   selectedTeacherId?: string;
-  tutoringId?: string;
+  tutoringId: string;
   createdAt?: string;
 }

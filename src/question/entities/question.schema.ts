@@ -13,20 +13,30 @@ export const ProblemSchema = new Schema({
   schoolSubject: {
     type: String,
   },
-  schoolChapter: {
-    type: String,
-  },
   difficulty: {
     type: String,
   },
 });
 
-export const RequestSchema = new Schema({
+export const QuestionSchema = new Schema({
   id: {
     type: String,
+    hashKey: true,
   },
-  studentId: {
+  status: {
     type: String,
+    enum: ['pending', 'matched', 'canceled', 'expired', 'completed'],
+  },
+  student: {
+    type: Object,
+    schema: {
+      vendor: {
+        type: String,
+      },
+      id: {
+        type: String,
+      },
+    },
   },
   problem: {
     type: Object,
@@ -35,9 +45,6 @@ export const RequestSchema = new Schema({
   teacherIds: {
     type: Array,
     schema: [String],
-  },
-  status: {
-    type: String,
   },
   selectedTeacherId: {
     type: String,

@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { HttpResponseDto } from '../../HttpResponseDto';
+import { HttpResponse } from '../../http.response';
 import { Tutoring } from '../entities/tutoring.interface';
 
 export class CreateTutoringDto {
@@ -22,7 +22,7 @@ export class CreateTutoringDto {
   teacherId: string;
 }
 
-export class Success_CreateTutoringDto extends HttpResponseDto {
+export class Success_CreateTutoringDto extends HttpResponse {
   @ApiProperty({
     default: '과외를 성공적으로 생성했습니다.',
   })
@@ -49,11 +49,11 @@ export class Success_CreateTutoringDto extends HttpResponseDto {
   data: Tutoring;
 
   constructor(data: Tutoring) {
-    super(201, '과외를 성공적으로 생성했습니다.', false, data);
+    super('과외를 성공적으로 생성했습니다.', data);
   }
 }
 
-export class NotFound_CreateTutoringDto extends HttpResponseDto {
+export class NotFound_CreateTutoringDto extends HttpResponse {
   @ApiProperty({
     default: '리소스를 찾을 수 없습니다.',
   })
@@ -70,6 +70,6 @@ export class NotFound_CreateTutoringDto extends HttpResponseDto {
   statusCode: number;
 
   constructor(message: string) {
-    super(404, message, true);
+    super(message);
   }
 }

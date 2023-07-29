@@ -3,6 +3,8 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from './entities/user.schema';
+import { UploadRepository } from '../upload/upload.repository';
+import { UserRepository } from './user.repository';
 
 @Module({
   imports: [
@@ -10,13 +12,11 @@ import { UserSchema } from './entities/user.schema';
       {
         name: 'User',
         schema: UserSchema,
-        options: {
-          tableName: 'Users',
-        },
       },
     ]),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, UserRepository, UploadRepository],
+  exports: [UserService, UserRepository],
 })
 export class UserModule {}
