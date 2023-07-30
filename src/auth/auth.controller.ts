@@ -4,10 +4,12 @@ import {
   ApiBearerAuth,
   ApiExcludeEndpoint,
   ApiOperation,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthOperation } from './descriptions/auth.operation';
 import { AccessToken } from './entities/auth.entity';
+import { AuthResponse } from './descriptions/auth.response';
 
 @ApiTags('Dev')
 @Controller('auth')
@@ -32,6 +34,7 @@ export class AuthController {
 
   @Get('createJwt')
   @ApiOperation(AuthOperation.jwt)
+  @ApiResponse(AuthResponse.jwt)
   createJwt(@Headers() headers: Headers, @Query('code') code: string) {
     console.log(headers['vendor'], code);
     return this.authService.createJwt(headers['vendor'], code);
