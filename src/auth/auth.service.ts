@@ -30,7 +30,27 @@ export class AuthService {
   async generateJwt(vendor: string, code: string) {
     try {
       const { jwt } = await this.authRepository.generateJwt(vendor, code);
-      return new Success('성공적으로 토큰을 가져왔습니다.', { jwt });
+      return new Success('성공적으로 토큰을 가져왔습니다.', {
+        jwt,
+      });
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async decodeJwt(jwt: string) {
+    try {
+      const decoded = await this.authRepository.decodeJwt(jwt);
+      return new Success('성공적으로 토큰을 디코딩했습니다.', decoded);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async verifyJwt(jwt: string) {
+    try {
+      const verified = await this.authRepository.verifyJwt(jwt);
+      return new Success('성공적으로 토큰을 검증했습니다.', verified);
     } catch (error) {
       return new Fail(error.message);
     }

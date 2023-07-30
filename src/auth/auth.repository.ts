@@ -59,6 +59,36 @@ export class AuthRepository {
     }
   }
 
+  async decodeJwt(jwt: string) {
+    try {
+      const decoded = this.jwtService.decode(jwt);
+      return {
+        vendor: decoded['vendor'],
+        userId: decoded['userId'],
+        iat: decoded['iat'],
+        exp: decoded['exp'],
+      };
+    } catch (error) {
+      throw new Error('JWT를 읽는데 실패했습니다.');
+    }
+  }
+
+  async verifyJwt(jwt: string) {
+    try {
+      const verified = await this.jwtService.verify(jwt, {
+        secret: process.env.JWT_SECRET_KEY,
+      });
+      return {
+        vendor: verified['vendor'],
+        userId: verified['userId'],
+        iat: verified['iat'],
+        exp: verified['exp'],
+      };
+    } catch (error) {
+      throw new Error('JWT를 검증하는데 실패했습니다.');
+    }
+  }
+
   async getTokenInfo(vendor: string, accessToken: string) {
     if (vendor === 'kakao') {
       try {

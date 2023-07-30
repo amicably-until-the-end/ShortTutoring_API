@@ -3,6 +3,7 @@ import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
   ApiExcludeEndpoint,
+  ApiHeader,
   ApiOperation,
   ApiResponse,
   ApiTags,
@@ -33,10 +34,31 @@ export class AuthController {
   }
 
   @Get('jwt/generate')
-  @ApiOperation(AuthOperation.jwt)
-  @ApiResponse(AuthResponse.jwt)
+  @ApiOperation(AuthOperation.generateJwt)
+  @ApiResponse(AuthResponse.generateJwt)
+  @ApiHeader({
+    name: 'vendor',
+    description: 'OAuth2 벤더',
+    example: 'kakao',
+    enum: ['kakao', 'naver', 'google'],
+  })
   generateJwt(@Headers() headers: Headers, @Query('code') code: string) {
     return this.authService.generateJwt(headers['vendor'], code);
+  }
+
+  @Get('jwt/decode')
+  @ApiOperation(AuthOperation.decodeJwt)
+  @ApiResponse(AuthResponse.decodeJwt)
+  decodeJwt(@Query('jwt') jwt: string) {
+    return this.authService.decodeJwt(jwt);
+  }
+
+  @Get('jwt/verify')
+  @ApiOperation(AuthOperation.verifyJwt)
+  @ApiResponse(AuthResponse.verifyJwt)
+  verifyJwt(@Query('jwt') jwt: string) {
+    console.log(jwt);
+    return this.authService.verifyJwt(jwt);
   }
 
   @Get('accessToken/info')
