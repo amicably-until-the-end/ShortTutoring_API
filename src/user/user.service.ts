@@ -27,7 +27,10 @@ export class UserService {
     const code = createUserDto.authorizationCode;
 
     try {
-      const { jwt, userId } = await this.authRepository.createJwt(vendor, code);
+      const { jwt, userId } = await this.authRepository.generateJwt(
+        vendor,
+        code,
+      );
 
       const user = await this.userRepository.create(
         {

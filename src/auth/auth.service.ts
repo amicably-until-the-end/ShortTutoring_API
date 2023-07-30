@@ -27,9 +27,9 @@ export class AuthService {
    * @param vendor OAuth2 벤더
    * @param code OAuth2 인가코드
    */
-  async createJwt(vendor: string, code: string) {
+  async generateJwt(vendor: string, code: string) {
     try {
-      const { jwt } = await this.authRepository.createJwt(vendor, code);
+      const { jwt } = await this.authRepository.generateJwt(vendor, code);
       return new Success('성공적으로 토큰을 가져왔습니다.', { jwt });
     } catch (error) {
       return new Fail(error.message);

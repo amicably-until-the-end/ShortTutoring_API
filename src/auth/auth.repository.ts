@@ -13,7 +13,7 @@ export class AuthRepository {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async createJwt(vendor: string, code: string) {
+  async generateJwt(vendor: string, code: string) {
     if (vendor === 'kakao') {
       try {
         const { data } = await firstValueFrom(
