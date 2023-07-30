@@ -37,6 +37,7 @@ export class AppModule implements NestModule {
       .apply(AuthMiddleware)
       .exclude(
         { path: 'auth/kakao/callback/(.*)', method: RequestMethod.GET },
+        { path: 'auth/kakao/token', method: RequestMethod.GET },
         { path: 'user/:userId/profile', method: RequestMethod.GET },
         { path: 'question/list', method: RequestMethod.GET },
       )

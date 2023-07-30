@@ -25,7 +25,7 @@ export const configSwagger = (app: INestApplication<any>) => {
       description: 'OAuth2 인증',
       flows: {
         authorizationCode: {
-          authorizationUrl: `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.KAKAO_REST_API_KEY}&redirect_uri=http://localhost:3000/auth/kakao/callback/authorize&response_type=code`,
+          authorizationUrl: `https://kauth.kakao.com/oauth/authorize?client_id=${process.env.KAKAO_REST_API_KEY}&redirect_uri=http://shorttutoring-493721324.ap-northeast-2.elb.amazonaws.com:3000/auth/kakao/callback/authorize&response_type=code`,
           scopes: undefined,
         },
       },

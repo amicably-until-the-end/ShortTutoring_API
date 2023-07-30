@@ -55,7 +55,7 @@ export class AuthController {
     );
   }
 
-  @Get('kakao/callback/token')
+  @Get('kakao/token')
   @ApiOperation(AuthOperation.kakaoToken)
   kakaoToken(@Query('code') code: string) {
     return this.authService.kakaoToken(code);
