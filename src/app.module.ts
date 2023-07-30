@@ -15,9 +15,13 @@ import { AuthModule } from './auth/auth.module';
 import { QuestionModule } from './question/question.module';
 import { OfferModule } from './offer/offer.module';
 import { AuthMiddleware } from './auth/auth.middleware';
+import { AuthRepository } from './auth/auth.repository';
+import { HttpModule } from '@nestjs/axios';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    HttpModule.register({ timeout: 5000, maxRedirects: 5 }),
     DynamooseModule.forRootAsync({ useClass: DynamooseConfig }),
     AuthModule,
     UserModule,
@@ -29,22 +33,18 @@ import { AuthMiddleware } from './auth/auth.middleware';
     // ReviewModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AuthRepository, JwtService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
       .apply(AuthMiddleware)
       .exclude(
-        { path: 'auth/kakao/callback/(.*)', method: RequestMethod.GET },
-        { path: 'auth/kakao/token', method: RequestMethod.GET },
+        { path: 'auth/jwt/(.*)', method: RequestMethod.GET },
         { path: 'user/:userId/profile', method: RequestMethod.GET },
         { path: 'question/list', method: RequestMethod.GET },
       )
-      .forRoutes({
-        path: 'user/me/profile',
-        method: RequestMethod.GET,
-      })
+      .forRoutes({ path: 'user/me/profile', method: RequestMethod.GET })
       .apply(AuthMiddleware)
       .forRoutes({
         path: '*',
