@@ -13,7 +13,7 @@ export class AuthRepository {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async jwtToken(vendor: string, code: string) {
+  async createJwt(vendor: string, code: string) {
     if (vendor === 'kakao') {
       try {
         const { data } = await firstValueFrom(
@@ -39,7 +39,7 @@ export class AuthRepository {
 
         const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
 
-        const jwtToken = this.jwtService.sign(
+        const jwt = this.jwtService.sign(
           {
             vendor,
             userId,
@@ -50,7 +50,7 @@ export class AuthRepository {
           },
         );
 
-        return { jwtToken, userId };
+        return { jwt, userId };
       } catch (error) {
         throw new Error('카카오 인가코드를 가져오는데 실패했습니다.');
       }

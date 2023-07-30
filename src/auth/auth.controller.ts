@@ -30,11 +30,11 @@ export class AuthController {
     );
   }
 
-  @Get('jwtToken')
-  @ApiOperation(AuthOperation.jwtToken)
-  jwtToken(@Headers() headers: Headers, @Query('code') code: string) {
+  @Get('createJwt')
+  @ApiOperation(AuthOperation.jwt)
+  createJwt(@Headers() headers: Headers, @Query('code') code: string) {
     console.log(headers['vendor'], code);
-    return this.authService.jwtToken(headers['vendor'], code);
+    return this.authService.createJwt(headers['vendor'], code);
   }
 
   @Get('accessToken/info')

@@ -27,10 +27,7 @@ export class UserService {
     const code = createUserDto.authorizationCode;
 
     try {
-      const { jwtToken, userId } = await this.authRepository.jwtToken(
-        vendor,
-        code,
-      );
+      const { jwt, userId } = await this.authRepository.createJwt(vendor, code);
 
       const user = await this.userRepository.create(
         {
@@ -47,7 +44,7 @@ export class UserService {
         .setDescription(`${user.name}님이 회원가입했습니다.`);
       await webhook.send(embed);
 
-      return new Success('성공적으로 회원가입했습니다.', { jwtToken });
+      return new Success('성공적으로 회원가입했습니다.', { jwt });
     } catch (error) {
       return new Fail(error.message);
     }
