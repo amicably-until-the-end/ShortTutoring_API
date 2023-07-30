@@ -43,6 +43,9 @@ export class Success_CreateTutoringDto extends HttpResponse {
       id: 'test-tutoring-id',
       studentId: 'test-student-id',
       teacherId: 'test-teacher-id',
+      whiteBoardAppId: 'test-white-board-app-id',
+      whiteBoardToken: 'test-white-board-token',
+      whiteBoardUUID: 'test-white-board-uuid',
       status: 'ongoing',
     },
   })

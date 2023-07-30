@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { SimulationController } from './simulation.controller';
+import { ResponseService } from './response.service';
+import { ResponseController } from './response.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
-import { UserSchema } from '../user/entities/user.schema';
 import { RequestSchema } from '../request/entities/request.schema';
-import { SimulationService } from './simulation.service';
+import { UserSchema } from '../user/entities/user.schema';
 import { TutoringSchema } from '../tutoring/entities/tutoring.schema';
-import {ResponseModule} from "../response/response.module";
+import { TutoringModule } from '../tutoring/tutoring.module';
 
 @Module({
   imports: [
@@ -31,10 +31,11 @@ import {ResponseModule} from "../response/response.module";
           tableName: 'Tutorings',
         },
       },
-    ]),ResponseModule
+    ]),
+    TutoringModule,
   ],
-  controllers: [SimulationController],
-  providers: [SimulationService],
-
+  controllers: [ResponseController],
+  providers: [ResponseService],
+  exports: [ResponseService],
 })
-export class SimulationModule {}
+export class ResponseModule {}
