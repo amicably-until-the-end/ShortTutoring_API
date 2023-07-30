@@ -14,6 +14,9 @@ export const TutoringSchema = new Schema({
   teacherId: {
     type: String,
   },
+  status: {
+    type: String,
+  },
   matchedAt: {
     type: String,
   },
@@ -23,16 +26,13 @@ export const TutoringSchema = new Schema({
   endedAt: {
     type: String,
   },
-  status: {
+  whiteBoardAppId: {
     type: String,
   },
   whiteBoardToken: {
     type: String,
   },
   whiteBoardUUID: {
-    type: String,
-  },
-  whiteBoardAppId: {
     type: String,
   },
 });

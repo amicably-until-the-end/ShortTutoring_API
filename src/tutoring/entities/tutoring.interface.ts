@@ -6,11 +6,11 @@ export interface Tutoring extends TutoringKey {
   requestId?: string;
   studentId: string;
   teacherId: string;
+  status: string;
   matchedAt?: string;
-  whiteBoardToken?: string;
-  whiteBoardUUID?: string;
-  whiteBoardAppId?: string;
   startedAt?: string;
   endedAt?: string;
-  status: string;
+  whiteBoardAppId?: string;
+  whiteBoardToken?: string;
+  whiteBoardUUID?: string;
 }

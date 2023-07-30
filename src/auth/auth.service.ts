@@ -1,31 +1,30 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { InjectModel, Model } from 'nestjs-dynamoose';
-import { User, UserKey } from '../user/entities/user.interface';
 import { firstValueFrom } from 'rxjs';
+import { AccessToken } from './entities/auth.entity';
+import * as process from 'process';
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly httpService: HttpService,
-    @InjectModel('User')
-    private readonly userService: Model<User, UserKey>,
+    private readonly userRepository: UserRepository,
   ) {}
 
-  /*
+  /**
    * 토큰 정보 보기
-   * @param vendor OAuth2 제공자
-   * @param token OAuth2 토큰
-   * @returns OAuth2 토큰 정보
+   * @param accessToken OAuth2 토큰
+   * @returns KakaoToken OAuth2 토큰 정보
    */
-  async accessTokenInfo(vendor: string, token: string) {
-    if (vendor === 'kakao') {
+  async accessTokenInfo(accessToken: AccessToken) {
+    if (accessToken.vendor === 'kakao') {
       const { data } = await firstValueFrom(
         this.httpService.get(
           'https://kapi.kakao.com/v1/user/access_token_info',
           {
             headers: {
-              Authorization: token,
+              Authorization: accessToken.token,
             },
           },
         ),
@@ -33,53 +32,75 @@ export class AuthService {
       return data;
     }
 
-    return 'Not implemented';
+    return null;
   }
 
-  /*
+  /**
    * 토큰으로 카카오 사용자 정보 조회
-   * @param vendor OAuth2 제공자
-   * @param token OAuth2 토큰
-   * @returns 카카오 사용자 정보
+   * @param accessToken OAuth2 토큰
+   * @returns userId 숏과외 사용자 ID
    */
-  async accessTokenUser(vendor: string, token: string) {
-    if (vendor === 'kakao') {
+  async getUserIdFromAccessToken(accessToken: AccessToken): Promise<string> {
+    if (accessToken.vendor === 'kakao') {
       const { data } = await firstValueFrom(
         this.httpService.get('https://kapi.kakao.com/v2/user/me', {
           headers: {
-            Authorization: token,
+            Authorization: accessToken.token,
           },
         }),
       );
 
-      return data;
+      return data.id.toString();
     }
   }
 
-  /*
+  /**
    * 토큰으로 숏과외 사용자 조회
-   * @param vendor OAuth2 제공자
-   * @param token OAuth2 토큰
-   * @returns 숏과외 사용자 정보
+   * @param accessToken OAuth2 토큰
+   * @returns User 숏과외 사용자 정보
    */
-  async getUserFromAccessToken(vendor: string, token: string) {
-    if (vendor === 'kakao') {
-      const { data } = await firstValueFrom(
-        this.httpService.get('https://kapi.kakao.com/v2/user/me', {
-          headers: {
-            Authorization: token,
-          },
-        }),
-      );
+  async getUserFromAccessToken(accessToken: AccessToken) {
+    if (accessToken.vendor === 'kakao') {
+      try {
+        const userId = await this.getUserIdFromAccessToken(accessToken);
 
-      const userId = data.properties.shorttutoring_id;
-
-      const user = await this.userService.get({ id: userId });
-      if (user === undefined) {
-        return null;
+        return await this.userRepository.get({
+          vendor: accessToken.vendor,
+          userId,
+        });
+      } catch (error) {
+        throw new Error('사용자를 찾을 수 없습니다.');
       }
-
-      return user;
     }
+  }
+
+  async kakaoCallbackAuthorize(
+    code: string,
+    state: string,
+    error: string,
+    errorDescription: string,
+  ) {
+    return code;
+  }
+
+  async kakaoToken(code: string) {
+    const { data } = await firstValueFrom(
+      this.httpService.post(
+        'https://kauth.kakao.com/oauth/token',
+        {
+          grant_type: 'authorization_code',
+          client_id: process.env.KAKAO_REST_API_KEY,
+          redirect_uri: 'http://localhost:3000/auth/kakao/callback/authorize',
+          code: code,
+        },
+        {
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+          },
+        },
+      ),
+    );
+
+    return data;
   }
 }

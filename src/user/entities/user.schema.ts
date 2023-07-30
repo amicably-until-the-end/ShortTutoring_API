@@ -1,9 +1,13 @@
 import { Schema } from 'dynamoose';
 
 export const UserSchema = new Schema({
-  id: {
+  vendor: {
     type: String,
     hashKey: true,
+  },
+  id: {
+    type: String,
+    rangeKey: true,
   },
   name: {
     type: String,

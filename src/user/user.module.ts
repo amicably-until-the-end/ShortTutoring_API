@@ -3,7 +3,8 @@ import { UserService } from './user.service';
 import { UserController } from './user.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from './entities/user.schema';
-import {AgoraModule} from "../agora/agora.module";
+import { UploadRepository } from '../upload/upload.repository';
+import { UserRepository } from './user.repository';
 
 @Module({
   imports: [
@@ -11,13 +12,11 @@ import {AgoraModule} from "../agora/agora.module";
       {
         name: 'User',
         schema: UserSchema,
-        options: {
-          tableName: 'Users',
-        },
       },
-    ]),AgoraModule
+    ]),
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, UserRepository, UploadRepository],
+  exports: [UserService, UserRepository],
 })
 export class UserModule {}

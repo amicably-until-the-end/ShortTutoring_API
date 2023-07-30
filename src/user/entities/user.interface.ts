@@ -1,11 +1,12 @@
 export interface UserKey {
-  id: string;
+  vendor?: string;
+  id?: string;
 }
 
 export interface User extends UserKey {
+  role?: string;
   name: string;
   bio?: string;
   profileImage?: string;
-  role?: string;
   createdAt?: string;
 }

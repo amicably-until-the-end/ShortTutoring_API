@@ -4,6 +4,8 @@ import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from '../user/entities/user.schema';
+import { UploadRepository } from '../upload/upload.repository';
+import { UserRepository } from '../user/user.repository';
 
 @Module({
   imports: [
@@ -12,13 +14,11 @@ import { UserSchema } from '../user/entities/user.schema';
       {
         name: 'User',
         schema: UserSchema,
-        options: {
-          tableName: 'Users',
-        },
       },
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, UserRepository, UploadRepository],
+  exports: [AuthService],
 })
 export class AuthModule {}
