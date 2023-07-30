@@ -6,38 +6,13 @@ import {
   ApiOperation,
   ApiTags,
 } from '@nestjs/swagger';
-import { AccessToken } from './entities/auth.entity';
 import { AuthOperation } from './descriptions/auth.operation';
+import { AccessToken } from './entities/auth.entity';
 
 @ApiTags('Dev')
 @Controller('auth')
-@ApiBearerAuth('Authorization')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
-  @Get('accessToken/info')
-  @ApiOperation(AuthOperation.accessTokenInfo)
-  accessTokenInfo(@Headers() headers: Headers) {
-    return this.authService.accessTokenInfo(
-      new AccessToken(headers['vendor'], headers['authorization']),
-    );
-  }
-
-  @Get('accessToken/userId')
-  @ApiOperation(AuthOperation.getUserIdFromAccessToken)
-  getUserIdFromAccessToken(@Headers() headers: Headers) {
-    return this.authService.getUserIdFromAccessToken(
-      new AccessToken(headers['vendor'], headers['authorization']),
-    );
-  }
-
-  @Get('accessToken/user')
-  @ApiOperation(AuthOperation.getUserFromAccessToken)
-  getUserFromAccessToken(@Headers() headers: Headers) {
-    return this.authService.getUserFromAccessToken(
-      new AccessToken(headers['vendor'], headers['authorization']),
-    );
-  }
 
   @Get('kakao/callback/authorize')
   @ApiExcludeEndpoint()
@@ -55,9 +30,37 @@ export class AuthController {
     );
   }
 
-  @Get('kakao/token')
-  @ApiOperation(AuthOperation.kakaoToken)
-  kakaoToken(@Query('code') code: string) {
-    return this.authService.kakaoToken(code);
+  @Get('jwtToken')
+  @ApiOperation(AuthOperation.jwtToken)
+  jwtToken(@Headers() headers: Headers, @Query('code') code: string) {
+    console.log(headers['vendor'], code);
+    return this.authService.jwtToken(headers['vendor'], code);
+  }
+
+  @Get('accessToken/info')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(AuthOperation.accessTokenInfo)
+  accessTokenInfo(@Headers() headers: Headers) {
+    return this.authService.accessTokenInfo(AccessToken.authorization(headers));
+  }
+
+  @Get('accessToken/userId')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(AuthOperation.getUserIdFromAccessToken)
+  getUserIdFromAccessToken(@Headers() headers: Headers) {
+    return this.authService.getUserIdFromAccessToken(
+      headers['vendor'],
+      headers['authorization'],
+    );
+  }
+
+  @Get('accessToken/user')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(AuthOperation.getUserFromAccessToken)
+  getUserFromAccessToken(@Headers() headers: Headers) {
+    return this.authService.getUserFromAccessToken(
+      headers['vendor'],
+      headers['authorization'],
+    );
   }
 }

@@ -1,79 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import { AccessToken } from './entities/auth.entity';
-import * as process from 'process';
-import { UserRepository } from '../user/user.repository';
+import { AuthRepository } from './auth.repository';
+import { Fail, Success } from '../response';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private readonly httpService: HttpService,
-    private readonly userRepository: UserRepository,
-  ) {}
+  constructor(private readonly authRepository: AuthRepository) {}
 
   /**
-   * 토큰 정보 보기
-   * @param accessToken OAuth2 토큰
-   * @returns KakaoToken OAuth2 토큰 정보
+   * 카카오 인가코드 콜백
+   * @param code
+   * @param state
+   * @param error
+   * @param errorDescription
    */
-  async accessTokenInfo(accessToken: AccessToken) {
-    if (accessToken.vendor === 'kakao') {
-      const { data } = await firstValueFrom(
-        this.httpService.get(
-          'https://kapi.kakao.com/v1/user/access_token_info',
-          {
-            headers: {
-              Authorization: accessToken.token,
-            },
-          },
-        ),
-      );
-      return data;
-    }
-
-    return null;
-  }
-
-  /**
-   * 토큰으로 카카오 사용자 정보 조회
-   * @param accessToken OAuth2 토큰
-   * @returns userId 숏과외 사용자 ID
-   */
-  async getUserIdFromAccessToken(accessToken: AccessToken): Promise<string> {
-    if (accessToken.vendor === 'kakao') {
-      const { data } = await firstValueFrom(
-        this.httpService.get('https://kapi.kakao.com/v2/user/me', {
-          headers: {
-            Authorization: accessToken.token,
-          },
-        }),
-      );
-
-      return data.id.toString();
-    }
-  }
-
-  /**
-   * 토큰으로 숏과외 사용자 조회
-   * @param accessToken OAuth2 토큰
-   * @returns User 숏과외 사용자 정보
-   */
-  async getUserFromAccessToken(accessToken: AccessToken) {
-    if (accessToken.vendor === 'kakao') {
-      try {
-        const userId = await this.getUserIdFromAccessToken(accessToken);
-
-        return await this.userRepository.get({
-          vendor: accessToken.vendor,
-          userId,
-        });
-      } catch (error) {
-        throw new Error('사용자를 찾을 수 없습니다.');
-      }
-    }
-  }
-
   async kakaoCallbackAuthorize(
     code: string,
     state: string,
@@ -83,24 +22,70 @@ export class AuthService {
     return code;
   }
 
-  async kakaoToken(code: string) {
-    const { data } = await firstValueFrom(
-      this.httpService.post(
-        'https://kauth.kakao.com/oauth/token',
-        {
-          grant_type: 'authorization_code',
-          client_id: process.env.KAKAO_REST_API_KEY,
-          redirect_uri: 'http://localhost:3000/auth/kakao/callback/authorize',
-          code: code,
-        },
-        {
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
-          },
-        },
-      ),
-    );
+  /**
+   * 인가코드로부터 숏과외 토큰 발급하기
+   * @param vendor OAuth2 벤더
+   * @param code OAuth2 인가코드
+   */
+  async jwtToken(vendor: string, code: string) {
+    try {
+      const { jwtToken } = await this.authRepository.jwtToken(vendor, code);
+      return new Success('성공적으로 토큰을 가져왔습니다.', { jwtToken });
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
 
-    return data;
+  /**
+   * 토큰 정보 보기
+   * @param token OAuth2 토큰
+   * @returns tokenInfo OAuth2 토큰 정보
+   */
+  async accessTokenInfo(token: { vendor: string; accessToken: string }) {
+    try {
+      const tokenInfo = await this.authRepository.getTokenInfo(
+        token.vendor,
+        token.accessToken,
+      );
+      return new Success('성공적으로 토큰 정보를 가져왔습니다.', tokenInfo);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  /**
+   * 토큰으로 카카오 사용자 정보 조회
+   * @param vendor OAuth2 벤더
+   * @param accessToken OAuth2 토큰
+   * @returns userId 숏과외 사용자 ID
+   */
+  async getUserIdFromAccessToken(vendor: string, accessToken: string) {
+    try {
+      const userId = await this.authRepository.getUserIdFromAccessToken(
+        vendor,
+        accessToken,
+      );
+      return new Success('성공적으로 사용자 ID를 가져왔습니다.', userId);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  /**
+   * 토큰으로 숏과외 사용자 조회
+   * @param vendor OAuth2 벤더
+   * @param accessToken OAuth2 토큰
+   * @returns User 숏과외 사용자 정보
+   */
+  async getUserFromAccessToken(vendor: string, accessToken: string) {
+    try {
+      const user = await this.authRepository.getUserFromAccessToken(
+        vendor,
+        accessToken,
+      );
+      return new Success('성공적으로 사용자를 가져왔습니다.', user);
+    } catch (error) {
+      return new Fail(error.message);
+    }
   }
 }

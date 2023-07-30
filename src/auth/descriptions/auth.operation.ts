@@ -11,8 +11,8 @@ export const AuthOperation = {
     summary: '액세스 토큰으로부터 User 조회',
     description: '액세스 토큰으로부터 User를 조회합니다.',
   },
-  kakaoToken: {
-    summary: '카카오 콜백 토큰',
-    description: '카카오 콜백으로부터 토큰을 발급받습니다.',
+  jwtToken: {
+    summary: 'JWT 토큰 발급',
+    description: 'OAuth 인가코드로 JWT 토큰을 발급합니다.',
   },
 };

@@ -6,6 +6,8 @@ import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from '../user/entities/user.schema';
 import { UploadRepository } from '../upload/upload.repository';
 import { UserRepository } from '../user/user.repository';
+import { AuthRepository } from './auth.repository';
+import { JwtService } from '@nestjs/jwt';
 
 @Module({
   imports: [
@@ -18,7 +20,13 @@ import { UserRepository } from '../user/user.repository';
     ]),
   ],
   controllers: [AuthController],
-  providers: [AuthService, UserRepository, UploadRepository],
+  providers: [
+    AuthService,
+    AuthRepository,
+    JwtService,
+    UserRepository,
+    UploadRepository,
+  ],
   exports: [AuthService],
 })
 export class AuthModule {}

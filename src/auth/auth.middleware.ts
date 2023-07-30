@@ -14,10 +14,10 @@ export class AuthMiddleware implements NestMiddleware {
     }
 
     try {
-      req.headers['userId'] = await this.authService.getUserIdFromAccessToken({
+      req.headers['userId'] = await this.authService.getUserIdFromAccessToken(
         vendor,
-        token: token,
-      });
+        token,
+      );
       next();
     } catch (error) {
       next();
