@@ -112,9 +112,10 @@ export class OfferRepository {
     }
 
     if (question.selectedTeacherId === teacherId) {
+      const tutoring = await this.tutoringRepository.get(question.tutoringId);
       return {
         status: 'selected',
-        tutoringId: question.tutoringId,
+        tutoring,
       };
     } else {
       return {
@@ -147,11 +148,13 @@ export class OfferRepository {
       throw new Error('질문 대기열에 존재하지 않는 선생님입니다.');
     }
 
-    const tutoringId = await this.tutoringRepository.create(
+    const tutoring = await this.tutoringRepository.create(
       questionId,
       userKey.userId,
       question.selectedTeacherId,
     );
+
+    const tutoringId = tutoring.id;
 
     await this.questionModel.update(
       { id: questionId },
@@ -162,6 +165,6 @@ export class OfferRepository {
       },
     );
 
-    return tutoringId;
+    return tutoring;
   }
 }

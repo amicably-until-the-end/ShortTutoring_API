@@ -1,4 +1,4 @@
-const StudentEntity = {
+export const StudentEntity = {
   id: {
     type: 'string',
     description: '사용자 id',

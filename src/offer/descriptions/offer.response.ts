@@ -1,3 +1,5 @@
+import { TutoringEntity } from '../../tutoring/descriptions/tutoring.response';
+
 export const OfferResponse = {
   getStatus: {
     success: {
@@ -19,10 +21,10 @@ export const OfferResponse = {
                 example: 'accepted',
                 enum: ['accepted', 'rejected', 'pending'],
               },
-              tutoringId: {
-                type: 'string',
-                description: '과외 ID',
-                example: 'test-tutoring-id',
+              tutoring: {
+                type: 'object',
+                description: '튜터링 정보',
+                properties: TutoringEntity,
               },
             },
           },

@@ -9,6 +9,7 @@ import { QuestionRepository } from '../question/question.repository';
 import { OfferRepository } from './offer.repository';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { TutoringSchema } from '../tutoring/entities/tutoring.schema';
+import { AgoraModule } from '../agora/agora.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { TutoringSchema } from '../tutoring/entities/tutoring.schema';
         schema: TutoringSchema,
       },
     ]),
+    AgoraModule,
   ],
   controllers: [OfferController],
   providers: [

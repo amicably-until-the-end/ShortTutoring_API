@@ -48,12 +48,12 @@ export class OfferService {
     teacherId: string,
   ) {
     try {
-      const tutoringId = await this.offerRepository.accept(
+      const tutoring = await this.offerRepository.accept(
         userKey,
         questionId,
         teacherId,
       );
-      return new Success('튜터링을 시작합니다.', { tutoringId });
+      return new Success('튜터링을 시작합니다.', tutoring);
     } catch (error) {
       return new BadRequest(error.message);
     }

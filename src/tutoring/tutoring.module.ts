@@ -10,9 +10,6 @@ import { TutoringSchema } from './entities/tutoring.schema';
       {
         name: 'Tutoring',
         schema: TutoringSchema,
-        options: {
-          tableName: 'Tutorings',
-        },
       },
     ]),
   ],

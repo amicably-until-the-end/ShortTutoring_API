@@ -1,4 +1,4 @@
-const QuestionEntity = {
+export const QuestionEntity = {
   type: 'object',
   properties: {
     id: {
@@ -60,6 +60,7 @@ const QuestionEntity = {
     },
   },
 };
+
 export const QuestionResponse = {
   create: {
     success: {
