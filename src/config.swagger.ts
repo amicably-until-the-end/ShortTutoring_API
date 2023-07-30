@@ -37,16 +37,6 @@ export const configSwagger = (app: INestApplication<any>) => {
       },
       'Authorization',
     )
-    .addGlobalParameters({
-      description: 'OAuth2 제공자',
-      in: 'header',
-      name: 'vendor',
-      required: false,
-      schema: {
-        type: 'string',
-        enum: ['kakao', 'naver', 'google'],
-      },
-    })
     .addTag('Dev', '개발용')
     .addTag('User', '모든 사용자')
     .addTag('Student', '학생')
