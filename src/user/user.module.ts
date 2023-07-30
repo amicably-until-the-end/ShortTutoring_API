@@ -27,6 +27,6 @@ import { HttpModule } from '@nestjs/axios';
     JwtService,
     UploadRepository,
   ],
-  exports: [UserService, UserRepository],
+  exports: [UserRepository],
 })
 export class UserModule {}

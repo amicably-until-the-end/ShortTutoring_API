@@ -15,6 +15,5 @@ import { TutoringSchema } from './entities/tutoring.schema';
   ],
   controllers: [TutoringController],
   providers: [TutoringService],
-  exports: [TutoringService],
 })
 export class TutoringModule {}
