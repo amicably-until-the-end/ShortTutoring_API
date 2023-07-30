@@ -1,3 +1,27 @@
+export const jwtEntity = {
+  vendor: {
+    type: 'string',
+    description: 'OAuth2 벤더',
+    example: 'kakao',
+    enum: ['kakao', 'naver', 'google'],
+  },
+  userId: {
+    type: 'string',
+    description: '사용자 ID',
+    example: 'sample-user-id',
+  },
+  iat: {
+    type: 'number',
+    description: '토큰 발급 시간',
+    example: 1625241600,
+  },
+  exp: {
+    type: 'number',
+    description: '토큰 만료 시간',
+    example: 1625245200,
+  },
+};
+
 export const AuthResponse = {
   generateJwt: {
     status: 200,
@@ -44,18 +68,7 @@ export const AuthResponse = {
         },
         data: {
           type: 'object',
-          properties: {
-            decoded: {
-              type: 'object',
-              description: '디코딩된 토큰',
-              example: {
-                vendor: 'kakao',
-                userId: 'sample-user-id',
-                iat: 1625241600,
-                exp: 1625245200,
-              },
-            },
-          },
+          properties: jwtEntity,
         },
       },
     },
@@ -77,18 +90,7 @@ export const AuthResponse = {
         },
         data: {
           type: 'object',
-          properties: {
-            decoded: {
-              type: 'object',
-              description: '디코딩된 토큰',
-              example: {
-                vendor: 'kakao',
-                userId: 'sample-user-id',
-                iat: 1625241600,
-                exp: 1625245200,
-              },
-            },
-          },
+          properties: jwtEntity,
         },
       },
     },
