@@ -35,138 +35,76 @@ export const StudentEntity = {
 
 export const UserResponse = {
   signup: {
-    success: {
-      status: 201,
-      schema: {
-        type: 'object',
-        properties: {
-          message: {
-            type: 'string',
-            description: '디버깅 메시지',
-            example: '사용자 생성 성공',
-          },
-          data: {
-            properties: StudentEntity,
-          },
+    status: 201,
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          description: '디버깅 메시지',
+          example: '사용자 생성 성공',
+        },
+        data: {
+          properties: StudentEntity,
         },
       },
     },
   },
   login: {
-    success: {
-      status: 200,
-      schema: {
-        type: 'object',
-        properties: {
-          message: {
-            type: 'string',
-            description: '디버깅 메시지',
-            example: '로그인 성공',
-          },
-          data: {
-            properties: StudentEntity,
-          },
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          description: '디버깅 메시지',
+          example: '로그인 성공',
         },
-      },
-    },
-    notFound: {
-      status: 200,
-      schema: {
-        type: 'object',
-        properties: {
-          message: {
-            type: 'string',
-            description: '디버깅 메시지',
-            example: '사용자를 찾을 수 없습니다',
-          },
+        data: {
+          properties: StudentEntity,
         },
       },
     },
   },
   me: {
     profile: {
-      success: {
-        status: 200,
-        schema: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              description: '디버깅 메시지',
-              example: '내 프로필 조회 성공',
-            },
-            data: {
-              type: 'object',
-              properties: StudentEntity,
-            },
+      status: 200,
+      schema: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            description: '디버깅 메시지',
+            example: '내 프로필 조회 성공',
           },
-        },
-      },
-      notFound: {
-        status: 404,
-        schema: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              description: '사용자를 찾을 수 없습니다.',
-              example: '사용자를 찾을 수 없습니다.',
-            },
+          data: {
+            type: 'object',
+            properties: StudentEntity,
           },
         },
       },
     },
     updateProfile: {
-      success: {
-        status: 200,
-        schema: {
-          type: 'object',
-          properties: {
-            data: {
-              type: 'object',
-              properties: StudentEntity,
-            },
-          },
-        },
-      },
-      notFound: {
-        status: 404,
-        schema: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              description: '사용자를 찾을 수 없습니다.',
-              example: '사용자를 찾을 수 없습니다.',
-            },
+      status: 200,
+      schema: {
+        type: 'object',
+        properties: {
+          data: {
+            type: 'object',
+            properties: StudentEntity,
           },
         },
       },
     },
     withdraw: {
-      success: {
-        status: 200,
-        schema: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              description: '디버깅 메시지',
-              example: '회원 탈퇴 성공',
-            },
-          },
-        },
-      },
-      notFound: {
-        status: 404,
-        schema: {
-          type: 'object',
-          properties: {
-            message: {
-              type: 'string',
-              description: '사용자를 찾을 수 없습니다.',
-              example: '사용자를 찾을 수 없습니다.',
-            },
+      status: 200,
+      schema: {
+        type: 'object',
+        properties: {
+          message: {
+            type: 'string',
+            description: '디버깅 메시지',
+            example: '회원 탈퇴 성공',
           },
         },
       },

@@ -15,7 +15,6 @@ export class UserRepository {
       userId: string;
     },
     createUserDto: CreateUserDto,
-    profileImage: string,
   ) {
     const user: User = {
       vendor: userKey.vendor,
@@ -23,7 +22,8 @@ export class UserRepository {
       name: createUserDto.name,
       bio: createUserDto.bio,
       role: createUserDto.role,
-      profileImage,
+      profileImage:
+        'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
       createdAt: new Date().toISOString(),
     };
 
@@ -49,7 +49,7 @@ export class UserRepository {
 
   async update(userKey: { userId: string; vendor: string }, updateUser: User) {
     try {
-      const user: User = await this.userModel.get({
+      await this.userModel.get({
         vendor: userKey.vendor,
         id: userKey.userId,
       });

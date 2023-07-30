@@ -5,49 +5,49 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UploadRepository } from '../upload/upload.repository';
 import { UserRepository } from './user.repository';
+import { AuthRepository } from '../auth/auth.repository';
+import { MessageBuilder } from 'discord-webhook-node';
+import { webhook } from '../config.discord-webhook';
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly authRepository: AuthRepository,
     private readonly userRepository: UserRepository,
     private readonly uploadRepository: UploadRepository,
   ) {}
 
   /**
-   createdUserDto의 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
-   @param userId 사용자 ID
-   @param createUserDto 사용자 정보
-   @return profileImage URL
-   */
-  async profileImage(userId: string, createUserDto: CreateUserDto) {
-    return await this.uploadRepository
-      .uploadBase64(
-        `user/${userId}`,
-        `profile.${createUserDto.profileImageFormat}`,
-        createUserDto.profileImageBase64,
-      )
-      .then((res) => res.toString());
-  }
-
-  /**
    사용자를 생성합니다.
-   @param userKey
-   @param createUserDto 사용자 정보
+   @param vendor OAuth2 벤더
+   @param createUserDto 사용자 생성 DTO
    @return 사용자 정보
    */
-  async signup(
-    userKey: { vendor: string; userId: string },
-    createUserDto: CreateUserDto,
-  ) {
-    const profileImage = await this.profileImage(userKey.userId, createUserDto);
+  async signup(vendor: string, createUserDto: CreateUserDto) {
+    const code = createUserDto.authorizationCode;
 
     try {
-      const user: User = await this.userRepository.create(
-        userKey,
-        createUserDto,
-        profileImage,
+      const { jwtToken, userId } = await this.authRepository.jwtToken(
+        vendor,
+        code,
       );
-      return new Success('성공적으로 회원가입했습니다.', user);
+
+      const user = await this.userRepository.create(
+        {
+          vendor,
+          userId,
+        },
+        createUserDto,
+      );
+
+      const embed = new MessageBuilder()
+        .setTitle('회원가입')
+        .setColor(Number('#00ff00'))
+        .setImage(user.profileImage)
+        .setDescription(`${user.name}님이 회원가입했습니다.`);
+      await webhook.send(embed);
+
+      return new Success('성공적으로 회원가입했습니다.', { jwtToken });
     } catch (error) {
       return new Fail(error.message);
     }
@@ -82,6 +82,22 @@ export class UserService {
   }
 
   /**
+   updateUserDto 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
+   @param userId 사용자 ID
+   @param updateUserDto
+   @return profileImage URL
+   */
+  async profileImage(userId: string, updateUserDto: UpdateUserDto) {
+    return await this.uploadRepository
+      .uploadBase64(
+        `user/${userId}`,
+        `profile.${updateUserDto.profileImageFormat}`,
+        updateUserDto.profileImageBase64,
+      )
+      .then((res) => res.toString());
+  }
+
+  /**
    사용자 정보를 업데이트합니다.
    @param userKey 업데이트할 사용자의 키
    @param updateUserDto 업데이트할 사용자 정보
@@ -91,10 +107,7 @@ export class UserService {
     userKey: { vendor: string; userId: string },
     updateUserDto: UpdateUserDto,
   ) {
-    const profileImage = await this.profileImage(
-      userKey.userId,
-      updateUserDto as CreateUserDto,
-    );
+    const profileImage = await this.profileImage(userKey.userId, updateUserDto);
 
     const updateUser = {
       name: updateUserDto.name,
