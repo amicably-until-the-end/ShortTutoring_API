@@ -2,13 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Question } from './entities/question.interface';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { QuestionRepository } from './question.repository';
-import {
-  BadRequest,
-  Created,
-  Forbidden,
-  NotFound,
-  Success,
-} from '../http.response';
+import { Fail, Success } from '../response';
 import { UploadRepository } from '../upload/upload.repository';
 import { v4 as uuid } from 'uuid';
 
@@ -62,16 +56,9 @@ export class QuestionService {
         createQuestionDto,
         problemImage,
       );
-      return new Created('질문이 생성되었습니다.', question);
+      return new Success('질문이 생성되었습니다.', question);
     } catch (error) {
-      switch (error.statusCode) {
-        case 400:
-          return new BadRequest('잘못된 요청입니다.');
-        case 403:
-          return new Forbidden('질문을 생성할 권한이 없습니다.');
-        case 404:
-          return new NotFound('사용자가 존재하지 않습니다.');
-      }
+      return new Fail(error.message);
     }
   }
 
@@ -83,14 +70,7 @@ export class QuestionService {
       await this.questionRepository.delete(userKey, questionId);
       return new Success('질문이 삭제되었습니다.', { questionId });
     } catch (error) {
-      switch (error.statusCode) {
-        case 400:
-          return new BadRequest('잘못된 요청입니다.');
-        case 403:
-          return new Forbidden('질문을 삭제할 권한이 없습니다.');
-        case 404:
-          return new NotFound('질문이 존재하지 않습니다.');
-      }
+      return new Fail(error.message);
     }
   }
 
@@ -101,7 +81,7 @@ export class QuestionService {
       );
       return new Success('질문 목록을 불러왔습니다.', questions);
     } catch (error) {
-      return new BadRequest('잘못된 요청입니다.');
+      return new Fail(error.message);
     }
   }
 }

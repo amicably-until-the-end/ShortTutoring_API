@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { OfferRepository } from './offer.repository';
-import { BadRequest, Success } from '../http.response';
+import { Fail, Success } from '../response';
 
 @Injectable()
 export class OfferService {
@@ -14,7 +14,7 @@ export class OfferService {
       await this.offerRepository.append(userKey, questionId);
       return new Success('질문 대기열에 추가되었습니다.', { questionId });
     } catch (error) {
-      return new BadRequest(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -26,7 +26,7 @@ export class OfferService {
       await this.offerRepository.remove(userKey, questionId);
       return new Success('질문 대기열에서 삭제되었습니다.', { questionId });
     } catch (error) {
-      return new BadRequest(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -38,7 +38,7 @@ export class OfferService {
       const status = await this.offerRepository.getStatus(userKey, questionId);
       return new Success('질문 대기열 상태를 불러왔습니다.', status);
     } catch (error) {
-      return new BadRequest(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -55,7 +55,7 @@ export class OfferService {
       );
       return new Success('튜터링을 시작합니다.', tutoring);
     } catch (error) {
-      return new BadRequest(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -70,7 +70,7 @@ export class OfferService {
       );
       return new Success('선생님 목록을 불러왔습니다.', { teachers });
     } catch (error) {
-      return new BadRequest(error.message);
+      return new Fail(error.message);
     }
   }
 }

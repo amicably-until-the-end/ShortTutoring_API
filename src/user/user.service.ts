@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.interface';
-import { Created, NotFound, Success } from '../http.response';
+import { Fail, Success } from '../response';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UploadRepository } from '../upload/upload.repository';
@@ -47,9 +47,9 @@ export class UserService {
         createUserDto,
         profileImage,
       );
-      return new Created('성공적으로 회원가입했습니다.', user);
+      return new Success('성공적으로 회원가입했습니다.', user);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -64,7 +64,7 @@ export class UserService {
       const user: User = await this.userRepository.get(userKey);
       return new Success('성공적으로 로그인했습니다.', user);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -77,7 +77,7 @@ export class UserService {
       const user: User = await this.userRepository.get(userKey);
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -107,7 +107,7 @@ export class UserService {
       const user = await this.userRepository.update(userKey, updateUser);
       return new Success('성공적으로 사용자 프로필을 업데이트했습니다.', user);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -122,7 +122,7 @@ export class UserService {
         await this.userRepository.get(userKey),
       );
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -132,7 +132,7 @@ export class UserService {
       await this.userRepository.delete(userKey);
       return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', userKey);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 }
