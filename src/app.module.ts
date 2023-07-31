@@ -15,9 +15,9 @@ import { AuthModule } from './auth/auth.module';
 import { QuestionModule } from './question/question.module';
 import { OfferModule } from './offer/offer.module';
 import { AuthMiddleware } from './auth/auth.middleware';
-import { AuthRepository } from './auth/auth.repository';
 import { HttpModule } from '@nestjs/axios';
 import { JwtService } from '@nestjs/jwt';
+import { AuthRepository } from './auth/auth.repository';
 
 @Module({
   imports: [
@@ -46,13 +46,11 @@ export class AppModule implements NestModule {
         { path: 'user/:userId/profile', method: RequestMethod.GET },
         { path: 'question/list', method: RequestMethod.GET },
       )
-      .forRoutes(
-        { path: 'user/me/profile', method: RequestMethod.GET },
-        {
-          path: '*',
-          method: RequestMethod.ALL,
-        },
-      )
-      .apply(AuthMiddleware);
+      .forRoutes({
+        path: '*',
+        method: RequestMethod.ALL,
+      })
+      .apply(AuthMiddleware)
+      .forRoutes({ path: 'user/me/profile', method: RequestMethod.GET });
   }
 }
