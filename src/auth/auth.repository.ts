@@ -22,7 +22,8 @@ export class AuthRepository {
             {
               grant_type: 'authorization_code',
               client_id: process.env.KAKAO_REST_API_KEY,
-              redirect_uri: 'http://localhost:3000/auth/callback/authorize',
+              redirect_uri:
+                'http://shorttutoring-493721324.ap-northeast-2.elb.amazonaws.com/auth/callback/authorize',
               code,
             },
             {
