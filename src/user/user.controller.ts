@@ -3,7 +3,6 @@ import { UserService } from './user.service';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiNotFoundResponse,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -16,66 +15,50 @@ import { UserParam } from './descriptions/user.param';
 import { UserResponse } from './descriptions/user.response';
 import { AccessToken } from '../auth/entities/auth.entity';
 
+@ApiTags('User')
 @Controller('user')
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiTags('Dev')
-  @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.signup)
-  @ApiCreatedResponse(UserResponse.signup.success)
+  @ApiCreatedResponse(UserResponse.signup)
   @Post('signup')
-  signup(@Headers() headers: Headers, @Body() createUserDto: CreateUserDto) {
-    return this.userService.signup(
-      AccessToken.fromHeaders(headers),
-      createUserDto,
-    );
+  signup(@Body() createUserDto: CreateUserDto) {
+    return this.userService.signup(createUserDto);
   }
 
-  @ApiTags('User')
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.login)
-  @ApiResponse(UserResponse.login.success)
-  @ApiNotFoundResponse(UserResponse.login.notFound)
+  @ApiResponse(UserResponse.login)
   @Get('login')
   login(@Headers() headers: Headers) {
-    return this.userService.login(AccessToken.fromHeaders(headers));
+    return this.userService.login(AccessToken.userKey(headers));
   }
 
-  @ApiTags('User')
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.profile)
-  @ApiResponse(UserResponse.me.profile.success)
-  @ApiNotFoundResponse(UserResponse.me.profile.notFound)
+  @ApiResponse(UserResponse.me.profile)
   @Get('me/profile')
   profile(@Headers() header: Headers) {
-    return this.userService.profile(AccessToken.fromHeaders(header));
+    return this.userService.profile(AccessToken.userKey(header));
   }
 
-  @ApiTags('User')
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.updateProfile)
-  @ApiResponse(UserResponse.me.updateProfile.success)
-  @ApiNotFoundResponse(UserResponse.me.updateProfile.notFound)
+  @ApiResponse(UserResponse.me.updateProfile)
   @Post('me/updateProfile')
   update(@Headers() headers: Headers, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(
-      AccessToken.fromHeaders(headers),
-      updateUserDto,
-    );
+    return this.userService.update(AccessToken.userKey(headers), updateUserDto);
   }
 
-  @ApiTags('User')
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.withdraw)
-  @ApiResponse(UserResponse.me.withdraw.success)
-  @ApiNotFoundResponse(UserResponse.me.withdraw.notFound)
+  @ApiResponse(UserResponse.me.withdraw)
   @Get('me/withdraw')
   withdraw(@Headers() headers: Headers) {
-    return this.userService.withdraw(AccessToken.fromHeaders(headers));
+    return this.userService.withdraw(AccessToken.userKey(headers));
   }
 
-  @ApiTags('User')
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.otherProfile)
   @ApiResponse(UserResponse.profile)

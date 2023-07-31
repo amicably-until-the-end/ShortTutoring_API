@@ -1,55 +1,55 @@
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.interface';
-import { Created, NotFound, Success } from '../http.response';
+import { Fail, Success } from '../response';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UploadRepository } from '../upload/upload.repository';
 import { UserRepository } from './user.repository';
+import { AuthRepository } from '../auth/auth.repository';
+import { MessageBuilder } from 'discord-webhook-node';
+import { webhook } from '../config.discord-webhook';
 
 @Injectable()
 export class UserService {
   constructor(
+    private readonly authRepository: AuthRepository,
     private readonly userRepository: UserRepository,
     private readonly uploadRepository: UploadRepository,
   ) {}
 
   /**
-   createdUserDto의 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
-   @param userId 사용자 ID
-   @param createUserDto 사용자 정보
-   @return profileImage URL
-   */
-  async profileImage(userId: string, createUserDto: CreateUserDto) {
-    return await this.uploadRepository
-      .uploadBase64(
-        `user/${userId}`,
-        `profile.${createUserDto.profileImageFormat}`,
-        createUserDto.profileImageBase64,
-      )
-      .then((res) => res.toString());
-  }
-
-  /**
    사용자를 생성합니다.
-   @param userKey
-   @param createUserDto 사용자 정보
+   @param createUserDto 사용자 생성 DTO
    @return 사용자 정보
    */
-  async signup(
-    userKey: { vendor: string; userId: string },
-    createUserDto: CreateUserDto,
-  ) {
-    const profileImage = await this.profileImage(userKey.userId, createUserDto);
+  async signup(createUserDto: CreateUserDto) {
+    const vendor = createUserDto.vendor;
+    const code = createUserDto.authorizationCode;
 
     try {
-      const user: User = await this.userRepository.create(
-        userKey,
-        createUserDto,
-        profileImage,
+      const { jwt, userId } = await this.authRepository.generateJwt(
+        vendor,
+        code,
       );
-      return new Created('성공적으로 회원가입했습니다.', user);
+
+      const user = await this.userRepository.create(
+        {
+          vendor,
+          userId,
+        },
+        createUserDto,
+      );
+
+      const embed = new MessageBuilder()
+        .setTitle('회원가입')
+        .setColor(Number('#00ff00'))
+        .setImage(user.profileImage)
+        .setDescription(`${user.name}님이 회원가입했습니다.`);
+      await webhook.send(embed);
+
+      return new Success('성공적으로 회원가입했습니다.', { jwt });
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -64,7 +64,7 @@ export class UserService {
       const user: User = await this.userRepository.get(userKey);
       return new Success('성공적으로 로그인했습니다.', user);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -77,8 +77,24 @@ export class UserService {
       const user: User = await this.userRepository.get(userKey);
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
+  }
+
+  /**
+   updateUserDto 프로필 이미지를 S3에 업로드하고, URL을 반환합니다.
+   @param userId 사용자 ID
+   @param updateUserDto
+   @return profileImage URL
+   */
+  async profileImage(userId: string, updateUserDto: UpdateUserDto) {
+    return await this.uploadRepository
+      .uploadBase64(
+        `user/${userId}`,
+        `profile.${updateUserDto.profileImageFormat}`,
+        updateUserDto.profileImageBase64,
+      )
+      .then((res) => res.toString());
   }
 
   /**
@@ -91,15 +107,11 @@ export class UserService {
     userKey: { vendor: string; userId: string },
     updateUserDto: UpdateUserDto,
   ) {
-    const profileImage = await this.profileImage(
-      userKey.userId,
-      updateUserDto as CreateUserDto,
-    );
+    const profileImage = await this.profileImage(userKey.userId, updateUserDto);
 
     const updateUser = {
       name: updateUserDto.name,
       bio: updateUserDto.bio,
-      role: updateUserDto.role,
       profileImage,
     } as User;
 
@@ -107,7 +119,7 @@ export class UserService {
       const user = await this.userRepository.update(userKey, updateUser);
       return new Success('성공적으로 사용자 프로필을 업데이트했습니다.', user);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -122,7 +134,7 @@ export class UserService {
         await this.userRepository.get(userKey),
       );
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 
@@ -132,7 +144,7 @@ export class UserService {
       await this.userRepository.delete(userKey);
       return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', userKey);
     } catch (error) {
-      return new NotFound(error.message);
+      return new Fail(error.message);
     }
   }
 }

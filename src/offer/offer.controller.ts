@@ -23,10 +23,7 @@ export class OfferController {
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.append)
   append(@Headers() headers: Headers, @Param('questionId') questionId: string) {
-    return this.offerService.append(
-      AccessToken.fromHeaders(headers),
-      questionId,
-    );
+    return this.offerService.append(AccessToken.userKey(headers), questionId);
   }
 
   @ApiTags('Teacher')
@@ -34,10 +31,7 @@ export class OfferController {
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.remove)
   remove(@Headers() headers: Headers, @Param('questionId') questionId: string) {
-    return this.offerService.remove(
-      AccessToken.fromHeaders(headers),
-      questionId,
-    );
+    return this.offerService.remove(AccessToken.userKey(headers), questionId);
   }
 
   @ApiTags('Teacher')
@@ -50,7 +44,7 @@ export class OfferController {
     @Param('questionId') questionId: string,
   ) {
     return this.offerService.getStatus(
-      AccessToken.fromHeaders(headers),
+      AccessToken.userKey(headers),
       questionId,
     );
   }
@@ -64,7 +58,7 @@ export class OfferController {
     @Param('questionId') questionId: string,
   ) {
     return this.offerService.getTeachers(
-      AccessToken.fromHeaders(headers),
+      AccessToken.userKey(headers),
       questionId,
     );
   }
@@ -79,7 +73,7 @@ export class OfferController {
     @Body() acceptOfferDto: AcceptOfferDto,
   ) {
     return this.offerService.accept(
-      AccessToken.fromHeaders(headers),
+      AccessToken.userKey(headers),
       questionId,
       acceptOfferDto.teacherId,
     );
