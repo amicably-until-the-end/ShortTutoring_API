@@ -17,8 +17,8 @@ import { AuthResponse } from './descriptions/auth.response';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('callback/authorize')
   @ApiExcludeEndpoint()
+  @Get('callback/authorize')
   callbackAuthorize(
     @Query('code') code: string,
     @Query('state') state: string,
@@ -33,7 +33,6 @@ export class AuthController {
     );
   }
 
-  @Get('jwt/generate')
   @ApiOperation(AuthOperation.generateJwt)
   @ApiResponse(AuthResponse.generateJwt)
   @ApiHeader({
@@ -42,32 +41,35 @@ export class AuthController {
     example: 'kakao',
     enum: ['kakao', 'naver', 'google'],
   })
+  @Get('jwt/generate')
   generateJwt(@Headers() headers: Headers, @Query('code') code: string) {
     return this.authService.generateJwt(headers['vendor'], code);
   }
 
-  @Get('jwt/decode')
   @ApiOperation(AuthOperation.decodeJwt)
   @ApiResponse(AuthResponse.decodeJwt)
+  @Get('jwt/decode')
   decodeJwt(@Query('jwt') jwt: string) {
     return this.authService.decodeJwt(jwt);
   }
 
-  @Get('jwt/verify')
   @ApiOperation(AuthOperation.verifyJwt)
   @ApiResponse(AuthResponse.verifyJwt)
+  @Get('jwt/verify')
   verifyJwt(@Query('jwt') jwt: string) {
     console.log(jwt);
     return this.authService.verifyJwt(jwt);
   }
 
-  @Get('accessToken/info')
+  @ApiExcludeEndpoint()
   @ApiBearerAuth('Authorization')
   @ApiOperation(AuthOperation.accessTokenInfo)
+  @Get('accessToken/info')
   accessTokenInfo(@Headers() headers: Headers) {
     return this.authService.accessTokenInfo(AccessToken.authorization(headers));
   }
 
+  @ApiExcludeEndpoint()
   @Get('accessToken/userId')
   @ApiBearerAuth('Authorization')
   @ApiOperation(AuthOperation.getUserIdFromAccessToken)
@@ -78,6 +80,7 @@ export class AuthController {
     );
   }
 
+  @ApiExcludeEndpoint()
   @Get('accessToken/user')
   @ApiBearerAuth('Authorization')
   @ApiOperation(AuthOperation.getUserFromAccessToken)
