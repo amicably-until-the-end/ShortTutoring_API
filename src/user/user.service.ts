@@ -19,11 +19,11 @@ export class UserService {
 
   /**
    사용자를 생성합니다.
-   @param vendor OAuth2 벤더
    @param createUserDto 사용자 생성 DTO
    @return 사용자 정보
    */
-  async signup(vendor: string, createUserDto: CreateUserDto) {
+  async signup(createUserDto: CreateUserDto) {
+    const vendor = createUserDto.vendor;
     const code = createUserDto.authorizationCode;
 
     try {
@@ -112,7 +112,6 @@ export class UserService {
     const updateUser = {
       name: updateUserDto.name,
       bio: updateUserDto.bio,
-      role: updateUserDto.role,
       profileImage,
     } as User;
 

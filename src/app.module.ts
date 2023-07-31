@@ -40,8 +40,9 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware)
       .exclude(
-        { path: 'auth/callback/authorize', method: RequestMethod.GET },
+        { path: 'auth/callback/authorize', method: RequestMethod.ALL },
         { path: 'auth/jwt/(.*)', method: RequestMethod.GET },
+        { path: 'user/signup', method: RequestMethod.POST },
         { path: 'user/:userId/profile', method: RequestMethod.GET },
         { path: 'question/list', method: RequestMethod.GET },
       )

@@ -23,8 +23,8 @@ export class UserController {
   @ApiOperation(UserOperation.signup)
   @ApiCreatedResponse(UserResponse.signup)
   @Post('signup')
-  signup(@Headers() headers: Headers, @Body() createUserDto: CreateUserDto) {
-    return this.userService.signup(headers['vendor'], createUserDto);
+  signup(@Body() createUserDto: CreateUserDto) {
+    return this.userService.signup(createUserDto);
   }
 
   @ApiBearerAuth('Authorization')
