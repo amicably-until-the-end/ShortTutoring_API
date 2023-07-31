@@ -1,7 +1,18 @@
-import { ApiProperty, PartialType } from '@nestjs/swagger';
-import { CreateUserDto } from './create-user.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
-export class UpdateUserDto extends PartialType(CreateUserDto) {
+export class UpdateUserDto {
+  @ApiProperty({
+    description: '사용자 이름',
+    default: 'test-student',
+  })
+  name: string;
+
+  @ApiProperty({
+    description: '사용자 소개',
+    default: 'lets study!',
+  })
+  bio: string;
+
   @ApiProperty({
     description: 'base64 인코딩된 프로필 이미지',
     default:
