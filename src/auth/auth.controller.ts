@@ -17,15 +17,15 @@ import { AuthResponse } from './descriptions/auth.response';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('kakao/callback/authorize')
+  @Get('callback/authorize')
   @ApiExcludeEndpoint()
-  kakaoCallbackAuthorize(
+  callbackAuthorize(
     @Query('code') code: string,
     @Query('state') state: string,
     @Query('error') error: string,
     @Query('error_description') errorDescription: string,
   ) {
-    return this.authService.kakaoCallbackAuthorize(
+    return this.authService.callbackAuthorize(
       code,
       state,
       error,

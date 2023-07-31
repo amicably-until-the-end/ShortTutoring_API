@@ -40,15 +40,18 @@ export class AppModule implements NestModule {
     consumer
       .apply(AuthMiddleware)
       .exclude(
+        { path: 'auth/callback/authorize', method: RequestMethod.GET },
         { path: 'auth/jwt/(.*)', method: RequestMethod.GET },
         { path: 'user/:userId/profile', method: RequestMethod.GET },
         { path: 'question/list', method: RequestMethod.GET },
       )
-      .forRoutes({ path: 'user/me/profile', method: RequestMethod.GET })
-      .apply(AuthMiddleware)
-      .forRoutes({
-        path: '*',
-        method: RequestMethod.ALL,
-      });
+      .forRoutes(
+        { path: 'user/me/profile', method: RequestMethod.GET },
+        {
+          path: '*',
+          method: RequestMethod.ALL,
+        },
+      )
+      .apply(AuthMiddleware);
   }
 }

@@ -13,7 +13,7 @@ export class AuthService {
    * @param error
    * @param errorDescription
    */
-  async kakaoCallbackAuthorize(
+  async callbackAuthorize(
     code: string,
     state: string,
     error: string,
