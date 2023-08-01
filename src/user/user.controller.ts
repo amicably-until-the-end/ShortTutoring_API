@@ -3,6 +3,8 @@ import { UserService } from './user.service';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiExcludeEndpoint,
+  ApiHeader,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -28,11 +30,17 @@ export class UserController {
   }
 
   @ApiBearerAuth('Authorization')
+  @ApiHeader({
+    name: 'vendor',
+    description: 'OAuth2 벤더',
+    example: 'kakao',
+    enum: ['kakao', 'naver', 'google'],
+  })
   @ApiOperation(UserOperation.login)
   @ApiResponse(UserResponse.login)
   @Get('login')
   login(@Headers() headers: Headers) {
-    return this.userService.login(AccessToken.userKey(headers));
+    return this.userService.login(AccessToken.authorization(headers));
   }
 
   @ApiBearerAuth('Authorization')
@@ -59,6 +67,8 @@ export class UserController {
     return this.userService.withdraw(AccessToken.userKey(headers));
   }
 
+  // TODO: 다른 사용자의 프로필을 조회하는 API
+  @ApiExcludeEndpoint()
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.otherProfile)
   @ApiResponse(UserResponse.profile)
