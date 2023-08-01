@@ -16,26 +16,7 @@ export class AuthRepository {
   async generateJwt(vendor: string, code: string) {
     if (vendor === 'kakao') {
       try {
-        const { data } = await firstValueFrom(
-          this.httpService.post(
-            'https://kauth.kakao.com/oauth/token',
-            {
-              grant_type: 'authorization_code',
-              client_id: process.env.KAKAO_REST_API_KEY,
-              redirect_uri:
-                'http://shorttutoring-493721324.ap-northeast-2.elb.amazonaws.com/auth/callback/authorize',
-              code,
-            },
-            {
-              headers: {
-                'Content-Type':
-                  'application/x-www-form-urlencoded;charset=utf-8',
-              },
-            },
-          ),
-        );
-
-        const accessToken = data['access_token'];
+        const accessToken = await this.getAccessToken(vendor, code);
 
         const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
 
@@ -56,6 +37,23 @@ export class AuthRepository {
       }
     } else {
       throw new Error('지원하지 않는 벤더입니다.');
+    }
+  }
+
+  async signJwt(vendor: string, userId: string) {
+    try {
+      return this.jwtService.sign(
+        {
+          vendor,
+          userId,
+        },
+        {
+          secret: process.env.JWT_SECRET_KEY,
+          expiresIn: '1d',
+        },
+      );
+    } catch (error) {
+      throw new Error('JWT를 생성하는데 실패했습니다.');
     }
   }
 
@@ -89,6 +87,36 @@ export class AuthRepository {
     }
   }
 
+  async getAccessToken(vendor: string, code: string) {
+    if (vendor === 'kakao') {
+      try {
+        const { data } = await firstValueFrom(
+          this.httpService.post(
+            'https://kauth.kakao.com/oauth/token',
+            {
+              grant_type: 'authorization_code',
+              client_id: process.env.KAKAO_REST_API_KEY,
+              redirect_uri: 'http://localhost:3000/auth/callback/authorize',
+              code,
+            },
+            {
+              headers: {
+                'Content-Type':
+                  'application/x-www-form-urlencoded;charset=utf-8',
+              },
+            },
+          ),
+        );
+
+        return data['access_token'];
+      } catch (error) {
+        throw new Error('카카오 인가코드를 가져오는데 실패했습니다.');
+      }
+    } else {
+      throw new Error('지원하지 않는 벤더입니다.');
+    }
+  }
+
   async getTokenInfo(vendor: string, accessToken: string) {
     if (vendor === 'kakao') {
       try {
@@ -116,7 +144,7 @@ export class AuthRepository {
         const { data } = await firstValueFrom(
           this.httpService.get('https://kapi.kakao.com/v2/user/me', {
             headers: {
-              Authorization: `Bearer ${accessToken}`,
+              Authorization: accessToken,
             },
           }),
         );
