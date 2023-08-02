@@ -13,13 +13,13 @@ import { AccessToken } from '../auth/entities/auth.entity';
 import { OfferResponse } from './descriptions/offer.response';
 import { AcceptOfferDto } from './dto/accept-offer.dto';
 
-@Controller('question/:questionId/offer')
+@Controller('question/offer')
 @ApiBearerAuth('Authorization')
 export class OfferController {
   constructor(private readonly offerService: OfferService) {}
 
   @ApiTags('Teacher')
-  @Get('append')
+  @Get('append/:questionId')
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.append)
   append(@Headers() headers: Headers, @Param('questionId') questionId: string) {
@@ -27,7 +27,7 @@ export class OfferController {
   }
 
   @ApiTags('Teacher')
-  @Post('remove')
+  @Post('remove/:questionId')
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.remove)
   remove(@Headers() headers: Headers, @Param('questionId') questionId: string) {
@@ -35,7 +35,7 @@ export class OfferController {
   }
 
   @ApiTags('Teacher')
-  @Get('status')
+  @Get('status/:questionId')
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.getStatus)
   @ApiResponse(OfferResponse.getStatus.success)
@@ -50,7 +50,7 @@ export class OfferController {
   }
 
   @ApiTags('Student')
-  @Get('list')
+  @Get('list/:questionId')
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.getTeachers)
   getTeachers(
@@ -64,7 +64,7 @@ export class OfferController {
   }
 
   @ApiTags('Student')
-  @Post('accept')
+  @Post('accept/:questionId')
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.accept)
   accept(
