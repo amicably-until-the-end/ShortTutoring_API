@@ -42,7 +42,7 @@ export class QuestionController {
 
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @Get(':questionId/delete')
+  @Get('delete/:questionId')
   @ApiOperation(QuestionOperation.delete)
   delete(@Param('questionId') questionId: string, @Headers() headers: Headers) {
     return this.questionService.delete(
