@@ -3,6 +3,8 @@ import { UserService } from './user.service';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiExcludeEndpoint,
+  ApiHeader,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -28,17 +30,23 @@ export class UserController {
   }
 
   @ApiBearerAuth('Authorization')
+  @ApiHeader({
+    name: 'vendor',
+    description: 'OAuth2 벤더',
+    example: 'kakao',
+    enum: ['kakao', 'naver', 'google'],
+  })
   @ApiOperation(UserOperation.login)
   @ApiResponse(UserResponse.login)
   @Get('login')
   login(@Headers() headers: Headers) {
-    return this.userService.login(AccessToken.userKey(headers));
+    return this.userService.login(AccessToken.authorization(headers));
   }
 
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.profile)
   @ApiResponse(UserResponse.me.profile)
-  @Get('me/profile')
+  @Get('profile')
   profile(@Headers() header: Headers) {
     return this.userService.profile(AccessToken.userKey(header));
   }
@@ -46,7 +54,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.updateProfile)
   @ApiResponse(UserResponse.me.updateProfile)
-  @Post('me/updateProfile')
+  @Post('profile/update')
   update(@Headers() headers: Headers, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(AccessToken.userKey(headers), updateUserDto);
   }
@@ -54,11 +62,13 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.withdraw)
   @ApiResponse(UserResponse.me.withdraw)
-  @Get('me/withdraw')
+  @Get('withdraw')
   withdraw(@Headers() headers: Headers) {
     return this.userService.withdraw(AccessToken.userKey(headers));
   }
 
+  // TODO: 다른 사용자의 프로필을 조회하는 API
+  @ApiExcludeEndpoint()
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.otherProfile)
   @ApiResponse(UserResponse.profile)

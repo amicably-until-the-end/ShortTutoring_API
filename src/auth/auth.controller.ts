@@ -1,4 +1,4 @@
-import { Controller, Get, Headers, Query } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
   ApiBearerAuth,
@@ -11,6 +11,7 @@ import {
 import { AuthOperation } from './descriptions/auth.operation';
 import { AccessToken } from './entities/auth.entity';
 import { AuthResponse } from './descriptions/auth.response';
+import { GetAccessTokenDto } from './dto/get-accesstoken.dto';
 
 @ApiTags('Dev')
 @Controller('auth')
@@ -41,24 +42,29 @@ export class AuthController {
     example: 'kakao',
     enum: ['kakao', 'naver', 'google'],
   })
-  @Get('jwt/generate')
+  @Get('token/generate')
   generateJwt(@Headers() headers: Headers, @Query('code') code: string) {
     return this.authService.generateJwt(headers['vendor'], code);
   }
 
   @ApiOperation(AuthOperation.decodeJwt)
   @ApiResponse(AuthResponse.decodeJwt)
-  @Get('jwt/decode')
+  @Get('token/decode')
   decodeJwt(@Query('jwt') jwt: string) {
     return this.authService.decodeJwt(jwt);
   }
 
   @ApiOperation(AuthOperation.verifyJwt)
   @ApiResponse(AuthResponse.verifyJwt)
-  @Get('jwt/verify')
+  @Get('token/verify')
   verifyJwt(@Query('jwt') jwt: string) {
     console.log(jwt);
     return this.authService.verifyJwt(jwt);
+  }
+
+  @Post('access-token')
+  getAccessToken(@Body() getAccessTokenDto: GetAccessTokenDto) {
+    return this.authService.getAccessToken(getAccessTokenDto);
   }
 
   @ApiExcludeEndpoint()

@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
 import { Fail, Success } from '../response';
+import { GetAccessTokenDto } from './dto/get-accesstoken.dto';
 
 @Injectable()
 export class AuthService {
@@ -57,15 +58,31 @@ export class AuthService {
   }
 
   /**
+   * 발급받은 인가 코드로부터 엑세스 토큰을 가져옵니다.
+   * @param getAccessTokenDto
+   */
+  async getAccessToken(getAccessTokenDto: GetAccessTokenDto) {
+    try {
+      const accessToken = await this.authRepository.getAccessToken(
+        getAccessTokenDto.vendor,
+        getAccessTokenDto.authorizationCode,
+      );
+      return new Success('성공적으로 토큰을 가져왔습니다.', accessToken);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  /**
    * 토큰 정보 보기
    * @param token OAuth2 토큰
    * @returns tokenInfo OAuth2 토큰 정보
    */
-  async accessTokenInfo(token: { vendor: string; accessToken: string }) {
+  async accessTokenInfo(token: { vendor: string; authorization: string }) {
     try {
       const tokenInfo = await this.authRepository.getTokenInfo(
         token.vendor,
-        token.accessToken,
+        token.authorization,
       );
       return new Success('성공적으로 토큰 정보를 가져왔습니다.', tokenInfo);
     } catch (error) {

@@ -59,10 +59,15 @@ export class UserService {
    * 로그인 실패 시, NotFound 예외를 반환합니다.
    * @param userKey
    */
-  async login(userKey: { vendor: string; userId: string }) {
+  async login(userKey: { vendor: string; authorization: string }) {
+    console.log(userKey);
     try {
-      const user: User = await this.userRepository.get(userKey);
-      return new Success('성공적으로 로그인했습니다.', user);
+      const userId = await this.authRepository.getUserIdFromAccessToken(
+        userKey.vendor,
+        userKey.authorization,
+      );
+      const token = await this.authRepository.signJwt(userKey.vendor, userId);
+      return new Success('성공적으로 로그인했습니다.', { token });
     } catch (error) {
       return new Fail(error.message);
     }
