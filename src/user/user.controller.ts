@@ -46,7 +46,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.profile)
   @ApiResponse(UserResponse.me.profile)
-  @Get('me/profile')
+  @Get('profile')
   profile(@Headers() header: Headers) {
     return this.userService.profile(AccessToken.userKey(header));
   }
@@ -54,7 +54,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.updateProfile)
   @ApiResponse(UserResponse.me.updateProfile)
-  @Post('me/updateProfile')
+  @Post('updateProfile')
   update(@Headers() headers: Headers, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(AccessToken.userKey(headers), updateUserDto);
   }
@@ -62,7 +62,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.withdraw)
   @ApiResponse(UserResponse.me.withdraw)
-  @Get('me/withdraw')
+  @Get('withdraw')
   withdraw(@Headers() headers: Headers) {
     return this.userService.withdraw(AccessToken.userKey(headers));
   }
