@@ -50,7 +50,7 @@ export class OfferController {
   }
 
   @ApiTags('Student')
-  @Get('list/:questionId')
+  @Get('teacher-list/:questionId')
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.getTeachers)
   getTeachers(

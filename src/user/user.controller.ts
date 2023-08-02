@@ -54,7 +54,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.me.updateProfile)
   @ApiResponse(UserResponse.me.updateProfile)
-  @Post('updateProfile')
+  @Post('profile/update')
   update(@Headers() headers: Headers, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.update(AccessToken.userKey(headers), updateUserDto);
   }

@@ -42,21 +42,21 @@ export class AuthController {
     example: 'kakao',
     enum: ['kakao', 'naver', 'google'],
   })
-  @Get('jwt/generate')
+  @Get('token/generate')
   generateJwt(@Headers() headers: Headers, @Query('code') code: string) {
     return this.authService.generateJwt(headers['vendor'], code);
   }
 
   @ApiOperation(AuthOperation.decodeJwt)
   @ApiResponse(AuthResponse.decodeJwt)
-  @Get('jwt/decode')
+  @Get('token/decode')
   decodeJwt(@Query('jwt') jwt: string) {
     return this.authService.decodeJwt(jwt);
   }
 
   @ApiOperation(AuthOperation.verifyJwt)
   @ApiResponse(AuthResponse.verifyJwt)
-  @Get('jwt/verify')
+  @Get('token/verify')
   verifyJwt(@Query('jwt') jwt: string) {
     console.log(jwt);
     return this.authService.verifyJwt(jwt);
