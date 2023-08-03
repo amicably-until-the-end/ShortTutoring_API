@@ -29,7 +29,7 @@ export class UserService {
     try {
       const userId = await this.authRepository.getUserIdFromAccessToken(
         vendor,
-        accessToken,
+        `Bearer ${accessToken}`,
       );
 
       const token = await this.authRepository.signJwt(vendor, userId);
