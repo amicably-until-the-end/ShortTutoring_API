@@ -8,6 +8,7 @@ import { UserRepository } from './user.repository';
 import { AuthRepository } from '../auth/auth.repository';
 import { MessageBuilder } from 'discord-webhook-node';
 import { webhook } from '../config.discord-webhook';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @Injectable()
 export class UserService {
@@ -57,18 +58,24 @@ export class UserService {
 
   /**
    * 로그인합니다.
-   * 로그인 성공 시, 사용자 정보를 반환합니다.
-   * 로그인 실패 시, NotFound 예외를 반환합니다.
-   * @param userKey
+   * 로그인 성공 시, JWT 토큰을 반환합니다.
+   * 로그인 실패 시, 실패 메시지를 반환합니다.
+   * @param loginUserDto
    */
-  async login(userKey: { vendor: string; authorization: string }) {
-    console.log(userKey);
+  async login(loginUserDto: LoginUserDto) {
     try {
       const userId = await this.authRepository.getUserIdFromAccessToken(
-        userKey.vendor,
-        userKey.authorization,
+        loginUserDto.vendor,
+        `Bearer ${loginUserDto.accessToken}`,
       );
-      const token = await this.authRepository.signJwt(userKey.vendor, userId);
+
+      await this.userRepository.get({ vendor: loginUserDto.vendor, userId });
+
+      const token = await this.authRepository.signJwt(
+        loginUserDto.vendor,
+        userId,
+      );
+
       return new Success('성공적으로 로그인했습니다.', { token });
     } catch (error) {
       return new Fail(error.message);
