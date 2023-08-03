@@ -9,10 +9,10 @@ export class CreateUserDto {
   vendor: string;
 
   @ApiProperty({
-    description: '발급받은 OAuth 인가 코드',
-    default: 'OAUTH_AUTHORIZATION_CODE',
+    description: '발급받은 OAuth 액세스 토큰',
+    default: 'OAUTH_ACCESS_TOKEN',
   })
-  authorizationCode: string;
+  accessToken: string;
 
   @ApiProperty({
     description: '사용자 이름',

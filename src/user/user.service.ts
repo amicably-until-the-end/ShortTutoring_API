@@ -24,13 +24,15 @@ export class UserService {
    */
   async signup(createUserDto: CreateUserDto) {
     const vendor = createUserDto.vendor;
-    const code = createUserDto.authorizationCode;
+    const accessToken = createUserDto.accessToken;
 
     try {
-      const { jwt, userId } = await this.authRepository.generateJwt(
+      const userId = await this.authRepository.getUserIdFromAccessToken(
         vendor,
-        code,
+        accessToken,
       );
+
+      const token = await this.authRepository.signJwt(vendor, userId);
 
       const user = await this.userRepository.create(
         {
@@ -47,7 +49,7 @@ export class UserService {
         .setDescription(`${user.name}님이 회원가입했습니다.`);
       await webhook.send(embed);
 
-      return new Success('성공적으로 회원가입했습니다.', { jwt });
+      return new Success('성공적으로 회원가입했습니다.', { token });
     } catch (error) {
       return new Fail(error.message);
     }
