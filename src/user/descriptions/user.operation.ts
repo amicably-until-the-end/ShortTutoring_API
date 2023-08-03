@@ -7,8 +7,8 @@ export const UserOperation = {
     summary: '로그인',
     description:
       '`USER`\n\n로그인합니다.\n\n' +
-      '로그인 성공 시, 사용자 프로필 정보가 반환됩니다.\n\n' +
-      '로그인 실패 시, `404` 에러가 반환됩니다.',
+      '로그인 성공 시, JWT 토큰 정보가 반환됩니다.\n\n' +
+      '로그인 실패 시, 실패 메시지가 반환됩니다.',
   },
   me: {
     profile: {
