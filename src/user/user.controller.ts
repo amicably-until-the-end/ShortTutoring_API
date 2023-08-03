@@ -4,7 +4,6 @@ import {
   ApiBearerAuth,
   ApiCreatedResponse,
   ApiExcludeEndpoint,
-  ApiHeader,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -16,6 +15,7 @@ import { UserOperation } from './descriptions/user.operation';
 import { UserParam } from './descriptions/user.param';
 import { UserResponse } from './descriptions/user.response';
 import { AccessToken } from '../auth/entities/auth.entity';
+import { LoginUserDto } from './dto/login-user.dto';
 
 @ApiTags('User')
 @Controller('user')
@@ -29,18 +29,11 @@ export class UserController {
     return this.userService.signup(createUserDto);
   }
 
-  @ApiBearerAuth('Authorization')
-  @ApiHeader({
-    name: 'vendor',
-    description: 'OAuth2 벤더',
-    example: 'kakao',
-    enum: ['kakao', 'naver', 'google'],
-  })
   @ApiOperation(UserOperation.login)
   @ApiResponse(UserResponse.login)
-  @Get('login')
-  login(@Headers() headers: Headers) {
-    return this.userService.login(AccessToken.authorization(headers));
+  @Post('login')
+  login(@Body() loginUserDto: LoginUserDto) {
+    return this.userService.login(loginUserDto);
   }
 
   @ApiBearerAuth('Authorization')
