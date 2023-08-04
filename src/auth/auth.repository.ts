@@ -19,11 +19,14 @@ export class AuthRepository {
         const accessToken = await this.getAccessToken(vendor, code);
 
         const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
+        const user = await this.userRepository.get({ vendor, userId });
+        const role = user.role;
 
         const jwt = this.jwtService.sign(
           {
             vendor,
             userId,
+            role,
           },
           {
             secret: process.env.JWT_SECRET_KEY,
