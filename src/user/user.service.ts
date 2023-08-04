@@ -33,7 +33,11 @@ export class UserService {
         `Bearer ${accessToken}`,
       );
 
-      const token = await this.authRepository.signJwt(vendor, userId);
+      const token = await this.authRepository.signJwt(
+        vendor,
+        userId,
+        createUserDto.role,
+      );
 
       const user = await this.userRepository.create(
         {
@@ -69,14 +73,21 @@ export class UserService {
         `Bearer ${loginUserDto.accessToken}`,
       );
 
-      await this.userRepository.get({ vendor: loginUserDto.vendor, userId });
+      const user = await this.userRepository.get({
+        vendor: loginUserDto.vendor,
+        userId,
+      });
 
       const token = await this.authRepository.signJwt(
         loginUserDto.vendor,
         userId,
+        user.role,
       );
 
-      return new Success('성공적으로 로그인했습니다.', { token });
+      return new Success('성공적으로 로그인했습니다.', {
+        role: user.role,
+        token,
+      });
     } catch (error) {
       return new Fail(error.message);
     }

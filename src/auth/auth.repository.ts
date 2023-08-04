@@ -43,12 +43,13 @@ export class AuthRepository {
     }
   }
 
-  async signJwt(vendor: string, userId: string) {
+  async signJwt(vendor: string, userId: string, role: string) {
     try {
       return this.jwtService.sign(
         {
           vendor,
           userId,
+          role,
         },
         {
           secret: process.env.JWT_SECRET_KEY,
@@ -66,6 +67,7 @@ export class AuthRepository {
       return {
         vendor: decoded['vendor'],
         userId: decoded['userId'],
+        role: decoded['role'],
         iat: decoded['iat'],
         exp: decoded['exp'],
       };
@@ -82,6 +84,7 @@ export class AuthRepository {
       return {
         vendor: verified['vendor'],
         userId: verified['userId'],
+        role: verified['role'],
         iat: verified['iat'],
         exp: verified['exp'],
       };
