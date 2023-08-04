@@ -27,9 +27,9 @@ export class QuestionController {
 
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @Post('create')
   @ApiOperation(QuestionOperation.create)
   @ApiResponse(QuestionResponse.create.success)
+  @Post('create')
   create(
     @Headers() headers: Headers,
     @Body() createQuestionDto: CreateQuestionDto,
@@ -42,8 +42,8 @@ export class QuestionController {
 
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @Get('delete/:questionId')
   @ApiOperation(QuestionOperation.delete)
+  @Get('delete/:questionId')
   delete(@Param('questionId') questionId: string, @Headers() headers: Headers) {
     return this.questionService.delete(
       AccessToken.userKey(headers),
@@ -52,9 +52,10 @@ export class QuestionController {
   }
 
   @ApiTags('Teacher')
-  @Get('list')
+  @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.list)
   @ApiQuery(QuestionQuery.list)
+  @Get('list')
   list(@Query('status') status: string) {
     return this.questionService.list(status);
   }
