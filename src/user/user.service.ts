@@ -2,13 +2,13 @@ import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.interface';
 import { Fail, Success } from '../response';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { CreateUserDto } from './dto/create-user.dto';
 import { UploadRepository } from '../upload/upload.repository';
 import { UserRepository } from './user.repository';
 import { AuthRepository } from '../auth/auth.repository';
 import { MessageBuilder } from 'discord-webhook-node';
 import { webhook } from '../config.discord-webhook';
 import { LoginUserDto } from './dto/login-user.dto';
+import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -19,13 +19,13 @@ export class UserService {
   ) {}
 
   /**
-   사용자를 생성합니다.
-   @param createUserDto 사용자 생성 DTO
-   @return 사용자 정보
+   학생 사용자를 생성합니다.
+   @param createStudentDto 학생 사용자 생성 DTO
+   @return token 학생 사용자 토큰
    */
-  async signup(createUserDto: CreateUserDto) {
-    const vendor = createUserDto.vendor;
-    const accessToken = createUserDto.accessToken;
+  async signupStudent(createStudentDto: CreateStudentDto) {
+    const vendor = createStudentDto.vendor;
+    const accessToken = createStudentDto.accessToken;
 
     try {
       const userId = await this.authRepository.getUserIdFromAccessToken(
@@ -36,7 +36,7 @@ export class UserService {
       const token = await this.authRepository.signJwt(
         vendor,
         userId,
-        createUserDto.role,
+        'student',
       );
 
       const user = await this.userRepository.create(
@@ -44,7 +44,51 @@ export class UserService {
           vendor,
           userId,
         },
-        createUserDto,
+        createStudentDto,
+        'student',
+      );
+
+      const embed = new MessageBuilder()
+        .setTitle('회원가입')
+        .setColor(Number('#00ff00'))
+        .setImage(user.profileImage)
+        .setDescription(`${user.name}님이 회원가입했습니다.`);
+      await webhook.send(embed);
+
+      return new Success('성공적으로 회원가입했습니다.', { token });
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  /**
+   선생님 사용자를 생성합니다.
+   @return token 학생 사용자 토큰
+   * @param createTeacherDto
+   */
+  async signupTeacher(createTeacherDto: CreateTeacherDto) {
+    const vendor = createTeacherDto.vendor;
+    const accessToken = createTeacherDto.accessToken;
+
+    try {
+      const userId = await this.authRepository.getUserIdFromAccessToken(
+        vendor,
+        `Bearer ${accessToken}`,
+      );
+
+      const token = await this.authRepository.signJwt(
+        vendor,
+        userId,
+        'teacher',
+      );
+
+      const user = await this.userRepository.create(
+        {
+          vendor,
+          userId,
+        },
+        createTeacherDto,
+        'teacher',
       );
 
       const embed = new MessageBuilder()
