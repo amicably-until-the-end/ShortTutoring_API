@@ -49,4 +49,23 @@ export class TutoringRepository {
 
     return tutoring;
   }
+
+  async finishTutoring(tutoringId: string): Promise<Tutoring> {
+    let tutoring: Tutoring;
+    try {
+      tutoring = await this.tutoringModel.get({ id: tutoringId });
+    } catch (error) {
+      throw new Error('해당 과외를 찾을 수 없습니다.');
+    }
+    try {
+      if (tutoring !== undefined) {
+        return await this.tutoringModel.update(
+          { id: tutoringId },
+          { status: 'finished', endedAt: new Date().toISOString() },
+        );
+      }
+    } catch (error) {
+      throw new Error('과외 상태를 변경할 수 없습니다.');
+    }
+  }
 }

@@ -58,6 +58,29 @@ export class AgoraService {
       return null;
     }
   }
+
+  async disableWhiteBoardChannel(whiteBoardUUID: string) {
+    try {
+      const { data } = await firstValueFrom(
+        this.httpService.patch(
+          `https://api.netless.link/v5/rooms/${whiteBoardUUID}`,
+          {
+            isBan: true,
+          },
+          {
+            headers: {
+              'Content-Type': 'application/json',
+              token: process.env.AGORA_WHITEBOARD_SDK_TOKEN,
+              region: 'us-sv',
+            },
+          },
+        ),
+      );
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
 }
 
 export interface WhiteBoardData {
