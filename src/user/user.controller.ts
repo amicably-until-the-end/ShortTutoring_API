@@ -9,7 +9,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserOperation } from './descriptions/user.operation';
 import { UserParam } from './descriptions/user.param';
@@ -22,11 +22,18 @@ import { LoginUserDto } from './dto/login-user.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @ApiOperation(UserOperation.signup)
-  @ApiCreatedResponse(UserResponse.signup)
-  @Post('signup')
-  signup(@Body() createUserDto: CreateUserDto) {
-    return this.userService.signup(createUserDto);
+  @ApiOperation(UserOperation.signup.student)
+  @ApiCreatedResponse(UserResponse.signup.student)
+  @Post('signup/student')
+  signupStudent(@Body() createStudentDto: CreateStudentDto) {
+    return this.userService.signupStudent(createStudentDto);
+  }
+
+  @ApiOperation(UserOperation.signup.teacher)
+  @ApiCreatedResponse(UserResponse.signup.teacher)
+  @Post('signup/teacher')
+  signupTeacher(@Body() createTeacherDto: CreateTeacherDto) {
+    return this.userService.signupTeacher(createTeacherDto);
   }
 
   @ApiOperation(UserOperation.login)

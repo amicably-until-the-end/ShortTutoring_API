@@ -1,7 +1,17 @@
 export const UserOperation = {
   signup: {
-    summary: '사용자 생성',
-    description: '`USER`\n\n사용자를 생성합니다.',
+    student: {
+      summary: '학생 회원가입',
+      description:
+        '`USER`\n\n학생으로 회원가입합니다.\n\n' +
+        '회원가입 성공 시, JWT 토큰 정보가 반환됩니다.',
+    },
+    teacher: {
+      summary: '선생님 회원가입',
+      description:
+        '`USER`\n\n선생님으로 회원가입합니다.\n\n' +
+        '회원가입 성공 시, JWT 토큰 정보가 반환됩니다.',
+    },
   },
   login: {
     summary: '로그인',
