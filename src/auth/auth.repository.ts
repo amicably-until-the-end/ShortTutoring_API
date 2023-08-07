@@ -4,10 +4,13 @@ import { firstValueFrom } from 'rxjs';
 import { UserRepository } from '../user/user.repository';
 import * as process from 'process';
 import { JwtService } from '@nestjs/jwt';
+import { Auth, AuthKey } from './entities/auth.interface';
+import { InjectModel, Model } from 'nestjs-dynamoose';
 
 @Injectable()
 export class AuthRepository {
   constructor(
+    @InjectModel('Auth') private readonly authModel: Model<Auth, AuthKey>,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
     private readonly userRepository: UserRepository,
@@ -19,12 +22,11 @@ export class AuthRepository {
         const accessToken = await this.getAccessToken(vendor, code);
 
         const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
-        const user = await this.userRepository.get({ vendor, userId });
+        const user = await this.userRepository.get(userId);
         const role = user.role;
 
         const jwt = this.jwtService.sign(
           {
-            vendor,
             userId,
             role,
           },
@@ -43,11 +45,10 @@ export class AuthRepository {
     }
   }
 
-  async signJwt(vendor: string, userId: string, role: string) {
+  async signJwt(userId: string, role: string) {
     try {
       return this.jwtService.sign(
         {
-          vendor,
           userId,
           role,
         },
@@ -132,7 +133,7 @@ export class AuthRepository {
             'https://kapi.kakao.com/v1/user/access_token_info',
             {
               headers: {
-                Authorization: `${accessToken}`,
+                Authorization: accessToken,
               },
             },
           ),
@@ -164,17 +165,50 @@ export class AuthRepository {
   }
 
   async getUserFromAccessToken(vendor: string, accessToken: string) {
-    if (vendor === 'kakao') {
-      try {
-        const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
+    try {
+      const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
 
-        return await this.userRepository.get({
-          vendor,
-          userId,
-        });
-      } catch (error) {
-        throw new Error('사용자를 찾을 수 없습니다.');
-      }
+      return await this.userRepository.get(userId);
+    } catch (error) {
+      throw new Error('사용자를 찾을 수 없습니다.');
     }
+  }
+
+  async createAuth(
+    vendor: string,
+    authId: string,
+    userId: string,
+    role: string,
+  ) {
+    try {
+      return await this.authModel.create({
+        vendor,
+        authId,
+        userId,
+        role,
+      });
+    } catch (error) {
+      throw new Error('인증정보를 생성하는데 실패했습니다.');
+    }
+  }
+
+  async getAuth(vendor: string, authId: string) {
+    try {
+      return await this.authModel.get({
+        vendor,
+        authId,
+      });
+    } catch (error) {
+      throw new Error('인증정보를 가져오는데 실패했습니다.');
+    }
+  }
+
+  async getUserIdFromAuth(vendor: string, authId: string) {
+    const auth = await this.getAuth(vendor, authId);
+    if (auth === undefined) {
+      throw new Error('인증정보를 찾을 수 없습니다.');
+    }
+
+    return auth.userId;
   }
 }

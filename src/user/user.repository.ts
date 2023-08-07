@@ -9,17 +9,9 @@ export class UserRepository {
     @InjectModel('User') private readonly userModel: Model<User, UserKey>,
   ) {}
 
-  async create(
-    userKey: {
-      vendor: string;
-      userId: string;
-    },
-    createUserDto: CreateUserDto,
-    role: string,
-  ) {
+  async create(userId: string, createUserDto: CreateUserDto, role: string) {
     const user: User = {
-      vendor: userKey.vendor,
-      id: userKey.userId,
+      id: userId,
       name: createUserDto.name,
       bio: createUserDto.bio,
       role,
@@ -35,10 +27,9 @@ export class UserRepository {
     }
   }
 
-  async get(userKey: { vendor: string; userId: string }): Promise<User> {
+  async get(userId: string): Promise<User> {
     const user: User = await this.userModel.get({
-      vendor: userKey.vendor,
-      id: userKey.userId,
+      id: userId,
     });
 
     if (user === undefined) {
@@ -48,11 +39,10 @@ export class UserRepository {
     return user;
   }
 
-  async update(userKey: { userId: string; vendor: string }, updateUser: User) {
+  async update(userId: string, updateUser: User) {
     try {
       await this.userModel.get({
-        vendor: userKey.vendor,
-        id: userKey.userId,
+        id: userId,
       });
     } catch (error) {
       throw new Error('사용자를 찾을 수 없습니다.');
@@ -61,8 +51,7 @@ export class UserRepository {
     try {
       return await this.userModel.update(
         {
-          vendor: userKey.vendor,
-          id: userKey.userId,
+          id: userId,
         },
         updateUser,
       );
@@ -71,10 +60,9 @@ export class UserRepository {
     }
   }
 
-  async delete(userKey: { userId: string; vendor: string }) {
+  async delete(userId: string) {
     const user: User = await this.userModel.get({
-      vendor: userKey.vendor,
-      id: userKey.userId,
+      id: userId,
     });
 
     if (user === undefined) {
@@ -82,8 +70,7 @@ export class UserRepository {
     }
 
     return await this.userModel.delete({
-      vendor: userKey.vendor,
-      id: userKey.userId,
+      id: userId,
     });
   }
 }

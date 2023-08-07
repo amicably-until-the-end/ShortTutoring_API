@@ -1,23 +1,18 @@
 import { Schema } from 'dynamoose';
 
-export const UserSchema = new Schema({
-  id: {
+export const AuthSchema = new Schema({
+  vendor: {
     type: String,
     hashKey: true,
   },
-  name: {
+  authId: {
     type: String,
+    rangeKey: true,
   },
-  bio: {
-    type: String,
-  },
-  profileImage: {
+  userId: {
     type: String,
   },
   role: {
-    type: String,
-  },
-  createdAt: {
     type: String,
   },
 });

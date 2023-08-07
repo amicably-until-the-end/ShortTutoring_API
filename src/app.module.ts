@@ -16,8 +16,6 @@ import { QuestionModule } from './question/question.module';
 import { OfferModule } from './offer/offer.module';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
-import { JwtService } from '@nestjs/jwt';
-import { AuthRepository } from './auth/auth.repository';
 
 @Module({
   imports: [
@@ -33,7 +31,7 @@ import { AuthRepository } from './auth/auth.repository';
     // ReviewModule,
   ],
   controllers: [AppController],
-  providers: [AppService, AuthRepository, JwtService],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

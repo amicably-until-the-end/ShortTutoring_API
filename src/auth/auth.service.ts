@@ -102,7 +102,7 @@ export class AuthService {
         vendor,
         accessToken,
       );
-      return new Success('성공적으로 사용자 ID를 가져왔습니다.', userId);
+      return new Success('성공적으로 사용자 ID를 가져왔습니다.', { userId });
     } catch (error) {
       return new Fail(error.message);
     }
