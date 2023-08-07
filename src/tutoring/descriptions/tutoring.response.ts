@@ -33,7 +33,7 @@ export const TutoringEntity = {
     type: 'string',
     description: '튜터링 상태',
     example: 'matched',
-    enum: ['matched', 'started', 'ended'],
+    enum: ['matched', 'started', 'finished'],
   },
   whiteBoardUUID: {
     type: 'string',
