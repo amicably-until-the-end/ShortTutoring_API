@@ -66,7 +66,6 @@ export class AuthRepository {
     try {
       const decoded = this.jwtService.decode(jwt);
       return {
-        vendor: decoded['vendor'],
         userId: decoded['userId'],
         role: decoded['role'],
         iat: decoded['iat'],
@@ -83,7 +82,6 @@ export class AuthRepository {
         secret: process.env.JWT_SECRET_KEY,
       });
       return {
-        vendor: verified['vendor'],
         userId: verified['userId'],
         role: verified['role'],
         iat: verified['iat'],
@@ -157,7 +155,12 @@ export class AuthRepository {
           }),
         );
 
-        return data.id.toString();
+        const authId = data.id.toString();
+        const auth = await this.authModel.get({
+          vendor,
+          authId,
+        });
+        return auth.userId;
       } catch (error) {
         throw new Error('사용자를 찾을 수 없습니다.');
       }
@@ -211,4 +214,6 @@ export class AuthRepository {
 
     return auth.userId;
   }
+
+  async delete(userId: string) {}
 }

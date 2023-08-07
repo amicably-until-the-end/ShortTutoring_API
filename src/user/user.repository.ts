@@ -40,11 +40,10 @@ export class UserRepository {
   }
 
   async update(userId: string, updateUser: User) {
-    try {
-      await this.userModel.get({
-        id: userId,
-      });
-    } catch (error) {
+    const user: User = await this.userModel.get({
+      id: userId,
+    });
+    if (user === undefined) {
       throw new Error('사용자를 찾을 수 없습니다.');
     }
 
