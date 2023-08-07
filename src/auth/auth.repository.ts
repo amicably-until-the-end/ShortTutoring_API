@@ -16,35 +16,6 @@ export class AuthRepository {
     private readonly userRepository: UserRepository,
   ) {}
 
-  async generateJwt(vendor: string, code: string) {
-    if (vendor === 'kakao') {
-      try {
-        const accessToken = await this.getAccessToken(vendor, code);
-
-        const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
-        const user = await this.userRepository.get(userId);
-        const role = user.role;
-
-        const jwt = this.jwtService.sign(
-          {
-            userId,
-            role,
-          },
-          {
-            secret: process.env.JWT_SECRET_KEY,
-            expiresIn: '1d',
-          },
-        );
-
-        return { jwt, userId };
-      } catch (error) {
-        throw new Error('카카오 인가코드를 가져오는데 실패했습니다.');
-      }
-    } else {
-      throw new Error('지원하지 않는 벤더입니다.');
-    }
-  }
-
   async signJwt(userId: string, role: string) {
     try {
       return this.jwtService.sign(
@@ -144,7 +115,7 @@ export class AuthRepository {
     }
   }
 
-  async getUserIdFromAccessToken(vendor: string, accessToken: string) {
+  async getAuthIdFromAccessToken(vendor: string, accessToken: string) {
     if (vendor === 'kakao') {
       try {
         const { data } = await firstValueFrom(
@@ -155,25 +126,22 @@ export class AuthRepository {
           }),
         );
 
-        const authId = data.id.toString();
-        const auth = await this.authModel.get({
-          vendor,
-          authId,
-        });
-        return auth.userId;
+        return data.id.toString();
       } catch (error) {
         throw new Error('사용자를 찾을 수 없습니다.');
       }
     }
   }
 
-  async getUserFromAccessToken(vendor: string, accessToken: string) {
-    try {
-      const userId = await this.getUserIdFromAccessToken(vendor, accessToken);
+  async getUserIdFromAccessToken(vendor: string, accessToken: string) {
+    if (vendor === 'kakao') {
+      const authId = await this.getAuthIdFromAccessToken(vendor, accessToken);
+      const auth = await this.getAuth(vendor, authId);
+      if (auth === undefined) {
+        throw new Error('사용자를 찾을 수 없습니다.');
+      }
 
-      return await this.userRepository.get(userId);
-    } catch (error) {
-      throw new Error('사용자를 찾을 수 없습니다.');
+      return auth.userId;
     }
   }
 
