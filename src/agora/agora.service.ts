@@ -65,19 +65,21 @@ export class AgoraService {
         this.httpService.patch(
           `https://api.netless.link/v5/rooms/${whiteBoardUUID}`,
           {
+            isBan: true,
+          },
+          {
             headers: {
               'Content-Type': 'application/json',
               token: process.env.AGORA_WHITEBOARD_SDK_TOKEN,
               region: 'us-sv',
             },
-            body: {
-              isBan: true,
-            },
           },
         ),
       );
+      console.log(data);
       return data;
     } catch (error) {
+      console.log(error);
       return null;
     }
   }

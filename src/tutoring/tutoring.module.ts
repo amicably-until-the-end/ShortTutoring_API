@@ -4,6 +4,7 @@ import { TutoringController } from './tutoring.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { TutoringSchema } from './entities/tutoring.schema';
 import { TutoringRepository } from './tutoring.repository';
+import { AgoraModule } from '../agora/agora.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { TutoringRepository } from './tutoring.repository';
         schema: TutoringSchema,
       },
     ]),
+    AgoraModule,
   ],
   controllers: [TutoringController],
   providers: [TutoringService, TutoringRepository],

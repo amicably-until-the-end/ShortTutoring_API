@@ -13,10 +13,7 @@ export class TutoringService {
   async finish(tutoringId: string) {
     //TODO: 과외에 참여한 사람이 맞는지 확인해야할까?
     try {
-      const tutoring = await this.tutoringRepository.updateStatus(
-        tutoringId,
-        'finished',
-      );
+      const tutoring = await this.tutoringRepository.finishTutoring(tutoringId);
       const { whiteBoardUUID } = tutoring;
       await this.agoraService.disableWhiteBoardChannel(whiteBoardUUID);
 

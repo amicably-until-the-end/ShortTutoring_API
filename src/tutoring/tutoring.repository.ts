@@ -50,7 +50,7 @@ export class TutoringRepository {
     return tutoring;
   }
 
-  async updateStatus(tutoringId: string, status: string): Promise<Tutoring> {
+  async finishTutoring(tutoringId: string): Promise<Tutoring> {
     let tutoring: Tutoring;
     try {
       tutoring = await this.tutoringModel.get({ id: tutoringId });
@@ -61,7 +61,7 @@ export class TutoringRepository {
       if (tutoring !== undefined) {
         return await this.tutoringModel.update(
           { id: tutoringId },
-          { status: status },
+          { status: 'finished', endedAt: new Date().toISOString() },
         );
       }
     } catch (error) {
