@@ -3,6 +3,7 @@ import { TutoringService } from './tutoring.service';
 import { TutoringController } from './tutoring.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { TutoringSchema } from './entities/tutoring.schema';
+import { TutoringRepository } from './tutoring.repository';
 
 @Module({
   imports: [
@@ -14,6 +15,6 @@ import { TutoringSchema } from './entities/tutoring.schema';
     ]),
   ],
   controllers: [TutoringController],
-  providers: [TutoringService],
+  providers: [TutoringService, TutoringRepository],
 })
 export class TutoringModule {}
