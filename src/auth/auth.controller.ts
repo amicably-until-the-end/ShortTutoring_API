@@ -58,7 +58,6 @@ export class AuthController {
   @ApiResponse(AuthResponse.verifyJwt)
   @Get('token/verify')
   verifyJwt(@Query('jwt') jwt: string) {
-    console.log(jwt);
     return this.authService.verifyJwt(jwt);
   }
 

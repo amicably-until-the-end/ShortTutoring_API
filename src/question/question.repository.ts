@@ -3,7 +3,6 @@ import { InjectModel, Model } from 'nestjs-dynamoose';
 import { Question, QuestionKey } from './entities/question.interface';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { User, UserKey } from '../user/entities/user.interface';
-import { HttpErrorByCode } from '@nestjs/common/utils/http-error-by-code.util';
 
 @Injectable()
 export class QuestionRepository {
@@ -20,18 +19,11 @@ export class QuestionRepository {
     createQuestionDto: CreateQuestionDto,
     problemImage: string,
   ): Promise<Question> {
-    let user: User;
-    try {
-      user = await this.userModel.get({
-        vendor: userKey.vendor,
-        id: userKey.userId,
-      });
-    } catch (error) {
-      throw new ErrorEvent['404']('사용자를 찾을 수 없습니다.');
-    }
-
-    if (user.role === 'teacher') {
-      throw new ErrorEvent['403']('선생님은 질문을 생성할 수 없습니다.');
+    const user: User = await this.userModel.get({ id: userKey.userId });
+    if (user === undefined) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    } else if (user.role === 'teacher') {
+      throw new Error('선생님은 질문을 생성할 수 없습니다.');
     }
 
     try {
@@ -55,7 +47,7 @@ export class QuestionRepository {
         createdAt: new Date().toISOString(),
       });
     } catch (error) {
-      throw new HttpErrorByCode['400']('질문을 생성할 수 없습니다.');
+      throw new Error('질문을 생성할 수 없습니다.');
     }
   }
 
@@ -76,35 +68,29 @@ export class QuestionRepository {
     userKey: { vendor: string; userId: string },
     questionId: string,
   ) {
-    let user: User;
-    try {
-      user = await this.userModel.get({
-        vendor: userKey.vendor,
-        id: userKey.userId,
-      });
-    } catch (error) {
-      throw new ErrorEvent['404']('사용자를 찾을 수 없습니다.');
+    const user: User = await this.userModel.get({ id: userKey.userId });
+    if (user === undefined) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    } else if (user.role === 'teacher') {
+      throw new Error('선생님은 질문을 삭제할 수 없습니다.');
     }
 
-    if (user.role === 'teacher') {
-      throw new ErrorEvent['403']('선생님은 질문을 삭제할 수 없습니다.');
+    const question: Question = await this.questionModel.get({
+      id: questionId,
+    });
+    if (
+      question.student.id !== userKey.userId ||
+      question.student.vendor !== userKey.vendor
+    ) {
+      return new Error('질문을 삭제할 권한이 없습니다.');
     }
 
     try {
-      const question: Question = await this.questionModel.get({
-        id: questionId,
-      });
-      if (
-        question.student.id !== userKey.userId ||
-        question.student.vendor !== userKey.vendor
-      ) {
-        return new ErrorEvent['403']('질문을 삭제할 권한이 없습니다.');
-      }
       return await this.questionModel.delete({
         id: questionId,
       });
     } catch (error) {
-      throw new ErrorEvent['400']('질문을 삭제할 수 없습니다.');
+      throw new Error('질문을 삭제할 수 없습니다.');
     }
   }
 }

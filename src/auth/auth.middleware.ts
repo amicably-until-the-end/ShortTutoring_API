@@ -12,9 +12,9 @@ export class AuthMiddleware implements NestMiddleware {
       next();
     }
     try {
-      const { vendor, userId } = await this.authRepository.decodeJwt(jwt);
-      req.headers['vendor'] = vendor;
+      const { userId, role } = await this.authRepository.decodeJwt(jwt);
       req.headers['userId'] = userId;
+      req.headers['role'] = role;
       next();
     } catch (error) {
       next();

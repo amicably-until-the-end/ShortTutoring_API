@@ -48,7 +48,7 @@ export class UserController {
   @ApiResponse(UserResponse.me.profile)
   @Get('profile')
   profile(@Headers() header: Headers) {
-    return this.userService.profile(AccessToken.userKey(header));
+    return this.userService.profile(AccessToken.userId(header));
   }
 
   @ApiBearerAuth('Authorization')
@@ -56,7 +56,7 @@ export class UserController {
   @ApiResponse(UserResponse.me.updateProfile)
   @Post('profile/update')
   update(@Headers() headers: Headers, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(AccessToken.userKey(headers), updateUserDto);
+    return this.userService.update(AccessToken.userId(headers), updateUserDto);
   }
 
   @ApiBearerAuth('Authorization')
@@ -64,7 +64,7 @@ export class UserController {
   @ApiResponse(UserResponse.me.withdraw)
   @Get('withdraw')
   withdraw(@Headers() headers: Headers) {
-    return this.userService.withdraw(AccessToken.userKey(headers));
+    return this.userService.withdraw(AccessToken.userId(headers));
   }
 
   // TODO: 다른 사용자의 프로필을 조회하는 API
@@ -74,6 +74,6 @@ export class UserController {
   @ApiResponse(UserResponse.profile)
   @Get(':userId/profile')
   otherProfile(@Headers() headers: Headers, @Param('userId') userId: string) {
-    return this.userService.otherProfile({ vendor: headers['vendor'], userId });
+    return this.userService.otherProfile(userId);
   }
 }

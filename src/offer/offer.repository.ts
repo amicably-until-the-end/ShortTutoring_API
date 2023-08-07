@@ -20,7 +20,6 @@ export class OfferRepository {
   ) {
     try {
       const teacher = await this.userModel.get({
-        vendor: userKey.vendor,
         id: userKey.userId,
       });
 
@@ -48,7 +47,6 @@ export class OfferRepository {
     questionId: string,
   ) {
     const user = await this.userModel.get({
-      vendor: userKey.vendor,
       id: userKey.userId,
     });
     if (user === undefined) {
@@ -67,10 +65,7 @@ export class OfferRepository {
     const teachers = question.teacherIds.map(async (teacherId) => {
       const vendor = teacherId.split('#')[0];
       const id = teacherId.split('#')[1];
-      return await this.userModel.get({
-        vendor,
-        id,
-      });
+      return await this.userModel.get({ id });
     });
     return await Promise.all(teachers);
   }
@@ -129,10 +124,7 @@ export class OfferRepository {
     questionId: string,
     teacherId: string,
   ) {
-    const user: User = await this.userModel.get({
-      vendor: userKey.vendor,
-      id: userKey.userId,
-    });
+    const user: User = await this.userModel.get({ id: userKey.userId });
     if (user === undefined) {
       throw new Error('사용자를 찾을 수 없습니다.');
     } else if (user.role === 'teacher') {

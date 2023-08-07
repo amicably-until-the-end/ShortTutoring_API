@@ -4,10 +4,11 @@ import { AuthController } from './auth.controller';
 import { HttpModule } from '@nestjs/axios';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { UserSchema } from '../user/entities/user.schema';
-import { UploadRepository } from '../upload/upload.repository';
 import { UserRepository } from '../user/user.repository';
 import { AuthRepository } from './auth.repository';
 import { JwtService } from '@nestjs/jwt';
+import { AuthSchema } from './entities/auth.schema';
+import { UploadRepository } from '../upload/upload.repository';
 
 @Module({
   imports: [
@@ -16,6 +17,10 @@ import { JwtService } from '@nestjs/jwt';
       {
         name: 'User',
         schema: UserSchema,
+      },
+      {
+        name: 'Auth',
+        schema: AuthSchema,
       },
     ]),
   ],
