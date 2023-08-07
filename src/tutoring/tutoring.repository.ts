@@ -55,7 +55,7 @@ export class TutoringRepository {
     try {
       tutoring = await this.tutoringModel.get({ id: tutoringId });
     } catch (error) {
-      throw new ErrorEvent['404']('해당 과외를 찾을 수 없습니다.');
+      throw new Error('해당 과외를 찾을 수 없습니다.');
     }
     try {
       if (tutoring !== undefined) {
@@ -65,7 +65,7 @@ export class TutoringRepository {
         );
       }
     } catch (error) {
-      throw new ErrorEvent['400']('과외 상태를 변경할 수 없습니다.');
+      throw new Error('과외 상태를 변경할 수 없습니다.');
     }
   }
 }
