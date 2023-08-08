@@ -3,9 +3,18 @@ export interface UserKey {
 }
 
 export interface User extends UserKey {
-  role: string;
-  name: string;
   bio?: string;
-  profileImage?: string;
   createdAt?: string;
+  followers: string[];
+  following: string[];
+  name: string;
+  profileImage?: string;
+  role: string;
+  school?: {
+    level?: string;
+    name?: string;
+    division?: string;
+    department?: string;
+    grade: number;
+  };
 }

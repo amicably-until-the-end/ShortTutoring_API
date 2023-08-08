@@ -20,4 +20,30 @@ export const UserSchema = new Schema({
   createdAt: {
     type: String,
   },
+  following: {
+    type: Array,
+  },
+  followers: {
+    type: Array,
+  },
+  school: {
+    type: Object,
+    schema: {
+      level: {
+        type: String,
+      },
+      name: {
+        type: String,
+      },
+      division: {
+        type: String,
+      },
+      department: {
+        type: String,
+      },
+      grade: {
+        type: Number,
+      },
+    },
+  },
 });
