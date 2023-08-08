@@ -196,4 +196,12 @@ export class UserService {
       return new Fail(error.message);
     }
   }
+
+  follow(studentId: string, teacherId: string) {}
+
+  unfollow(studentId: string, teacherId: string) {}
+
+  following(studentId: string) {}
+
+  followers(teacherId: string) {}
 }

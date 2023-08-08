@@ -76,4 +76,34 @@ export class UserController {
   otherProfile(@Headers() headers: Headers, @Param('userId') userId: string) {
     return this.userService.otherProfile(userId);
   }
+
+  @ApiBearerAuth('Authorization')
+  @ApiParam(UserParam.userId)
+  @ApiOperation(UserOperation.follow)
+  @Get('follow/:userId')
+  follow(@Headers() headers: Headers, @Param('userId') userId: string) {
+    return this.userService.follow(AccessToken.userId(headers), userId);
+  }
+
+  @ApiBearerAuth('Authorization')
+  @ApiParam(UserParam.userId)
+  @ApiOperation(UserOperation.unfollow)
+  @Get('unfollow/:userId')
+  unfollow(@Headers() headers: Headers, @Param('userId') userId: string) {
+    return this.userService.unfollow(AccessToken.userId(headers), userId);
+  }
+
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(UserOperation.following)
+  @Get('following')
+  following(@Headers() headers: Headers) {
+    return this.userService.following(AccessToken.userId(headers));
+  }
+
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(UserOperation.followers)
+  @Get('followers')
+  followers(@Headers() headers: Headers) {
+    return this.userService.followers(AccessToken.userId(headers));
+  }
 }
