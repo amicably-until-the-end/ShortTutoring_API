@@ -54,7 +54,7 @@ export class AgoraService {
     }
     const token = await this.makeWhiteBoardToken(data.uuid);
     return {
-      whiteBoardAppId: data?.appUUID,
+      whiteBoardAppId: `${data?.teamUUID}/${data?.appUUID}`,
       whiteBoardUUID: data?.uuid,
       whiteBoardToken: token,
     };
