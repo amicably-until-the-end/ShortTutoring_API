@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { User, UserKey } from '../user/entities/user.interface';
 import { Question, QuestionKey } from '../question/entities/question.interface';
@@ -15,22 +15,21 @@ export class OfferRepository {
   ) {}
 
   async append(userId: string, questionId: string) {
-    try {
-      const teacher = await this.userModel.get({
-        id: userId,
-      });
+    const teacher = await this.userModel.get({
+      id: userId,
+    });
 
-      if (teacher.role !== 'teacher') {
-        return new Error('선생님만 질문 대기열에 추가할 수 있습니다.');
-      }
-    } catch (error) {
+    if (teacher === undefined) {
       throw new Error('선생님을 찾을 수 없습니다.');
+    } else if (teacher.role === 'student') {
+      throw new Error('선생님만 질문 대기열에 추가할 수 있습니다.');
     }
 
     const question = await this.questionModel.get({ id: questionId });
     if (question.teacherIds.includes(userId)) {
-      throw new BadRequestException('이미 질문 대기열에 추가되었습니다.');
+      throw new Error('이미 질문 대기열에 추가되었습니다.');
     }
+
     question.teacherIds.push(userId);
     await this.questionModel.update(
       { id: questionId },
@@ -49,16 +48,12 @@ export class OfferRepository {
     const question = await this.questionModel.get({ id: questionId });
     if (question === undefined) {
       throw new Error('질문을 찾을 수 없습니다.');
-    }
-
-    if (question.studentId !== userId) {
+    } else if (question.studentId !== userId) {
       throw new Error('본인의 질문이 아닙니다.');
     }
 
     const teachers = question.teacherIds.map(async (teacherId) => {
-      const vendor = teacherId.split('#')[0];
-      const id = teacherId.split('#')[1];
-      return await this.userModel.get({ id });
+      return await this.userModel.get({ id: teacherId });
     });
     return await Promise.all(teachers);
   }
@@ -66,8 +61,9 @@ export class OfferRepository {
   async remove(userId: string, questionId: string) {
     const question = await this.questionModel.get({ id: questionId });
     if (!question.teacherIds.includes(userId)) {
-      throw new BadRequestException('질문 대기열에 존재하지 않습니다.');
+      throw new Error('질문 대기열에 존재하지 않습니다.');
     }
+
     question.teacherIds = question.teacherIds.filter((id) => id !== userId);
     await this.questionModel.update(
       { id: questionId },
