@@ -30,7 +30,7 @@ export class UserRepository {
       const createStudentDto = createUserDto as CreateStudentDto;
       user.school = {
         level: createStudentDto.schoolLevel,
-        name: createStudentDto.schoolGrade,
+        grade: createStudentDto.schoolGrade,
       };
     } else if (role === 'teacher') {
       const createTeacherDto = createUserDto as CreateTeacherDto;
@@ -85,14 +85,17 @@ export class UserRepository {
     const user: User = await this.userModel.get({
       id: userId,
     });
-
     if (user === undefined) {
       throw new Error('사용자를 찾을 수 없습니다.');
     }
 
-    return await this.userModel.delete({
-      id: userId,
-    });
+    try {
+      return await this.userModel.delete({
+        id: userId,
+      });
+    } catch (error) {
+      throw new Error('사용자를 삭제할 수 없습니다.');
+    }
   }
 
   async follow(studentId: string, teacherId: string) {
