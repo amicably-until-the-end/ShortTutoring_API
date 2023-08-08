@@ -27,16 +27,8 @@ export const QuestionSchema = new Schema({
     type: String,
     enum: ['pending', 'matched', 'canceled', 'expired', 'completed'],
   },
-  student: {
-    type: Object,
-    schema: {
-      vendor: {
-        type: String,
-      },
-      id: {
-        type: String,
-      },
-    },
+  studentId: {
+    type: String,
   },
   problem: {
     type: Object,

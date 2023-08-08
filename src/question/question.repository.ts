@@ -15,11 +15,11 @@ export class QuestionRepository {
 
   async create(
     questionId: string,
-    userKey: { vendor: string; userId: string },
+    userId: string,
     createQuestionDto: CreateQuestionDto,
     problemImage: string,
   ): Promise<Question> {
-    const user: User = await this.userModel.get({ id: userKey.userId });
+    const user: User = await this.userModel.get({ id: userId });
     if (user === undefined) {
       throw new Error('사용자를 찾을 수 없습니다.');
     } else if (user.role === 'teacher') {
@@ -30,10 +30,7 @@ export class QuestionRepository {
       return await this.questionModel.create({
         id: questionId,
         status: 'pending',
-        student: {
-          vendor: userKey.vendor,
-          id: userKey.userId,
-        },
+        studentId: userId,
         teacherIds: [],
         problem: {
           image: problemImage,
@@ -64,11 +61,8 @@ export class QuestionRepository {
     return questions;
   }
 
-  async delete(
-    userKey: { vendor: string; userId: string },
-    questionId: string,
-  ) {
-    const user: User = await this.userModel.get({ id: userKey.userId });
+  async delete(userId: string, questionId: string) {
+    const user: User = await this.userModel.get({ id: userId });
     if (user === undefined) {
       throw new Error('사용자를 찾을 수 없습니다.');
     } else if (user.role === 'teacher') {
@@ -78,10 +72,7 @@ export class QuestionRepository {
     const question: Question = await this.questionModel.get({
       id: questionId,
     });
-    if (
-      question.student.id !== userKey.userId ||
-      question.student.vendor !== userKey.vendor
-    ) {
+    if (question.studentId !== userId) {
       return new Error('질문을 삭제할 권한이 없습니다.');
     }
 
