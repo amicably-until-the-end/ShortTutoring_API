@@ -197,11 +197,43 @@ export class UserService {
     }
   }
 
-  follow(studentId: string, teacherId: string) {}
+  async follow(studentId: string, teacherId: string) {
+    try {
+      await this.userRepository.follow(studentId, teacherId);
+      return new Success('성공적으로 팔로우했습니다.', null);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
 
-  unfollow(studentId: string, teacherId: string) {}
+  async unfollow(studentId: string, teacherId: string) {
+    try {
+      await this.userRepository.unfollow(studentId, teacherId);
+      return new Success('성공적으로 언팔로우했습니다.', null);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
 
-  following(studentId: string) {}
+  async following(studentId: string) {
+    try {
+      return new Success(
+        '성공적으로 팔로잉한 선생님들을 가져왔습니다.',
+        await this.userRepository.following(studentId),
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
 
-  followers(teacherId: string) {}
+  async followers(teacherId: string) {
+    try {
+      return new Success(
+        '성공적으로 팔로워 학생들을 가져왔습니다.',
+        await this.userRepository.followers(teacherId),
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
 }
