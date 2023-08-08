@@ -13,4 +13,6 @@ export interface Tutoring extends TutoringKey {
   whiteBoardAppId?: string;
   whiteBoardToken?: string;
   whiteBoardUUID?: string;
+  teacherRTCToken?: string;
+  studentRTCToken?: string;
 }

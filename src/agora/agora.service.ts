@@ -1,11 +1,37 @@
 import { Injectable } from '@nestjs/common';
 import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import * as process from 'process';
 
 @Injectable()
 export class AgoraService {
   constructor(private readonly httpService: HttpService) {}
+
+  async makeRtcToken(channelName: string) {
+    const appID = process.env.AGORA_RTC_APP_ID;
+    const appCertificate = process.env.AGORA_RTC_APP_CERTIFICATE;
+    const expirationTimeInSeconds = 3600;
+    const currentTimestamp = Math.floor(Date.now() / 1000);
+    const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
+    const studentToken = RtcTokenBuilder.buildTokenWithUid(
+      appID,
+      appCertificate,
+      channelName,
+      2,
+      RtcRole.PUBLISHER,
+      privilegeExpiredTs,
+    );
+    const teacherToken = RtcTokenBuilder.buildTokenWithUid(
+      appID,
+      appCertificate,
+      channelName,
+      1,
+      RtcRole.PUBLISHER,
+      privilegeExpiredTs,
+    );
+    return { studentToken: studentToken, teacherToken: teacherToken };
+  }
 
   async makeWhiteBoardChannel(): Promise<WhiteBoardData> {
     const { data } = await firstValueFrom(
