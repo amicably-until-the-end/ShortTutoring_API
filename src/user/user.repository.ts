@@ -106,6 +106,8 @@ export class UserRepository {
       throw new Error('선생님을 찾을 수 없습니다.');
     } else if (teacher.role !== 'teacher') {
       throw new Error('학생을 팔로우할 수 없습니다.');
+    } else if (teacher.followers.includes(studentId)) {
+      throw new Error('이미 팔로우 중입니다.');
     }
 
     const student: User = (await this.userModel.get({
@@ -119,10 +121,19 @@ export class UserRepository {
 
     try {
       teacher.followers.push(studentId);
-      await this.update(teacherId, teacher);
+      await this.userModel.update(
+        { id: teacherId },
+        { followers: teacher.followers },
+      );
+      console.log('follower', teacher.followers);
 
       student.following.push(teacherId);
-      await this.update(studentId, student);
+      await this.userModel.update(
+        {
+          id: studentId,
+        },
+        { following: student.following },
+      );
     } catch (error) {
       throw new Error('팔로우를 할 수 없습니다.');
     }
@@ -136,6 +147,8 @@ export class UserRepository {
       throw new Error('선생님을 찾을 수 없습니다.');
     } else if (teacher.role !== 'teacher') {
       throw new Error('학생을 팔로우할 수 없습니다.');
+    } else if (teacher.followers.includes(studentId) === false) {
+      throw new Error('팔로우 중이 아닙니다.');
     }
 
     const student: User = (await this.userModel.get({
@@ -154,12 +167,22 @@ export class UserRepository {
       teacher.followers = teacher.followers.filter(
         (follower) => follower !== studentId,
       );
-      await this.update(teacherId, teacher);
+      await this.userModel.update(
+        {
+          id: teacherId,
+        },
+        { followers: teacher.followers },
+      );
 
       student.following = student.following.filter(
         (following) => following !== teacherId,
       );
-      await this.update(studentId, student);
+      await this.userModel.update(
+        {
+          id: studentId,
+        },
+        { following: student.following },
+      );
     } catch (error) {
       throw new Error('언팔로우를 할 수 없습니다.');
     }

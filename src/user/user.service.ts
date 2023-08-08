@@ -222,7 +222,7 @@ export class UserService {
   async follow(studentId: string, teacherId: string) {
     try {
       await this.userRepository.follow(studentId, teacherId);
-      return new Success('성공적으로 팔로우했습니다.', null);
+      return new Success('성공적으로 팔로우했습니다.');
     } catch (error) {
       return new Fail(error.message);
     }
@@ -231,7 +231,7 @@ export class UserService {
   async unfollow(studentId: string, teacherId: string) {
     try {
       await this.userRepository.unfollow(studentId, teacherId);
-      return new Success('성공적으로 언팔로우했습니다.', null);
+      return new Success('성공적으로 언팔로우했습니다.');
     } catch (error) {
       return new Fail(error.message);
     }

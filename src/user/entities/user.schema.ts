@@ -22,9 +22,11 @@ export const UserSchema = new Schema({
   },
   following: {
     type: Array,
+    schema: [String],
   },
   followers: {
     type: Array,
+    schema: [String],
   },
   school: {
     type: Object,
