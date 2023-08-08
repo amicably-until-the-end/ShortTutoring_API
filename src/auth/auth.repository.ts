@@ -47,22 +47,6 @@ export class AuthRepository {
     }
   }
 
-  async verifyJwt(jwt: string) {
-    try {
-      const verified = await this.jwtService.verify(jwt, {
-        secret: process.env.JWT_SECRET_KEY,
-      });
-      return {
-        userId: verified['userId'],
-        role: verified['role'],
-        iat: verified['iat'],
-        exp: verified['exp'],
-      };
-    } catch (error) {
-      throw new Error('JWT를 검증하는데 실패했습니다.');
-    }
-  }
-
   async getAccessToken(vendor: string, code: string) {
     if (vendor === 'kakao') {
       try {
@@ -94,27 +78,6 @@ export class AuthRepository {
     }
   }
 
-  async getTokenInfo(vendor: string, accessToken: string) {
-    if (vendor === 'kakao') {
-      try {
-        const { data } = await firstValueFrom(
-          this.httpService.get(
-            'https://kapi.kakao.com/v1/user/access_token_info',
-            {
-              headers: {
-                Authorization: accessToken,
-              },
-            },
-          ),
-        );
-
-        return data;
-      } catch (error) {
-        throw new Error('토큰 정보를 가져올 수 없습니다.');
-      }
-    }
-  }
-
   async getAuthIdFromAccessToken(vendor: string, accessToken: string) {
     if (vendor === 'kakao') {
       try {
@@ -128,20 +91,19 @@ export class AuthRepository {
 
         return data.id.toString();
       } catch (error) {
-        throw new Error('사용자를 찾을 수 없습니다.');
+        throw new Error('카카오 사용자 정보를 가져오는데 실패했습니다.');
       }
     }
   }
 
   async getUserIdFromAccessToken(vendor: string, accessToken: string) {
-    if (vendor === 'kakao') {
+    try {
       const authId = await this.getAuthIdFromAccessToken(vendor, accessToken);
       const auth = await this.getAuth(vendor, authId);
-      if (auth === undefined) {
-        throw new Error('사용자를 찾을 수 없습니다.');
-      }
 
       return auth.userId;
+    } catch (error) {
+      throw new Error('사용자를 찾을 수 없습니다.');
     }
   }
 
@@ -172,15 +134,6 @@ export class AuthRepository {
     } catch (error) {
       throw new Error('인증정보를 가져오는데 실패했습니다.');
     }
-  }
-
-  async getUserIdFromAuth(vendor: string, authId: string) {
-    const auth = await this.getAuth(vendor, authId);
-    if (auth === undefined) {
-      throw new Error('인증정보를 찾을 수 없습니다.');
-    }
-
-    return auth.userId;
   }
 
   async delete(userId: string) {}

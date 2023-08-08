@@ -26,12 +26,12 @@ export class UserService {
    */
   async signupStudent(createStudentDto: CreateStudentDto) {
     const vendor = createStudentDto.vendor;
-    const accessToken = createStudentDto.accessToken;
+    const accessToken = `Bearer ${createStudentDto.accessToken}`;
 
     try {
-      const oauthId = await this.authRepository.getUserIdFromAccessToken(
+      const oauthId = await this.authRepository.getAuthIdFromAccessToken(
         vendor,
-        `Bearer ${accessToken}`,
+        accessToken,
       );
 
       const userId = uuid();
@@ -63,21 +63,21 @@ export class UserService {
    */
   async signupTeacher(createTeacherDto: CreateTeacherDto) {
     const vendor = createTeacherDto.vendor;
-    const accessToken = createTeacherDto.accessToken;
+    const accessToken = `Bearer ${createTeacherDto.accessToken}`;
 
     try {
-      const oauthId = await this.authRepository.getUserIdFromAccessToken(
+      const oauthId = await this.authRepository.getAuthIdFromAccessToken(
         vendor,
-        `Bearer ${accessToken}`,
+        accessToken,
       );
 
       const userId = uuid();
-      await this.authRepository.createAuth(vendor, oauthId, userId, 'teacher');
-      const token = await this.authRepository.signJwt(userId, 'teacher');
+      await this.authRepository.createAuth(vendor, oauthId, userId, 'student');
+      const token = await this.authRepository.signJwt(userId, 'student');
       const user = await this.userRepository.create(
         userId,
         createTeacherDto,
-        'teacher',
+        'student',
       );
 
       const embed = new MessageBuilder()
