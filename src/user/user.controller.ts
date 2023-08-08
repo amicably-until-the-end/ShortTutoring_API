@@ -69,7 +69,10 @@ export class UserController {
   @ApiResponse(UserResponse.me.withdraw)
   @Get('user/withdraw')
   withdraw(@Headers() headers: Headers) {
-    return this.userService.withdraw(AccessToken.userId(headers));
+    return this.userService.withdraw(
+      AccessToken.userId(headers),
+      AccessToken.authorization(headers),
+    );
   }
 
   // TODO: 다른 사용자의 프로필을 조회하는 API
