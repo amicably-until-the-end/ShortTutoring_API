@@ -17,15 +17,21 @@ export class TutoringRepository {
     studentId: string,
     teacherId: string,
   ): Promise<Tutoring> {
+    const tutoringId = uuid();
+
     const { whiteBoardAppId, whiteBoardUUID, whiteBoardToken }: WhiteBoardData =
       await this.agoraService.makeWhiteBoardChannel();
+
+    const { teacherToken, studentToken } = await this.agoraService.makeRtcToken(
+      tutoringId,
+    );
 
     if (whiteBoardToken == undefined) {
       throw new Error('화이트보드 토큰을 생성할 수 없습니다');
     }
 
     const tutoring = {
-      id: uuid(),
+      id: tutoringId,
       questionId,
       studentId,
       teacherId,
@@ -36,6 +42,9 @@ export class TutoringRepository {
       whiteBoardAppId,
       whiteBoardUUID,
       whiteBoardToken,
+      teacherRTCToken: teacherToken,
+      studentRTCToken: studentToken,
+      RTCAppId: process.env.AGORA_RTC_APP_ID,
     };
     await this.tutoringModel.create(tutoring);
     return tutoring;

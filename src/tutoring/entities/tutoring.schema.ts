@@ -35,4 +35,13 @@ export const TutoringSchema = new Schema({
   whiteBoardUUID: {
     type: String,
   },
+  teacherRTCToken: {
+    type: String,
+  },
+  studentRTCToken: {
+    type: String,
+  },
+  RTCAppId: {
+    type: String,
+  },
 });
