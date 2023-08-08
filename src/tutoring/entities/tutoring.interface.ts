@@ -15,4 +15,5 @@ export interface Tutoring extends TutoringKey {
   whiteBoardUUID?: string;
   teacherRTCToken?: string;
   studentRTCToken?: string;
+  RTCAppId?: string;
 }

@@ -41,4 +41,7 @@ export const TutoringSchema = new Schema({
   studentRTCToken: {
     type: String,
   },
+  RTCAppId: {
+    type: String,
+  },
 });

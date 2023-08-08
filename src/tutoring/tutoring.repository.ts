@@ -31,7 +31,7 @@ export class TutoringRepository {
     }
 
     const tutoring = {
-      id: uuid(),
+      id: tutoringId,
       questionId,
       studentId,
       teacherId,
@@ -42,8 +42,9 @@ export class TutoringRepository {
       whiteBoardAppId,
       whiteBoardUUID,
       whiteBoardToken,
-      teacherToken,
-      studentToken,
+      teacherRTCToken: teacherToken,
+      studentRTCToken: studentToken,
+      RTCAppId: process.env.AGORA_RTC_APP_ID,
     };
     await this.tutoringModel.create(tutoring);
     return tutoring;
