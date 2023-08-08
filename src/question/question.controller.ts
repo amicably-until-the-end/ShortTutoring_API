@@ -21,7 +21,7 @@ import { QuestionResponse } from './descriptions/question.response';
 import { QuestionOperation } from './descriptions/question.operation';
 import { QuestionQuery } from './descriptions/question.query';
 
-@Controller('question')
+@Controller()
 export class QuestionController {
   constructor(private readonly questionService: QuestionService) {}
 
@@ -29,7 +29,7 @@ export class QuestionController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.create)
   @ApiResponse(QuestionResponse.create.success)
-  @Post('create')
+  @Post('student/question/create')
   create(
     @Headers() headers: Headers,
     @Body() createQuestionDto: CreateQuestionDto,
@@ -43,7 +43,7 @@ export class QuestionController {
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.delete)
-  @Get('delete/:questionId')
+  @Get('student/question/delete/:questionId')
   delete(@Param('questionId') questionId: string, @Headers() headers: Headers) {
     return this.questionService.delete(AccessToken.userId(headers), questionId);
   }
@@ -52,7 +52,7 @@ export class QuestionController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.list)
   @ApiQuery(QuestionQuery.list)
-  @Get('list')
+  @Get('teacher/question/list')
   list(@Query('status') status: string) {
     return this.questionService.list(status);
   }

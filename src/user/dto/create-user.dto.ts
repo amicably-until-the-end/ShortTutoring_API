@@ -83,5 +83,5 @@ export class CreateTeacherDto extends CreateUserDto {
     description: '선생님의 학년',
     example: 3,
   })
-  schoolYear: number;
+  schoolGrade: number;
 }

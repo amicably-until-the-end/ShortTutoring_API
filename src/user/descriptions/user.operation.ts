@@ -38,4 +38,20 @@ export const UserOperation = {
     summary: '다른 사용자의 프로필 조회',
     description: '`USER`\n\n다른 사용자의 프로필을 가져옵니다.',
   },
+  follow: {
+    summary: '선생님 팔로우',
+    description: '`STUDENT`\n\n선생님을 팔로우합니다.',
+  },
+  unfollow: {
+    summary: '선생님 언팔로우',
+    description: '`STUDENT`\n\n선생님을 언팔로우합니다.',
+  },
+  following: {
+    summary: '팔로잉 목록 조회',
+    description: '`STUDENT`\n\n팔로잉 목록을 조회합니다.',
+  },
+  followers: {
+    summary: '팔로워 목록 조회',
+    description: '`TEACHER`\n\n팔로워 목록을 조회합니다.',
+  },
 };

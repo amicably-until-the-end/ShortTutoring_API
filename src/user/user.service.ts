@@ -29,14 +29,19 @@ export class UserService {
     const accessToken = `Bearer ${createStudentDto.accessToken}`;
 
     try {
-      const oauthId = await this.authRepository.getAuthIdFromAccessToken(
+      const authId = await this.authRepository.getAuthIdFromAccessToken(
         vendor,
         accessToken,
       );
 
       const userId = uuid();
-      await this.authRepository.createAuth(vendor, oauthId, userId, 'student');
-      const token = await this.authRepository.signJwt(userId, 'student');
+      await this.authRepository.createAuth(vendor, authId, userId, 'student');
+      const token = await this.authRepository.signJwt(
+        vendor,
+        authId,
+        userId,
+        'student',
+      );
       const user = await this.userRepository.create(
         userId,
         createStudentDto,
@@ -72,12 +77,17 @@ export class UserService {
       );
 
       const userId = uuid();
-      await this.authRepository.createAuth(vendor, oauthId, userId, 'student');
-      const token = await this.authRepository.signJwt(userId, 'student');
+      await this.authRepository.createAuth(vendor, oauthId, userId, 'teacher');
+      const token = await this.authRepository.signJwt(
+        vendor,
+        oauthId,
+        userId,
+        'teacher',
+      );
       const user = await this.userRepository.create(
         userId,
         createTeacherDto,
-        'student',
+        'teacher',
       );
 
       const embed = new MessageBuilder()
@@ -101,6 +111,10 @@ export class UserService {
    */
   async login(loginUserDto: LoginUserDto) {
     try {
+      const authId = await this.authRepository.getAuthIdFromAccessToken(
+        loginUserDto.vendor,
+        `Bearer ${loginUserDto.accessToken}`,
+      );
       const userId = await this.authRepository.getUserIdFromAccessToken(
         loginUserDto.vendor,
         `Bearer ${loginUserDto.accessToken}`,
@@ -108,7 +122,12 @@ export class UserService {
 
       const user = await this.userRepository.get(userId);
 
-      const token = await this.authRepository.signJwt(userId, user.role);
+      const token = await this.authRepository.signJwt(
+        loginUserDto.vendor,
+        authId,
+        userId,
+        user.role,
+      );
 
       return new Success('성공적으로 로그인했습니다.', {
         role: user.role,
@@ -186,12 +205,55 @@ export class UserService {
     }
   }
 
-  async withdraw(userId: string) {
+  async withdraw(userId: string, token: string) {
+    const stToken = token.split(' ')[1];
+    const decoded = await this.authRepository.decodeJwt(stToken);
+
     try {
       await this.userRepository.get(userId);
-      // TODO 인증정보 제거
       await this.userRepository.delete(userId);
+      await this.authRepository.delete(decoded.vendor, decoded.authId);
       return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', null);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async follow(studentId: string, teacherId: string) {
+    try {
+      await this.userRepository.follow(studentId, teacherId);
+      return new Success('성공적으로 팔로우했습니다.');
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async unfollow(studentId: string, teacherId: string) {
+    try {
+      await this.userRepository.unfollow(studentId, teacherId);
+      return new Success('성공적으로 언팔로우했습니다.');
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async following(studentId: string) {
+    try {
+      return new Success(
+        '성공적으로 팔로잉한 선생님들을 가져왔습니다.',
+        await this.userRepository.following(studentId),
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async followers(teacherId: string) {
+    try {
+      return new Success(
+        '성공적으로 팔로워 학생들을 가져왔습니다.',
+        await this.userRepository.followers(teacherId),
+      );
     } catch (error) {
       return new Fail(error.message);
     }

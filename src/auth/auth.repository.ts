@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { UserRepository } from '../user/user.repository';
 import * as process from 'process';
 import { JwtService } from '@nestjs/jwt';
 import { Auth, AuthKey } from './entities/auth.interface';
@@ -13,13 +12,14 @@ export class AuthRepository {
     @InjectModel('Auth') private readonly authModel: Model<Auth, AuthKey>,
     private readonly httpService: HttpService,
     private readonly jwtService: JwtService,
-    private readonly userRepository: UserRepository,
   ) {}
 
-  async signJwt(userId: string, role: string) {
+  async signJwt(vendor: string, authId: string, userId: string, role: string) {
     try {
       return this.jwtService.sign(
         {
+          vendor,
+          authId,
           userId,
           role,
         },
@@ -37,6 +37,8 @@ export class AuthRepository {
     try {
       const decoded = this.jwtService.decode(jwt);
       return {
+        vendor: decoded['vendor'],
+        authId: decoded['authId'],
         userId: decoded['userId'],
         role: decoded['role'],
         iat: decoded['iat'],
@@ -136,5 +138,14 @@ export class AuthRepository {
     }
   }
 
-  async delete(userId: string) {}
+  async delete(vendor: string, authId: string) {
+    try {
+      await this.authModel.delete({
+        vendor,
+        authId,
+      });
+    } catch (error) {
+      throw new Error('인증정보를 삭제하는데 실패했습니다.');
+    }
+  }
 }
