@@ -23,35 +23,10 @@ export class AuthService {
     return code;
   }
 
-  /**
-   * 인가코드로부터 숏과외 토큰 발급하기
-   * @param vendor OAuth2 벤더
-   * @param code OAuth2 인가코드
-   */
-  async generateJwt(vendor: string, code: string) {
-    try {
-      const { jwt } = await this.authRepository.generateJwt(vendor, code);
-      return new Success('성공적으로 토큰을 가져왔습니다.', {
-        jwt,
-      });
-    } catch (error) {
-      return new Fail(error.message);
-    }
-  }
-
   async decodeJwt(jwt: string) {
     try {
       const decoded = await this.authRepository.decodeJwt(jwt);
       return new Success('성공적으로 토큰을 디코딩했습니다.', decoded);
-    } catch (error) {
-      return new Fail(error.message);
-    }
-  }
-
-  async verifyJwt(jwt: string) {
-    try {
-      const verified = await this.authRepository.verifyJwt(jwt);
-      return new Success('성공적으로 토큰을 검증했습니다.', verified);
     } catch (error) {
       return new Fail(error.message);
     }
@@ -73,56 +48,56 @@ export class AuthService {
     }
   }
 
-  /**
-   * 토큰 정보 보기
-   * @param token OAuth2 토큰
-   * @returns tokenInfo OAuth2 토큰 정보
-   */
-  async accessTokenInfo(token: { vendor: string; authorization: string }) {
-    try {
-      const tokenInfo = await this.authRepository.getTokenInfo(
-        token.vendor,
-        token.authorization,
-      );
-      return new Success('성공적으로 토큰 정보를 가져왔습니다.', tokenInfo);
-    } catch (error) {
-      return new Fail(error.message);
-    }
-  }
-
-  /**
-   * 토큰으로 카카오 사용자 정보 조회
-   * @param vendor OAuth2 벤더
-   * @param accessToken OAuth2 토큰
-   * @returns userId 숏과외 사용자 ID
-   */
-  async getUserIdFromAccessToken(vendor: string, accessToken: string) {
-    try {
-      const userId = await this.authRepository.getUserIdFromAccessToken(
-        vendor,
-        accessToken,
-      );
-      return new Success('성공적으로 사용자 ID를 가져왔습니다.', userId);
-    } catch (error) {
-      return new Fail(error.message);
-    }
-  }
-
-  /**
-   * 토큰으로 숏과외 사용자 조회
-   * @param vendor OAuth2 벤더
-   * @param accessToken OAuth2 토큰
-   * @returns User 숏과외 사용자 정보
-   */
-  async getUserFromAccessToken(vendor: string, accessToken: string) {
-    try {
-      const user = await this.authRepository.getUserFromAccessToken(
-        vendor,
-        accessToken,
-      );
-      return new Success('성공적으로 사용자를 가져왔습니다.', user);
-    } catch (error) {
-      return new Fail(error.message);
-    }
-  }
+  // /**
+  //  * 토큰 정보 보기
+  //  * @param token OAuth2 토큰
+  //  * @returns tokenInfo OAuth2 토큰 정보
+  //  */
+  // async accessTokenInfo(token: { vendor: string; authorization: string }) {
+  //   try {
+  //     const tokenInfo = await this.authRepository.getTokenInfo(
+  //       token.vendor,
+  //       token.authorization,
+  //     );
+  //     return new Success('성공적으로 토큰 정보를 가져왔습니다.', tokenInfo);
+  //   } catch (error) {
+  //     return new Fail(error.message);
+  //   }
+  // }
+  //
+  // /**
+  //  * 토큰으로 카카오 사용자 정보 조회
+  //  * @param vendor OAuth2 벤더
+  //  * @param accessToken OAuth2 토큰
+  //  * @returns userId 숏과외 사용자 ID
+  //  */
+  // async getUserIdFromAccessToken(vendor: string, accessToken: string) {
+  //   try {
+  //     const userId = await this.authRepository.getUserIdFromAccessToken(
+  //       vendor,
+  //       accessToken,
+  //     );
+  //     return new Success('성공적으로 사용자 ID를 가져왔습니다.', { userId });
+  //   } catch (error) {
+  //     return new Fail(error.message);
+  //   }
+  // }
+  //
+  // /**
+  //  * 토큰으로 숏과외 사용자 조회
+  //  * @param vendor OAuth2 벤더
+  //  * @param accessToken OAuth2 토큰
+  //  * @returns User 숏과외 사용자 정보
+  //  */
+  // async getUserFromAccessToken(vendor: string, accessToken: string) {
+  //   try {
+  //     const user = await this.authRepository.getUserFromAccessToken(
+  //       vendor,
+  //       accessToken,
+  //     );
+  //     return new Success('성공적으로 사용자를 가져왔습니다.', user);
+  //   } catch (error) {
+  //     return new Fail(error.message);
+  //   }
+  // }
 }

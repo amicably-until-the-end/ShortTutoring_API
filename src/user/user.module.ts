@@ -8,6 +8,7 @@ import { UserRepository } from './user.repository';
 import { AuthRepository } from '../auth/auth.repository';
 import { JwtService } from '@nestjs/jwt';
 import { HttpModule } from '@nestjs/axios';
+import { AuthSchema } from '../auth/entities/auth.schema';
 
 @Module({
   imports: [
@@ -16,6 +17,10 @@ import { HttpModule } from '@nestjs/axios';
       {
         name: 'User',
         schema: UserSchema,
+      },
+      {
+        name: 'Auth',
+        schema: AuthSchema,
       },
     ]),
   ],

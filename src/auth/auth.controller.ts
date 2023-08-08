@@ -1,15 +1,12 @@
-import { Body, Controller, Get, Headers, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import {
-  ApiBearerAuth,
   ApiExcludeEndpoint,
-  ApiHeader,
   ApiOperation,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 import { AuthOperation } from './descriptions/auth.operation';
-import { AccessToken } from './entities/auth.entity';
 import { AuthResponse } from './descriptions/auth.response';
 import { GetAccessTokenDto } from './dto/get-accesstoken.dto';
 
@@ -34,19 +31,6 @@ export class AuthController {
     );
   }
 
-  @ApiOperation(AuthOperation.generateJwt)
-  @ApiResponse(AuthResponse.generateJwt)
-  @ApiHeader({
-    name: 'vendor',
-    description: 'OAuth2 벤더',
-    example: 'kakao',
-    enum: ['kakao', 'naver', 'google'],
-  })
-  @Get('token/generate')
-  generateJwt(@Headers() headers: Headers, @Query('code') code: string) {
-    return this.authService.generateJwt(headers['vendor'], code);
-  }
-
   @ApiOperation(AuthOperation.decodeJwt)
   @ApiResponse(AuthResponse.decodeJwt)
   @Get('token/decode')
@@ -54,46 +38,35 @@ export class AuthController {
     return this.authService.decodeJwt(jwt);
   }
 
-  @ApiOperation(AuthOperation.verifyJwt)
-  @ApiResponse(AuthResponse.verifyJwt)
-  @Get('token/verify')
-  verifyJwt(@Query('jwt') jwt: string) {
-    console.log(jwt);
-    return this.authService.verifyJwt(jwt);
-  }
-
   @Post('access-token')
   getAccessToken(@Body() getAccessTokenDto: GetAccessTokenDto) {
     return this.authService.getAccessToken(getAccessTokenDto);
   }
 
-  @ApiExcludeEndpoint()
-  @ApiBearerAuth('Authorization')
-  @ApiOperation(AuthOperation.accessTokenInfo)
-  @Get('accessToken/info')
-  accessTokenInfo(@Headers() headers: Headers) {
-    return this.authService.accessTokenInfo(AccessToken.authorization(headers));
-  }
-
-  @ApiExcludeEndpoint()
-  @Get('accessToken/userId')
-  @ApiBearerAuth('Authorization')
-  @ApiOperation(AuthOperation.getUserIdFromAccessToken)
-  getUserIdFromAccessToken(@Headers() headers: Headers) {
-    return this.authService.getUserIdFromAccessToken(
-      headers['vendor'],
-      headers['authorization'],
-    );
-  }
-
-  @ApiExcludeEndpoint()
-  @Get('accessToken/user')
-  @ApiBearerAuth('Authorization')
-  @ApiOperation(AuthOperation.getUserFromAccessToken)
-  getUserFromAccessToken(@Headers() headers: Headers) {
-    return this.authService.getUserFromAccessToken(
-      headers['vendor'],
-      headers['authorization'],
-    );
-  }
+  // @ApiBearerAuth('Authorization')
+  // @ApiOperation(AuthOperation.accessTokenInfo)
+  // @Get('accessToken/info')
+  // accessTokenInfo(@Headers() headers: Headers) {
+  //   return this.authService.accessTokenInfo(AccessToken.authorization(headers));
+  // }
+  //
+  // @Get('accessToken/userId')
+  // @ApiBearerAuth('Authorization')
+  // @ApiOperation(AuthOperation.getUserIdFromAccessToken)
+  // getUserIdFromAccessToken(@Headers() headers: Headers) {
+  //   return this.authService.getUserIdFromAccessToken(
+  //     headers['vendor'],
+  //     headers['authorization'],
+  //   );
+  // }
+  //
+  // @Get('accessToken/user')
+  // @ApiBearerAuth('Authorization')
+  // @ApiOperation(AuthOperation.getUserFromAccessToken)
+  // getUserFromAccessToken(@Headers() headers: Headers) {
+  //   return this.authService.getUserFromAccessToken(
+  //     headers['vendor'],
+  //     headers['authorization'],
+  //   );
+  // }
 }

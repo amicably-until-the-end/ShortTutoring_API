@@ -36,14 +36,11 @@ export class QuestionService {
 
   /**
    * 학생의 질문을 생성합니다.
-   * @param userKey 사용자 키
+   * @param userId
    * @param createQuestionDto 질문 생성 정보
    * @returns 생성된 질문의 ID
    */
-  async create(
-    userKey: { vendor: string; userId: string },
-    createQuestionDto: CreateQuestionDto,
-  ) {
+  async create(userId: string, createQuestionDto: CreateQuestionDto) {
     try {
       const questionId = uuid();
       const problemImage = await this.problemImage(
@@ -52,7 +49,7 @@ export class QuestionService {
       );
       const question: Question = await this.questionRepository.create(
         questionId,
-        userKey,
+        userId,
         createQuestionDto,
         problemImage,
       );
@@ -62,12 +59,9 @@ export class QuestionService {
     }
   }
 
-  async delete(
-    userKey: { vendor: string; userId: string },
-    questionId: string,
-  ) {
+  async delete(userId: string, questionId: string) {
     try {
-      await this.questionRepository.delete(userKey, questionId);
+      await this.questionRepository.delete(userId, questionId);
       return new Success('질문이 삭제되었습니다.', { questionId });
     } catch (error) {
       return new Fail(error.message);

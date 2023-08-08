@@ -49,7 +49,6 @@ export class AgoraService {
         },
       ),
     );
-    console.log('whiteboard token ', data);
     if (data?.uuid === undefined) {
       return null;
     }

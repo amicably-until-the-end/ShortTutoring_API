@@ -12,10 +12,7 @@ export interface Problem {
 
 export interface Question extends QuestionKey {
   status: string;
-  student: {
-    vendor: string;
-    id: string;
-  };
+  studentId: string;
   teacherIds: string[];
   problem: Problem;
   selectedTeacherId?: string;

@@ -35,7 +35,7 @@ export class QuestionController {
     @Body() createQuestionDto: CreateQuestionDto,
   ) {
     return this.questionService.create(
-      AccessToken.userKey(headers),
+      AccessToken.userId(headers),
       createQuestionDto,
     );
   }
@@ -45,10 +45,7 @@ export class QuestionController {
   @ApiOperation(QuestionOperation.delete)
   @Get('delete/:questionId')
   delete(@Param('questionId') questionId: string, @Headers() headers: Headers) {
-    return this.questionService.delete(
-      AccessToken.userKey(headers),
-      questionId,
-    );
+    return this.questionService.delete(AccessToken.userId(headers), questionId);
   }
 
   @ApiTags('Teacher')

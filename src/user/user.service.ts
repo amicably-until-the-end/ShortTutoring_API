@@ -9,6 +9,7 @@ import { MessageBuilder } from 'discord-webhook-node';
 import { webhook } from '../config.discord-webhook';
 import { LoginUserDto } from './dto/login-user.dto';
 import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UserService {
@@ -25,25 +26,19 @@ export class UserService {
    */
   async signupStudent(createStudentDto: CreateStudentDto) {
     const vendor = createStudentDto.vendor;
-    const accessToken = createStudentDto.accessToken;
+    const accessToken = `Bearer ${createStudentDto.accessToken}`;
 
     try {
-      const userId = await this.authRepository.getUserIdFromAccessToken(
+      const oauthId = await this.authRepository.getAuthIdFromAccessToken(
         vendor,
-        `Bearer ${accessToken}`,
+        accessToken,
       );
 
-      const token = await this.authRepository.signJwt(
-        vendor,
-        userId,
-        'student',
-      );
-
+      const userId = uuid();
+      await this.authRepository.createAuth(vendor, oauthId, userId, 'student');
+      const token = await this.authRepository.signJwt(userId, 'student');
       const user = await this.userRepository.create(
-        {
-          vendor,
-          userId,
-        },
+        userId,
         createStudentDto,
         'student',
       );
@@ -68,27 +63,21 @@ export class UserService {
    */
   async signupTeacher(createTeacherDto: CreateTeacherDto) {
     const vendor = createTeacherDto.vendor;
-    const accessToken = createTeacherDto.accessToken;
+    const accessToken = `Bearer ${createTeacherDto.accessToken}`;
 
     try {
-      const userId = await this.authRepository.getUserIdFromAccessToken(
+      const oauthId = await this.authRepository.getAuthIdFromAccessToken(
         vendor,
-        `Bearer ${accessToken}`,
+        accessToken,
       );
 
-      const token = await this.authRepository.signJwt(
-        vendor,
-        userId,
-        'teacher',
-      );
-
+      const userId = uuid();
+      await this.authRepository.createAuth(vendor, oauthId, userId, 'student');
+      const token = await this.authRepository.signJwt(userId, 'student');
       const user = await this.userRepository.create(
-        {
-          vendor,
-          userId,
-        },
+        userId,
         createTeacherDto,
-        'teacher',
+        'student',
       );
 
       const embed = new MessageBuilder()
@@ -117,16 +106,9 @@ export class UserService {
         `Bearer ${loginUserDto.accessToken}`,
       );
 
-      const user = await this.userRepository.get({
-        vendor: loginUserDto.vendor,
-        userId,
-      });
+      const user = await this.userRepository.get(userId);
 
-      const token = await this.authRepository.signJwt(
-        loginUserDto.vendor,
-        userId,
-        user.role,
-      );
+      const token = await this.authRepository.signJwt(userId, user.role);
 
       return new Success('성공적으로 로그인했습니다.', {
         role: user.role,
@@ -141,9 +123,9 @@ export class UserService {
    * 내 프로필을 조회합니다.
    * @returns User 나의 프로필
    */
-  async profile(userKey: { vendor: string; userId: string }) {
+  async profile(userId: string) {
     try {
-      const user: User = await this.userRepository.get(userKey);
+      const user: User = await this.userRepository.get(userId);
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
       return new Fail(error.message);
@@ -168,15 +150,12 @@ export class UserService {
 
   /**
    사용자 정보를 업데이트합니다.
-   @param userKey 업데이트할 사용자의 키
+   @param userId
    @param updateUserDto 업데이트할 사용자 정보
    @return 업데이트된 사용자 정보
    */
-  async update(
-    userKey: { vendor: string; userId: string },
-    updateUserDto: UpdateUserDto,
-  ) {
-    const profileImage = await this.profileImage(userKey.userId, updateUserDto);
+  async update(userId: string, updateUserDto: UpdateUserDto) {
+    const profileImage = await this.profileImage(userId, updateUserDto);
 
     const updateUser = {
       name: updateUserDto.name,
@@ -185,7 +164,7 @@ export class UserService {
     } as User;
 
     try {
-      const user = await this.userRepository.update(userKey, updateUser);
+      const user = await this.userRepository.update(userId, updateUser);
       return new Success('성공적으로 사용자 프로필을 업데이트했습니다.', user);
     } catch (error) {
       return new Fail(error.message);
@@ -194,24 +173,25 @@ export class UserService {
 
   /**
    * 사용자 정보를 조회합니다.
-   * @param userKey
+   * @param userId
    */
-  async otherProfile(userKey: { userId: string; vendor: string }) {
+  async otherProfile(userId: string) {
     try {
       return new Success(
         '사용자 프로필을 성공적으로 가져왔습니다.',
-        await this.userRepository.get(userKey),
+        await this.userRepository.get(userId),
       );
     } catch (error) {
       return new Fail(error.message);
     }
   }
 
-  async withdraw(userKey: { userId: string; vendor: string }) {
+  async withdraw(userId: string) {
     try {
-      await this.userRepository.get(userKey);
-      await this.userRepository.delete(userKey);
-      return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', userKey);
+      await this.userRepository.get(userId);
+      // TODO 인증정보 제거
+      await this.userRepository.delete(userId);
+      return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', null);
     } catch (error) {
       return new Fail(error.message);
     }
