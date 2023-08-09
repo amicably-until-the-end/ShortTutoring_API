@@ -198,7 +198,7 @@ export class UserService {
     try {
       return new Success(
         '사용자 프로필을 성공적으로 가져왔습니다.',
-        await this.userRepository.get(userId),
+        await this.userRepository.getOther(userId),
       );
     } catch (error) {
       return new Fail(error.message);
@@ -248,11 +248,33 @@ export class UserService {
     }
   }
 
+  async otherFollowers(userId: string) {
+    try {
+      return new Success(
+        '성공적으로 팔로워 학생들을 가져왔습니다.',
+        await this.userRepository.followers(userId),
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
   async followers(teacherId: string) {
     try {
       return new Success(
         '성공적으로 팔로워 학생들을 가져왔습니다.',
         await this.userRepository.followers(teacherId),
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async otherFollowing(userId: string) {
+    try {
+      return new Success(
+        '성공적으로 팔로잉한 선생님들을 가져왔습니다.',
+        await this.userRepository.following(userId),
       );
     } catch (error) {
       return new Fail(error.message);
