@@ -50,8 +50,16 @@ export const UserOperation = {
     summary: '팔로잉 목록 조회',
     description: '`STUDENT`\n\n팔로잉 목록을 조회합니다.',
   },
+  otherFollowing: {
+    summary: '다른 사용자의 팔로잉 목록 조회',
+    description: '`USER`\n\n다른 사용자의 팔로잉 목록을 조회합니다.',
+  },
   followers: {
     summary: '팔로워 목록 조회',
     description: '`TEACHER`\n\n팔로워 목록을 조회합니다.',
+  },
+  otherFollowers: {
+    summary: '다른 사용자의 팔로워 목록 조회',
+    description: '`USER`\n\n다른 사용자의 팔로워 목록을 조회합니다.',
   },
 };
