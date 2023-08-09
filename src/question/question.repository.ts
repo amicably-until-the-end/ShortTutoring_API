@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { Question, QuestionKey } from './entities/question.interface';
 import { CreateQuestionDto } from './dto/create-question.dto';
-import { User, UserKey } from '../user/entities/user.interface';
+import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
 
 @Injectable()
@@ -10,8 +10,6 @@ export class QuestionRepository {
   constructor(
     @InjectModel('Question')
     private readonly questionModel: Model<Question, QuestionKey>,
-    @InjectModel('User')
-    private readonly userModel: Model<User, UserKey>,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -21,10 +19,8 @@ export class QuestionRepository {
     createQuestionDto: CreateQuestionDto,
     problemImage: string,
   ): Promise<Question> {
-    const user: User = await this.userModel.get({ id: userId });
-    if (user === undefined) {
-      throw new Error('사용자를 찾을 수 없습니다.');
-    } else if (user.role === 'teacher') {
+    const user: User = await this.userRepository.get(userId);
+    if (user.role === 'teacher') {
       throw new Error('선생님은 질문을 생성할 수 없습니다.');
     }
 
@@ -51,7 +47,7 @@ export class QuestionRepository {
   }
 
   async getByStatus(status: string) {
-    let questions = [];
+    let questions: Question[];
     if (status === 'all') {
       questions = await this.questionModel.scan().exec();
     } else {
@@ -70,10 +66,8 @@ export class QuestionRepository {
   }
 
   async delete(userId: string, questionId: string) {
-    const user: User = await this.userModel.get({ id: userId });
-    if (user === undefined) {
-      throw new Error('사용자를 찾을 수 없습니다.');
-    } else if (user.role === 'teacher') {
+    const user: User = await this.userRepository.get(userId);
+    if (user.role === 'teacher') {
       throw new Error('선생님은 질문을 삭제할 수 없습니다.');
     }
 

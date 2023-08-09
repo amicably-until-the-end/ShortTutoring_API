@@ -223,9 +223,10 @@ export class UserRepository {
   }
 
   async getOther(userId: string) {
-    const user: User = await this.get(userId);
-
-    try {
+    const user: User = await this.userModel.get({ id: userId });
+    if (user === undefined) {
+      return undefined;
+    } else {
       return {
         id: user.id,
         name: user.name,
@@ -236,8 +237,6 @@ export class UserRepository {
         followersCount: user.followers.length,
         followingCount: user.following.length,
       };
-    } catch (error) {
-      throw new Error('사용자 정보를 가져올 수 없습니다.');
     }
   }
 }
