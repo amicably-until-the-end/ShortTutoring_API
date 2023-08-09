@@ -1,27 +1,22 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
-import { User, UserKey } from '../user/entities/user.interface';
+import { User } from '../user/entities/user.interface';
 import { Question, QuestionKey } from '../question/entities/question.interface';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
+import { UserRepository } from '../user/user.repository';
 
 @Injectable()
 export class OfferRepository {
   constructor(
-    @InjectModel('User')
-    private readonly userModel: Model<User, UserKey>,
     @InjectModel('Question')
     private readonly questionModel: Model<Question, QuestionKey>,
+    private readonly userRepository: UserRepository,
     private readonly tutoringRepository: TutoringRepository,
   ) {}
 
   async append(userId: string, questionId: string) {
-    const teacher = await this.userModel.get({
-      id: userId,
-    });
-
-    if (teacher === undefined) {
-      throw new Error('선생님을 찾을 수 없습니다.');
-    } else if (teacher.role === 'student') {
+    const teacher = await this.userRepository.get(userId);
+    if (teacher.role === 'student') {
       throw new Error('선생님만 질문 대기열에 추가할 수 있습니다.');
     }
 
@@ -38,12 +33,7 @@ export class OfferRepository {
   }
 
   async getTeachers(userId: string, questionId: string) {
-    const user = await this.userModel.get({
-      id: userId,
-    });
-    if (user === undefined) {
-      throw new Error('사용자를 찾을 수 없습니다.');
-    }
+    const user = await this.userRepository.get(userId);
 
     const question = await this.questionModel.get({ id: questionId });
     if (question === undefined) {
@@ -53,7 +43,7 @@ export class OfferRepository {
     }
 
     const teachers = question.teacherIds.map(async (teacherId) => {
-      return await this.userModel.get({ id: teacherId });
+      return await this.userRepository.getOther(teacherId);
     });
     return await Promise.all(teachers);
   }
@@ -101,10 +91,8 @@ export class OfferRepository {
   }
 
   async accept(userId: string, questionId: string, teacherId: string) {
-    const user: User = await this.userModel.get({ id: userId });
-    if (user === undefined) {
-      throw new Error('사용자를 찾을 수 없습니다.');
-    } else if (user.role === 'teacher') {
+    const user: User = await this.userRepository.get(userId);
+    if (user.role === 'teacher') {
       throw new Error('선생님은 질문을 수락할 수 없습니다.');
     }
 
