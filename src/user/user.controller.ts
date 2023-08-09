@@ -55,33 +55,21 @@ export class UserController {
 
   @ApiTags('User')
   @ApiBearerAuth('Authorization')
-  @ApiOperation(UserOperation.me.updateProfile)
-  @ApiResponse(UserResponse.me.updateProfile)
-  @Post('user/profile/update')
-  update(@Headers() headers: Headers, @Body() updateUserDto: UpdateUserDto) {
-    return this.userService.update(AccessToken.userId(headers), updateUserDto);
-  }
-
-  @ApiTags('User')
-  @ApiBearerAuth('Authorization')
-  @ApiOperation(UserOperation.me.withdraw)
-  @ApiResponse(UserResponse.me.withdraw)
-  @Get('user/withdraw')
-  withdraw(@Headers() headers: Headers) {
-    return this.userService.withdraw(
-      AccessToken.userId(headers),
-      AccessToken.authorization(headers),
-    );
-  }
-
-  @ApiTags('User')
-  @ApiBearerAuth('Authorization')
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.otherProfile)
   @ApiResponse(UserResponse.profile)
   @Get('user/profile/:userId')
   otherProfile(@Headers() headers: Headers, @Param('userId') userId: string) {
     return this.userService.otherProfile(userId);
+  }
+
+  @ApiTags('User')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(UserOperation.me.updateProfile)
+  @ApiResponse(UserResponse.me.updateProfile)
+  @Post('user/profile/update')
+  update(@Headers() headers: Headers, @Body() updateUserDto: UpdateUserDto) {
+    return this.userService.update(AccessToken.userId(headers), updateUserDto);
   }
 
   @ApiTags('User')
@@ -100,6 +88,18 @@ export class UserController {
   @Get('user/following/:userId')
   otherFollowing(@Headers() headers: Headers, @Param('userId') userId: string) {
     return this.userService.otherFollowing(userId);
+  }
+
+  @ApiTags('User')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(UserOperation.me.withdraw)
+  @ApiResponse(UserResponse.me.withdraw)
+  @Get('user/withdraw')
+  withdraw(@Headers() headers: Headers) {
+    return this.userService.withdraw(
+      AccessToken.userId(headers),
+      AccessToken.authorization(headers),
+    );
   }
 
   @ApiTags('Student')
