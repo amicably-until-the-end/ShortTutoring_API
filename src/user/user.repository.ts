@@ -195,9 +195,9 @@ export class UserRepository {
     }
 
     try {
-      const following: User[] = [];
+      const following = [];
       for (const followingId of student.following) {
-        following.push(await this.get(followingId));
+        following.push(await this.getOther(followingId));
       }
       return following;
     } catch (error) {
@@ -212,13 +212,32 @@ export class UserRepository {
     }
 
     try {
-      const followers: User[] = [];
+      const followers = [];
       for (const followerId of teacher.followers) {
-        followers.push(await this.get(followerId));
+        followers.push(await this.getOther(followerId));
       }
       return followers;
     } catch (error) {
       throw new Error('팔로워 목록을 가져올 수 없습니다.');
+    }
+  }
+
+  async getOther(userId: string) {
+    const user: User = await this.get(userId);
+
+    try {
+      return {
+        id: user.id,
+        name: user.name,
+        bio: user.bio,
+        profileImage: user.profileImage,
+        role: user.role,
+        school: user.school,
+        followersCount: user.followers.length,
+        followingCount: user.following.length,
+      };
+    } catch (error) {
+      throw new Error('사용자 정보를 가져올 수 없습니다.');
     }
   }
 }

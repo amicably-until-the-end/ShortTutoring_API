@@ -3,7 +3,6 @@ import { UserService } from './user.service';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
-  ApiExcludeEndpoint,
   ApiOperation,
   ApiParam,
   ApiResponse,
@@ -75,15 +74,30 @@ export class UserController {
     );
   }
 
-  // TODO: 다른 사용자의 프로필을 조회하는 API
   @ApiTags('User')
-  @ApiExcludeEndpoint()
+  @ApiBearerAuth('Authorization')
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.otherProfile)
   @ApiResponse(UserResponse.profile)
   @Get('user/profile/:userId')
   otherProfile(@Headers() headers: Headers, @Param('userId') userId: string) {
     return this.userService.otherProfile(userId);
+  }
+
+  @ApiTags('User')
+  @ApiBearerAuth('Authorization')
+  @ApiParam(UserParam.userId)
+  @Get('user/followers/:userId')
+  otherFollowers(@Headers() headers: Headers, @Param('userId') userId: string) {
+    return this.userService.otherFollowers(userId);
+  }
+
+  @ApiTags('User')
+  @ApiBearerAuth('Authorization')
+  @ApiParam(UserParam.userId)
+  @Get('user/following/:userId')
+  otherFollowing(@Headers() headers: Headers, @Param('userId') userId: string) {
+    return this.userService.otherFollowing(userId);
   }
 
   @ApiTags('Student')
