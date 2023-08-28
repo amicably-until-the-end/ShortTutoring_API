@@ -16,6 +16,7 @@ import { QuestionModule } from './question/question.module';
 import { OfferModule } from './offer/offer.module';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
+import { EventsGateway } from './events/events.gateway';
 
 @Module({
   imports: [
@@ -31,7 +32,7 @@ import { HttpModule } from '@nestjs/axios';
     // ReviewModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, EventsGateway],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
