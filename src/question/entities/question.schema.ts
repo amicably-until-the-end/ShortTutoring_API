@@ -47,4 +47,8 @@ export const QuestionSchema = new Schema({
   createdAt: {
     type: String,
   },
+  hopeTutorialTime: {
+    type: Array,
+    schema: [String],
+  },
 });

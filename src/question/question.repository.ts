@@ -26,10 +26,9 @@ export class QuestionRepository {
 
     try {
       return await this.questionModel.create({
+        createdAt: new Date().toISOString(),
+        hopeTutorialTime: createQuestionDto.hopeTutorialTime,
         id: questionId,
-        status: 'pending',
-        studentId: userId,
-        teacherIds: [],
         problem: {
           image: problemImage,
           description: createQuestionDto.description,
@@ -38,8 +37,10 @@ export class QuestionRepository {
           difficulty: createQuestionDto.difficulty,
         },
         selectedTeacherId: '',
+        status: 'pending',
+        studentId: userId,
+        teacherIds: [],
         tutoringId: '',
-        createdAt: new Date().toISOString(),
       });
     } catch (error) {
       throw new Error('질문을 생성할 수 없습니다.');

@@ -51,4 +51,10 @@ export class CreateQuestionDto {
     example: '쉬움',
   })
   difficulty: string;
+
+  @ApiProperty({
+    description: '희망하는 과외 시각입니다. (e.g. 월요일 18시, 화요일 19시)',
+    type: Array,
+  })
+  hopeTutorialTime: string[];
 }

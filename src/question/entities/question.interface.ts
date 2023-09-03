@@ -18,4 +18,5 @@ export interface Question extends QuestionKey {
   selectedTeacherId?: string;
   tutoringId: string;
   createdAt?: string;
+  hopeTutorialTime?: string[];
 }
