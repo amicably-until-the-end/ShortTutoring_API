@@ -1,8 +1,9 @@
 import { Schema } from 'dynamoose';
 
 export const ProblemSchema = new Schema({
-  image: {
-    type: String,
+  images: {
+    type: Array,
+    schema: [String],
   },
   description: {
     type: String,

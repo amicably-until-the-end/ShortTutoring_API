@@ -3,7 +3,7 @@ export interface QuestionKey {
 }
 
 export interface Problem {
-  image?: string;
+  images?: string[];
   description: string;
   schoolLevel?: string;
   schoolSubject?: string;
