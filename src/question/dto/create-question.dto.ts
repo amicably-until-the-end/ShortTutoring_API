@@ -46,15 +46,9 @@ export class CreateQuestionDto {
   schoolChapter: string;
 
   @ApiProperty({
-    description: '문제의 난이도입니다. (e.g. 쉬움, 중간, 어려움)',
-    type: String,
-    example: '쉬움',
-  })
-  difficulty: string;
-
-  @ApiProperty({
     description: '희망하는 과외 시각입니다. (e.g. 월요일 18시, 화요일 19시)',
     type: Array,
+    example: ['월요일 18시', '화요일 19시'],
   })
   hopeTutorialTime: string[];
 }

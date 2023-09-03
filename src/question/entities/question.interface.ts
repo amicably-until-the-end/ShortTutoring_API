@@ -7,7 +7,6 @@ export interface Problem {
   description: string;
   schoolLevel?: string;
   schoolSubject?: string;
-  difficulty?: string;
 }
 
 export interface Question extends QuestionKey {

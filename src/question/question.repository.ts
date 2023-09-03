@@ -36,7 +36,6 @@ export class QuestionRepository {
           description: createQuestionDto.description,
           schoolLevel: createQuestionDto.schoolLevel,
           schoolSubject: createQuestionDto.schoolSubject,
-          difficulty: createQuestionDto.difficulty,
         },
         selectedTeacherId: '',
         status: 'pending',

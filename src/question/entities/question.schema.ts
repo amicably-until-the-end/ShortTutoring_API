@@ -14,9 +14,6 @@ export const ProblemSchema = new Schema({
   schoolSubject: {
     type: String,
   },
-  difficulty: {
-    type: String,
-  },
 });
 
 export const QuestionSchema = new Schema({
