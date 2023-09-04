@@ -3,6 +3,7 @@ export interface QuestionKey {
 }
 
 export interface Problem {
+  mainImage?: string;
   images?: string[];
   description: string;
   schoolLevel?: string;
@@ -17,6 +18,6 @@ export interface Question extends QuestionKey {
   selectedTeacherId?: string;
   tutoringId: string;
   createdAt?: string;
-  hopeTutorialTime?: string[];
+  hopeTutoringTime?: string[];
   hopeImmediately?: boolean;
 }

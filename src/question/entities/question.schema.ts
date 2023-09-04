@@ -1,6 +1,9 @@
 import { Schema } from 'dynamoose';
 
 export const ProblemSchema = new Schema({
+  mainImage: {
+    type: String,
+  },
   images: {
     type: Array,
     schema: [String],
@@ -45,7 +48,7 @@ export const QuestionSchema = new Schema({
   createdAt: {
     type: String,
   },
-  hopeTutorialTime: {
+  hopeTutoringTime: {
     type: Array,
     schema: [String],
   },
