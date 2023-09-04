@@ -30,6 +30,7 @@ export class QuestionRepository {
       return await this.questionModel.create({
         createdAt: new Date().toISOString(),
         hopeTutorialTime: createQuestionDto.hopeTutorialTime,
+        hopeImmediately: createQuestionDto.hopeImmediately,
         id: questionId,
         problem: {
           images: problemImages,

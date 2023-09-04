@@ -51,4 +51,11 @@ export class CreateQuestionDto {
     example: ['월요일 18시', '화요일 19시'],
   })
   hopeTutorialTime: string[];
+
+  @ApiProperty({
+    description: '즉시 과외를 원하는지 여부입니다.',
+    type: Boolean,
+    example: false,
+  })
+  hopeImmediately: boolean;
 }

@@ -49,4 +49,8 @@ export const QuestionSchema = new Schema({
     type: Array,
     schema: [String],
   },
+  hopeImmediately: {
+    type: Boolean,
+    schema: Boolean,
+  },
 });
