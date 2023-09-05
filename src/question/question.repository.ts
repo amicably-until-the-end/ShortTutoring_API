@@ -4,6 +4,7 @@ import { Question, QuestionKey } from './entities/question.interface';
 import { CreateQuestionDto } from './dto/create-question.dto';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
+import { UploadRepository } from '../upload/upload.repository';
 
 @Injectable()
 export class QuestionRepository {
@@ -11,13 +12,14 @@ export class QuestionRepository {
     @InjectModel('Question')
     private readonly questionModel: Model<Question, QuestionKey>,
     private readonly userRepository: UserRepository,
+    private readonly uploadRepository: UploadRepository,
   ) {}
 
   async create(
     questionId: string,
     userId: string,
     createQuestionDto: CreateQuestionDto,
-    problemImage: string,
+    problemImages: string[],
   ): Promise<Question> {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
@@ -26,20 +28,22 @@ export class QuestionRepository {
 
     try {
       return await this.questionModel.create({
+        createdAt: new Date().toISOString(),
+        hopeTutoringTime: createQuestionDto.hopeTutoringTime,
+        hopeImmediately: createQuestionDto.hopeImmediately,
         id: questionId,
-        status: 'pending',
-        studentId: userId,
-        teacherIds: [],
         problem: {
-          image: problemImage,
+          mainImage: problemImages[createQuestionDto.mainImageIndex],
+          images: problemImages,
           description: createQuestionDto.description,
           schoolLevel: createQuestionDto.schoolLevel,
           schoolSubject: createQuestionDto.schoolSubject,
-          difficulty: createQuestionDto.difficulty,
         },
         selectedTeacherId: '',
+        status: 'pending',
+        studentId: userId,
+        teacherIds: [],
         tutoringId: '',
-        createdAt: new Date().toISOString(),
       });
     } catch (error) {
       throw new Error('질문을 생성할 수 없습니다.');
@@ -85,5 +89,38 @@ export class QuestionRepository {
     } catch (error) {
       throw new Error('질문을 삭제할 수 없습니다.');
     }
+  }
+
+  /**
+   createdRequestDto의 문제 이미지들을 S3에 업로드하고, URL 목록을 반환합니다.
+   문제 이미지 데이터가 존재하지 않을 경우 기본 이미지 URL을 반환합니다.
+   @param questionId 과외 요청 ID
+   @param createQuestionDto
+   @return problemImages 문제 이미지 URL 목록
+   */
+  async problemImages(
+    questionId: string,
+    createQuestionDto: CreateQuestionDto,
+  ) {
+    if (createQuestionDto.images === undefined) {
+      return [
+        'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/problem.png',
+      ];
+    }
+
+    const images = [];
+    let index = 0;
+    for (const image of createQuestionDto.images) {
+      const imageFormat = image.split(';')[0].split('/')[1];
+      const base64Data = image.replace(/^data:image\/\w+;base64,/, '');
+      const url = await this.uploadRepository.uploadBase64(
+        `question/${questionId}`,
+        `problem_${index++}.${imageFormat}`,
+        base64Data,
+      );
+      images.push(url.toString());
+    }
+
+    return images;
   }
 }

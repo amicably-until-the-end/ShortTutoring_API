@@ -10,6 +10,7 @@ import { OfferRepository } from './offer.repository';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { TutoringSchema } from '../tutoring/entities/tutoring.schema';
 import { AgoraModule } from '../agora/agora.module';
+import { UploadRepository } from '../upload/upload.repository';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { AgoraModule } from '../agora/agora.module';
     OfferService,
     OfferRepository,
     UserRepository,
+    UploadRepository,
     QuestionRepository,
     TutoringRepository,
   ],

@@ -50,13 +50,17 @@ export const QuestionEntity = {
           description: '학교 과목',
           example: 'test-school-subject',
         },
-        difficulty: {
-          type: 'string',
-          description: '문제 난이도',
-          example: 'easy',
-          enum: ['easy', 'normal', 'hard'],
-        },
       },
+    },
+    hopeTutorialTime: {
+      type: 'array',
+      description: '희망 과외 시간',
+      example: [new Date().toISOString()],
+    },
+    hopeImmediately: {
+      type: 'boolean',
+      description: '즉시 과외 여부',
+      example: true,
     },
   },
 };

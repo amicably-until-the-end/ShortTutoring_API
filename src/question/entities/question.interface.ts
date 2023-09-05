@@ -3,11 +3,11 @@ export interface QuestionKey {
 }
 
 export interface Problem {
-  image?: string;
+  mainImage?: string;
+  images?: string[];
   description: string;
   schoolLevel?: string;
   schoolSubject?: string;
-  difficulty?: string;
 }
 
 export interface Question extends QuestionKey {
@@ -18,4 +18,6 @@ export interface Question extends QuestionKey {
   selectedTeacherId?: string;
   tutoringId: string;
   createdAt?: string;
+  hopeTutoringTime?: string[];
+  hopeImmediately?: boolean;
 }
