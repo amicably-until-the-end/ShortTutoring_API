@@ -8,6 +8,8 @@ import { EventRepository } from './event.repository';
 import { UserRepository } from '../user/user.repository';
 import { AuthRepository } from '../auth/auth.repository';
 import { webhook } from '../config.discord-webhook';
+import { Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @WebSocketGateway()
 export class EventGateway {
@@ -18,6 +20,7 @@ export class EventGateway {
     private readonly authRepository: AuthRepository,
     private readonly eventRepository: EventRepository,
     private readonly userRepository: UserRepository,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
 
   @SubscribeMessage('message')

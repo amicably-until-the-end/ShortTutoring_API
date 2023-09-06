@@ -19,6 +19,8 @@ import { HttpModule } from '@nestjs/axios';
 import { EventGateway } from './event/event.gateway';
 import { EventModule } from './event/event.module';
 import { EventRepository } from './event/event.repository';
+import { CacheModule } from '@nestjs/cache-manager';
+import { ChattingModule } from './chatting/chatting.module';
 
 @Module({
   imports: [
@@ -33,6 +35,12 @@ import { EventRepository } from './event/event.repository';
     EventModule,
     // SimulationModule,
     // ReviewModule,
+    CacheModule.register({
+      store: 'redis',
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
+    }),
+    ChattingModule,
   ],
   controllers: [AppController],
   providers: [AppService, EventGateway, EventRepository],
