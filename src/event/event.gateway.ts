@@ -9,6 +9,7 @@ import { UserRepository } from '../user/user.repository';
 import { AuthRepository } from '../auth/auth.repository';
 import { webhook } from '../config.discord-webhook';
 import { Inject } from '@nestjs/common';
+import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 
 @WebSocketGateway()

@@ -8,9 +8,15 @@ import { AuthSchema } from '../auth/entities/auth.schema';
 import { AuthRepository } from '../auth/auth.repository';
 import { EventRepository } from './event.repository';
 import { JwtService } from '@nestjs/jwt';
+import { CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
+    CacheModule.register({
+      store: 'redis',
+      host: process.env.REDIS_HOST,
+      port: Number(process.env.REDIS_PORT),
+    }),
     HttpModule.register({ timeout: 5000, maxRedirects: 5 }),
     DynamooseModule.forFeature([
       {
