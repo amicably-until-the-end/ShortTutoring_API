@@ -1,15 +1,34 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ChattingService } from './chatting.service';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { AccessToken } from '../auth/entities/auth.entity';
 
 @Controller('chatting')
+@ApiTags('Chatting')
 export class ChattingController {
   constructor(private readonly chattingService: ChattingService) {}
 
   @Post()
-  create(@Body() createChattingDto: CreateChattingDto) {
-    return this.chattingService.create(createChattingDto);
+  @ApiBearerAuth('Authorization')
+  create(
+    @Headers() headers: Headers,
+    @Body() createChattingDto: CreateChattingDto,
+  ) {
+    return this.chattingService.create(
+      AccessToken.userId(headers),
+      createChattingDto,
+    );
   }
 
   @Get()
@@ -23,7 +42,10 @@ export class ChattingController {
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateChattingDto: UpdateChattingDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateChattingDto: UpdateChattingDto,
+  ) {
     return this.chattingService.update(+id, updateChattingDto);
   }
 

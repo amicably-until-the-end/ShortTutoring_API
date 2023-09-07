@@ -3,10 +3,16 @@ import { ChattingService } from './chatting.service';
 import { ChattingController } from './chatting.controller';
 import { DynamooseModule } from 'nestjs-dynamoose';
 import { ChattingSchema } from './entities/chatting.schema';
+import { UserRepository } from '../user/user.repository';
+import { UserSchema } from '../user/entities/user.schema';
 
 @Module({
   imports: [
     DynamooseModule.forFeature([
+      {
+        name: 'User',
+        schema: UserSchema,
+      },
       {
         name: 'Chatting',
         schema: ChattingSchema,
@@ -14,6 +20,6 @@ import { ChattingSchema } from './entities/chatting.schema';
     ]),
   ],
   controllers: [ChattingController],
-  providers: [ChattingService],
+  providers: [ChattingService, UserRepository],
 })
 export class ChattingModule {}
