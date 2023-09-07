@@ -24,6 +24,7 @@ export class UserRepository {
       profileImage:
         'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
       role,
+      participatingChattingRooms: [],
     };
 
     if (role === 'student') {
