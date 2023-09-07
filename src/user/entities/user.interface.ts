@@ -17,5 +17,8 @@ export interface User extends UserKey {
     department?: string;
     grade: number;
   };
-  participatingChattingRooms: string[];
+  participatingChattingRooms: {
+    id: string;
+    chatWith: string;
+  }[];
 }
