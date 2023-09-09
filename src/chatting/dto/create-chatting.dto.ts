@@ -7,3 +7,11 @@ export class CreateChattingDto {
   })
   readonly receiverId: string;
 }
+
+export class SendMessageDto extends CreateChattingDto {
+  @ApiProperty({
+    description: '채팅 내용',
+    example: '안녕하세요',
+  })
+  readonly message: string;
+}

@@ -286,4 +286,19 @@ export class UserRepository {
       throw new Error('채팅방을 추가할 수 없습니다.');
     }
   }
+
+  async removeAllChattingRooms() {
+    return await this.userModel
+      .scan()
+      .exec()
+      .then((users) => {
+        users.forEach(async (user) => {
+          user.participatingChattingRooms = [];
+          await this.userModel.update(
+            { id: user.id },
+            { participatingChattingRooms: user.participatingChattingRooms },
+          );
+        });
+      });
+  }
 }

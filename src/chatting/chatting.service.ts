@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateChattingDto } from './dto/create-chatting.dto';
+import { CreateChattingDto, SendMessageDto } from './dto/create-chatting.dto';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
 import { ChattingRepository } from './chatting.repository';
-import { Fail } from '../response';
+import { Fail, Success } from '../response';
 
 @Injectable()
 export class ChattingService {
@@ -22,16 +22,41 @@ export class ChattingService {
     }
   }
 
-  findAll() {
-    return `This action returns all chatting`;
+  async sendMessage(senderId: string, sendMessageDto: SendMessageDto) {
+    const receiverId = sendMessageDto.receiverId;
+    const areConnected = await this.chattingRepository.areConnected(
+      senderId,
+      receiverId,
+    );
+
+    if (areConnected) {
+      return new Success(
+        '성공적으로 메시지를 보냈습니다.',
+        await this.chattingRepository.sendMessage(
+          senderId,
+          receiverId,
+          sendMessageDto.message,
+        ),
+      );
+    } else {
+      return new Fail('채팅방이 존재하지 않습니다.');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} chatting`;
+  async findAll() {
+    return await this.chattingRepository.findAll();
+  }
+
+  async findOne(chattingRoomId: string) {
+    return await this.chattingRepository.findOne(chattingRoomId);
   }
 
   update(id: number, updateChattingDto: UpdateChattingDto) {
     return `This action updates a #${id} chatting`;
+  }
+
+  async removeAll() {
+    return await this.chattingRepository.removeAll();
   }
 
   remove(id: number) {

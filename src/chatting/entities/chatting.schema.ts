@@ -18,7 +18,7 @@ export const ChattingSchema = new Schema({
     hashKey: true,
   },
   participants: {
-    type: Set,
+    type: Array,
     schema: [String],
   },
   logs: {
