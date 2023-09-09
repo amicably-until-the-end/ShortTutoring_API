@@ -5,6 +5,7 @@ import { DynamooseModule } from 'nestjs-dynamoose';
 import { ChattingSchema } from './entities/chatting.schema';
 import { UserRepository } from '../user/user.repository';
 import { UserSchema } from '../user/entities/user.schema';
+import { ChattingRepository } from './chatting.repository';
 
 @Module({
   imports: [
@@ -20,6 +21,6 @@ import { UserSchema } from '../user/entities/user.schema';
     ]),
   ],
   controllers: [ChattingController],
-  providers: [ChattingService, UserRepository],
+  providers: [ChattingService, ChattingRepository, UserRepository],
 })
 export class ChattingModule {}

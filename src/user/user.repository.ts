@@ -260,28 +260,30 @@ export class UserRepository {
       throw new Error('이미 채팅방에 참여 중입니다.');
     }
 
-    sender.participatingChattingRooms.push({
-      id: chattingRoomId,
-      chatWith: receiverId,
-    });
-    await this.userModel.update(
-      { id: senderId },
-      {
-        participatingChattingRooms: sender.participatingChattingRooms,
-      },
-    );
-    console.log('sender', sender.participatingChattingRooms);
+    try {
+      sender.participatingChattingRooms.push({
+        id: chattingRoomId,
+        chatWith: receiverId,
+      });
+      await this.userModel.update(
+        { id: senderId },
+        {
+          participatingChattingRooms: sender.participatingChattingRooms,
+        },
+      );
 
-    receiver.participatingChattingRooms.push({
-      id: chattingRoomId,
-      chatWith: senderId,
-    });
-    await this.userModel.update(
-      { id: receiverId },
-      {
-        participatingChattingRooms: receiver.participatingChattingRooms,
-      },
-    );
-    console.log('receiver', receiver.participatingChattingRooms);
+      receiver.participatingChattingRooms.push({
+        id: chattingRoomId,
+        chatWith: senderId,
+      });
+      await this.userModel.update(
+        { id: receiverId },
+        {
+          participatingChattingRooms: receiver.participatingChattingRooms,
+        },
+      );
+    } catch (error) {
+      throw new Error('채팅방을 추가할 수 없습니다.');
+    }
   }
 }
