@@ -18,7 +18,6 @@ import { AuthMiddleware } from './auth/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
 import { SocketGateway } from './socket/socket.gateway';
 import { SocketModule } from './socket/socket.module';
-import { SocketRepository } from './socket/socket.repository';
 import { ChattingModule } from './chatting/chatting.module';
 import { RedisModule } from './redis/redis.module';
 import { redisProvider } from './config.redis';
@@ -40,7 +39,7 @@ import { redisProvider } from './config.redis';
     // SimulationModule,
     // ReviewModule,
   ],
-  providers: [AppService, SocketGateway, SocketRepository, redisProvider],
+  providers: [AppService, SocketGateway, redisProvider],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
