@@ -39,7 +39,7 @@ import { RedisModule, redisProvider } from './redis/redis.module';
     RedisModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EventGateway, EventRepository, ...redisProvider],
+  providers: [AppService, EventGateway, EventRepository, redisProvider],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

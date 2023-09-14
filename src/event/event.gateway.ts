@@ -29,7 +29,7 @@ export class EventGateway {
   @SubscribeMessage('get')
   async get(client: any, payload: any) {
     const { key } = JSON.parse(payload);
-    console.log('get', payload);
+    console.log('get', key);
     return await this.redisService.get(key);
   }
 

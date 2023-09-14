@@ -34,7 +34,7 @@ import { RedisService } from '../redis/redis.service';
     UserRepository,
     JwtService,
     RedisService,
-    ...redisProvider,
+    redisProvider,
   ],
 })
 export class EventModule {}
