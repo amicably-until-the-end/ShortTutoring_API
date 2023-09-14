@@ -1,24 +1,30 @@
 import { Module } from '@nestjs/common';
-import * as redisStore from 'cache-manager-redis-store';
 import * as dotenv from 'dotenv';
-import process from 'process';
-import { CacheModule } from '@nestjs/cache-manager';
+import * as process from 'process';
+import { createClient } from 'redis';
 import { RedisService } from './redis.service';
 
 dotenv.config();
 
-export const cacheModule = CacheModule.register({
-  useFactory: async () => ({
-    store: redisStore,
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-    ttl: 1000, // 캐시 유지 시간
-  }),
-});
+export const redisProvider = [
+  {
+    provide: 'REDIS_CLIENT',
+    useFactory: async () => {
+      const client = createClient({
+        socket: {
+          host: process.env.REDIS_HOST,
+          port: Number(process.env.REDIS_PORT),
+        },
+      });
+      await client.connect();
+      return client;
+    },
+  },
+];
 
 @Module({
-  imports: [cacheModule],
-  providers: [RedisService],
-  exports: [RedisService],
+  imports: [],
+  providers: [RedisService, ...redisProvider],
+  exports: [RedisService, ...redisProvider],
 })
 export class RedisModule {}

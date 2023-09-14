@@ -8,12 +8,11 @@ import { AuthSchema } from '../auth/entities/auth.schema';
 import { AuthRepository } from '../auth/auth.repository';
 import { EventRepository } from './event.repository';
 import { JwtService } from '@nestjs/jwt';
-import { cacheModule, RedisModule } from '../redis/redis.module';
+import { RedisModule, redisProvider } from '../redis/redis.module';
 import { RedisService } from '../redis/redis.service';
 
 @Module({
   imports: [
-    cacheModule,
     RedisModule,
     HttpModule.register({ timeout: 5000, maxRedirects: 5 }),
     DynamooseModule.forFeature([
@@ -35,6 +34,7 @@ import { RedisService } from '../redis/redis.service';
     UserRepository,
     JwtService,
     RedisService,
+    ...redisProvider,
   ],
 })
 export class EventModule {}

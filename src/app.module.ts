@@ -20,7 +20,7 @@ import { EventGateway } from './event/event.gateway';
 import { EventModule } from './event/event.module';
 import { EventRepository } from './event/event.repository';
 import { ChattingModule } from './chatting/chatting.module';
-import { cacheModule, RedisModule } from './redis/redis.module';
+import { RedisModule, redisProvider } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -37,10 +37,9 @@ import { cacheModule, RedisModule } from './redis/redis.module';
     // ReviewModule,
     ChattingModule,
     RedisModule,
-    cacheModule,
   ],
   controllers: [AppController],
-  providers: [AppService, EventGateway, EventRepository],
+  providers: [AppService, EventGateway, EventRepository, ...redisProvider],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
