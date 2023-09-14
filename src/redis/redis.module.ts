@@ -1,28 +1,7 @@
 import { Module } from '@nestjs/common';
-import * as dotenv from 'dotenv';
-import * as process from 'process';
-import { createClient } from 'redis';
-import { RedisService } from './redis.service';
+import { RedisRepository } from './redis.repository';
 import { CacheModule } from '@nestjs/cache-manager';
-
-dotenv.config();
-
-export const redisProvider = {
-  provide: 'REDIS_CLIENT',
-  useFactory: async () => {
-    if (process.env.NODE_ENV === 'local') {
-      return null;
-    }
-    const client = createClient({
-      socket: {
-        host: process.env.REDIS_HOST,
-        port: Number(process.env.REDIS_PORT),
-      },
-    });
-    await client.connect();
-    return client;
-  },
-};
+import { redisProvider } from '../config.redis';
 
 @Module({
   imports: [
@@ -31,7 +10,7 @@ export const redisProvider = {
       isGlobal: true,
     }),
   ],
-  providers: [RedisService, redisProvider],
-  exports: [RedisService, redisProvider],
+  providers: [RedisRepository, redisProvider],
+  exports: [RedisRepository, redisProvider],
 })
 export class RedisModule {}

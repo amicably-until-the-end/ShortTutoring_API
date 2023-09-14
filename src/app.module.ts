@@ -16,13 +16,15 @@ import { QuestionModule } from './question/question.module';
 import { OfferModule } from './offer/offer.module';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { HttpModule } from '@nestjs/axios';
-import { EventGateway } from './event/event.gateway';
-import { EventModule } from './event/event.module';
-import { EventRepository } from './event/event.repository';
+import { SocketGateway } from './socket/socket.gateway';
+import { SocketModule } from './socket/socket.module';
+import { SocketRepository } from './socket/socket.repository';
 import { ChattingModule } from './chatting/chatting.module';
-import { RedisModule, redisProvider } from './redis/redis.module';
+import { RedisModule } from './redis/redis.module';
+import { redisProvider } from './config.redis';
 
 @Module({
+  controllers: [AppController],
   imports: [
     HttpModule.register({ timeout: 5000, maxRedirects: 5 }),
     DynamooseModule.forRootAsync({ useClass: DynamooseConfig }),
@@ -32,14 +34,13 @@ import { RedisModule, redisProvider } from './redis/redis.module';
     OfferModule,
     UploadModule,
     TutoringModule,
-    EventModule,
-    // SimulationModule,
-    // ReviewModule,
+    SocketModule,
     ChattingModule,
     RedisModule,
+    // SimulationModule,
+    // ReviewModule,
   ],
-  controllers: [AppController],
-  providers: [AppService, EventGateway, EventRepository, redisProvider],
+  providers: [AppService, SocketGateway, SocketRepository, redisProvider],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

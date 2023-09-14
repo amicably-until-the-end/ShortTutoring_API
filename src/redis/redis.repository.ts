@@ -5,7 +5,7 @@ import { RedisClientType } from 'redis';
 import * as process from 'process';
 
 @Injectable()
-export class RedisService {
+export class RedisRepository {
   constructor(
     @Inject(CACHE_MANAGER) private cache: Cache,
     @Inject('REDIS_CLIENT') private redis: RedisClientType,
