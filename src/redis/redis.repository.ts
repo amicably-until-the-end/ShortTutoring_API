@@ -1,8 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import { Inject, Injectable } from '@nestjs/common';
 import { Cache } from 'cache-manager';
-import { RedisClientType } from 'redis';
 import * as process from 'process';
+import { RedisClientType } from 'redis';
 
 @Injectable()
 export class RedisRepository {
@@ -10,6 +10,14 @@ export class RedisRepository {
     @Inject(CACHE_MANAGER) private cache: Cache,
     @Inject('REDIS_CLIENT') private redis: RedisClientType,
   ) {}
+
+  async set(key: string, value: any) {
+    if (process.env.NODE_ENV === 'local') {
+      await this.cache.set(key, value, 60 * 60 * 24);
+    } else {
+      await this.redis.set(key, value);
+    }
+  }
 
   async get(key: string): Promise<any> {
     if (process.env.NODE_ENV === 'local') {
@@ -27,14 +35,6 @@ export class RedisRepository {
     }
   }
 
-  async set(key: string, value: any, option?: any) {
-    if (process.env.NODE_ENV === 'local') {
-      await this.cache.set(key, value, option);
-    } else {
-      await this.redis.set(key, value, option);
-    }
-  }
-
   async del(key: string) {
     if (process.env.NODE_ENV === 'local') {
       await this.cache.del(key);
@@ -47,13 +47,21 @@ export class RedisRepository {
     if (process.env.NODE_ENV === 'local') {
       const currentValue: Array<any> = await this.cache.get(key);
       if (currentValue === undefined) {
-        await this.cache.set(key, [value]);
+        await this.cache.set(key, [value], 60 * 60 * 24);
       } else {
         currentValue.push(value);
         await this.cache.set(key, currentValue);
       }
     } else {
       await this.redis.rPush(key, value);
+    }
+  }
+
+  async publish(channel: string, message: string) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
+    } else {
+      await this.redis.publish(channel, message);
     }
   }
 }
