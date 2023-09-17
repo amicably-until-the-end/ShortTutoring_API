@@ -42,4 +42,18 @@ export class RedisRepository {
       await this.redis.del(key);
     }
   }
+
+  async push(key: string, value: any) {
+    if (process.env.NODE_ENV === 'local') {
+      const currentValue: Array<any> = await this.cache.get(key);
+      if (currentValue === undefined) {
+        await this.cache.set(key, [value]);
+      } else {
+        currentValue.push(value);
+        await this.cache.set(key, currentValue);
+      }
+    } else {
+      await this.redis.rPush(key, value);
+    }
+  }
 }
