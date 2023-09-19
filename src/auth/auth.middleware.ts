@@ -5,14 +5,11 @@ import { AuthRepository } from './auth.repository';
 export class AuthMiddleware implements NestMiddleware {
   constructor(private readonly authRepository: AuthRepository) {}
 
-  async use(req: any, res: any, next: () => void) {
-    const token: string = req.headers.authorization;
-    const [type, jwt] = token.split(' ');
-    if (type !== 'Bearer') {
-      next();
-    }
+  use(req: any, res: any, next: () => void) {
     try {
-      const { userId, role } = await this.authRepository.decodeJwt(jwt);
+      const token: string = req.headers.authorization;
+      const jwt = token.split(' ')[1];
+      const { userId, role } = this.authRepository.decodeJwt(jwt);
       req.headers['userId'] = userId;
       req.headers['role'] = role;
       next();
