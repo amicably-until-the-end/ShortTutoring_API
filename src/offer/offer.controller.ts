@@ -1,5 +1,10 @@
-import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
+import { AccessToken } from '../auth/entities/auth.entity';
+import { OfferOperations } from './descriptions/offer.operation';
+import { OfferParam } from './descriptions/offer.param';
+import { OfferResponse } from './descriptions/offer.response';
+import { AcceptOfferDto } from './dto/accept-offer.dto';
 import { OfferService } from './offer.service';
+import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -7,11 +12,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { OfferOperations } from './descriptions/offer.operation';
-import { OfferParam } from './descriptions/offer.param';
-import { AccessToken } from '../auth/entities/auth.entity';
-import { OfferResponse } from './descriptions/offer.response';
-import { AcceptOfferDto } from './dto/accept-offer.dto';
 
 @Controller()
 @ApiBearerAuth('Authorization')

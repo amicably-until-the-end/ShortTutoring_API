@@ -1,8 +1,8 @@
+import { webhook } from '../config.discord-webhook';
 import { HttpException, Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
-import * as process from 'process';
-import { webhook } from '../config.discord-webhook';
 import { MessageBuilder } from 'discord-webhook-node';
+import * as process from 'process';
 
 @Injectable()
 export class UploadRepository {

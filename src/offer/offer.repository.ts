@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel, Model } from 'nestjs-dynamoose';
-import { User } from '../user/entities/user.interface';
 import { Question, QuestionKey } from '../question/entities/question.interface';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
+import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
+import { Injectable } from '@nestjs/common';
+import { InjectModel, Model } from 'nestjs-dynamoose';
 
 @Injectable()
 export class OfferRepository {

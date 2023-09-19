@@ -1,3 +1,7 @@
+import { AccessToken } from '../auth/entities/auth.entity';
+import { ChattingService } from './chatting.service';
+import { CreateChattingDto, SendMessageDto } from './dto/create-chatting.dto';
+import { UpdateChattingDto } from './dto/update-chatting.dto';
 import {
   Body,
   Controller,
@@ -8,11 +12,7 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ChattingService } from './chatting.service';
-import { CreateChattingDto, SendMessageDto } from './dto/create-chatting.dto';
-import { UpdateChattingDto } from './dto/update-chatting.dto';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { AccessToken } from '../auth/entities/auth.entity';
 
 @Controller('chatting')
 @ApiTags('Chatting')

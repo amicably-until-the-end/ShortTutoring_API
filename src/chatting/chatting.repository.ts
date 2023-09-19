@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
-import { Chatting, ChattingKey } from './entities/chatting.interface';
-import { InjectModel, Model } from 'nestjs-dynamoose';
-import { UserRepository } from '../user/user.repository';
-import { v4 as uuid } from 'uuid';
 import { Fail } from '../response';
+import { UserRepository } from '../user/user.repository';
+import { Chatting, ChattingKey } from './entities/chatting.interface';
+import { Injectable } from '@nestjs/common';
+import { InjectModel, Model } from 'nestjs-dynamoose';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ChattingRepository {

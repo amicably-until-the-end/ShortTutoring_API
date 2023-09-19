@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
-import * as process from 'process';
-import { JwtService } from '@nestjs/jwt';
 import { Auth, AuthKey } from './entities/auth.interface';
+import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { InjectModel, Model } from 'nestjs-dynamoose';
+import * as process from 'process';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AuthRepository {

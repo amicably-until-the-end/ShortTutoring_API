@@ -1,9 +1,9 @@
-import { Module } from '@nestjs/common';
-import { ChattingService } from './chatting.service';
-import { ChattingController } from './chatting.controller';
-import { UserRepository } from '../user/user.repository';
-import { ChattingRepository } from './chatting.repository';
 import { dynamooseModule } from '../config.dynamoose';
+import { UserRepository } from '../user/user.repository';
+import { ChattingController } from './chatting.controller';
+import { ChattingRepository } from './chatting.repository';
+import { ChattingService } from './chatting.service';
+import { Module } from '@nestjs/common';
 
 @Module({
   imports: [dynamooseModule],

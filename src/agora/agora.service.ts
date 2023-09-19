@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { firstValueFrom } from 'rxjs';
 import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
 import { RtcRole, RtcTokenBuilder } from 'agora-access-token';
 import * as process from 'process';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class AgoraService {

@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import { Question } from './entities/question.interface';
-import { CreateQuestionDto } from './dto/create-question.dto';
-import { QuestionRepository } from './question.repository';
 import { Fail, Success } from '../response';
+import { CreateQuestionDto } from './dto/create-question.dto';
+import { Question } from './entities/question.interface';
+import { QuestionRepository } from './question.repository';
+import { Injectable } from '@nestjs/common';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()

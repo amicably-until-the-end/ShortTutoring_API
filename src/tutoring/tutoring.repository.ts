@@ -1,8 +1,8 @@
+import { AgoraService, WhiteBoardData } from '../agora/agora.service';
+import { Tutoring, TutoringKey } from './entities/tutoring.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
-import { Tutoring, TutoringKey } from './entities/tutoring.interface';
 import { v4 as uuid } from 'uuid';
-import { AgoraService, WhiteBoardData } from '../agora/agora.service';
 
 @Injectable()
 export class TutoringRepository {
