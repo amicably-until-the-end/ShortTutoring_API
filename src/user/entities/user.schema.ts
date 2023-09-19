@@ -48,4 +48,20 @@ export const UserSchema = new Schema({
       },
     },
   },
+  participatingChattingRooms: {
+    type: Array,
+    schema: [
+      {
+        type: Object,
+        schema: {
+          id: {
+            type: String,
+          },
+          chatWith: {
+            type: String,
+          },
+        },
+      },
+    ],
+  },
 });

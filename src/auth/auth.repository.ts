@@ -33,7 +33,7 @@ export class AuthRepository {
     }
   }
 
-  async decodeJwt(jwt: string) {
+  decodeJwt(jwt: string) {
     try {
       const decoded = this.jwtService.decode(jwt);
       return {

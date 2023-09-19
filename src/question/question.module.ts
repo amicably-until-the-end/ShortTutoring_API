@@ -1,27 +1,16 @@
 import { Module } from '@nestjs/common';
 import { QuestionService } from './question.service';
 import { QuestionController } from './question.controller';
-import { DynamooseModule } from 'nestjs-dynamoose';
-import { QuestionSchema } from './entities/question.schema';
-import { UserSchema } from '../user/entities/user.schema';
 import { HttpModule } from '@nestjs/axios';
 import { QuestionRepository } from './question.repository';
 import { UserRepository } from '../user/user.repository';
 import { UploadRepository } from '../upload/upload.repository';
+import { dynamooseModule } from '../config.dynamoose';
 
 @Module({
   imports: [
     HttpModule.register({ timeout: 5000, maxRedirects: 5 }),
-    DynamooseModule.forFeature([
-      {
-        name: 'User',
-        schema: UserSchema,
-      },
-      {
-        name: 'Question',
-        schema: QuestionSchema,
-      },
-    ]),
+    dynamooseModule,
   ],
   controllers: [QuestionController],
   providers: [
@@ -30,5 +19,6 @@ import { UploadRepository } from '../upload/upload.repository';
     UserRepository,
     UploadRepository,
   ],
+  exports: [QuestionRepository],
 })
 export class QuestionModule {}
