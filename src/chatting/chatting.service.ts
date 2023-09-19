@@ -17,24 +17,26 @@ export class ChattingService {
     try {
       const userInfo = await this.userRepository.get(userId);
 
-      const chattingRoomIds = userInfo.participatingChattingRooms;
+      const chattingRoomIds = userInfo.participatingChattingRooms.map(
+        (roomId) => {
+          return { id: roomId };
+        },
+      );
 
       const userRole = userInfo.role;
 
       const result = {
-        normalProposed: undefined,
+        normalProposed: [],
         normalReserved: [],
         selectedProposed: [],
         selectedReserved: [],
       };
 
+      const normalProposedGrouping = {};
+
       if (chattingRoomIds.length > 0) {
         const roomInfos = await this.chattingRepository.getChatRoomsInfo(
-          chattingRoomIds.map((roomId) => {
-            return {
-              id: roomId,
-            };
-          }),
+          chattingRoomIds,
         );
         const roomInfosWithQuestion = await Promise.all(
           roomInfos?.map(async (roomInfo) => {
@@ -46,13 +48,17 @@ export class ChattingService {
 
             const item = {
               roomImage: undefined,
-              ...roomInfo,
+              id: roomInfo.id,
+              messages: roomInfo.messages,
               opponentId: undefined,
               questionState: status,
+              problemImages: questionInfo.problem.mainImage,
               isSelect: isSelect,
+              questionId: roomInfo.questionId,
               schoolSubject: schoolSubject,
               schoolLevel: schoolLevel,
               title: undefined,
+              status: status,
             };
 
             if (userRole == 'student') {
@@ -73,32 +79,30 @@ export class ChattingService {
               item.opponentId = studentInfo.id;
             }
 
-            return { ...roomInfo, questionInfo: questionInfo };
+            return item;
           }),
         );
+
         roomInfosWithQuestion.forEach((roomInfo) => {
-          if (roomInfo.questionInfo.isSelect) {
-            if (roomInfo.questionInfo.status === 'pending') {
+          if (roomInfo.isSelect) {
+            if (roomInfo.status === 'pending') {
               result.selectedProposed.push(roomInfo);
-            } else if (roomInfo.questionInfo.status === 'reserved') {
+            } else if (roomInfo.status === 'reserved') {
               result.selectedReserved.push(roomInfo);
             }
           } else {
-            if (roomInfo.questionInfo.status === 'pending') {
+            if (roomInfo.status === 'pending') {
               if (userRole == 'student') {
                 //grouping by questionId
-                if (result.normalProposed == undefined) {
-                  result.normalProposed = {};
-                }
-                if (result.normalProposed[roomInfo.questionId]) {
-                  result.normalProposed[roomInfo.questionId].teachers.push(
+                if (normalProposedGrouping[roomInfo.questionId]) {
+                  normalProposedGrouping[roomInfo.questionId].teachers.push(
                     roomInfo,
                   );
                 } else {
-                  result.normalProposed[roomInfo.questionId] = {
-                    ...roomInfo.questionInfo,
+                  normalProposedGrouping[roomInfo.questionId] = {
+                    ...roomInfo,
                     teachers: [roomInfo],
-                    questionImage: roomInfo.questionInfo.problem.mainImage,
+                    questionImage: roomInfo.problemImages,
                   };
                 }
               } else {
@@ -107,18 +111,14 @@ export class ChattingService {
                 }
                 result.normalProposed.push(roomInfo);
               }
-            } else if (roomInfo.questionInfo.status === 'reserved') {
+            } else if (roomInfo.status === 'reserved') {
               result.normalReserved.push(roomInfo);
             }
           }
         });
       }
-      if (result.normalProposed == undefined) {
-        result.normalProposed = {};
-      }
-      const normalProposed = Object.values(result.normalProposed);
-      if (normalProposed.length > 0) {
-        result.normalProposed = normalProposed;
+      if (Object.keys(normalProposedGrouping).length > 0) {
+        result.normalProposed = Object.values(result.normalProposed);
       }
 
       console.log(result);
