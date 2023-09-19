@@ -2,10 +2,9 @@ export interface ChattingKey {
   id: string;
 }
 
-export interface Message {
+export interface Chat {
   sender: string;
-  format: string;
-  body: string;
+  message: string;
   createdAt: string;
 }
 
@@ -13,5 +12,5 @@ export interface Chatting extends ChattingKey {
   studentId: string;
   teacherId: string;
   questionId: string;
-  messages: Message[];
+  messages: Chat[];
 }

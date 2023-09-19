@@ -17,82 +17,42 @@ export class ChattingService {
     try {
       const userInfo = await this.userRepository.get(userId);
 
-      const chattingRoomIds = userInfo.participatingChattingRooms.map(
-        (roomId) => {
-          return { id: roomId };
-        },
-      );
+      const chattingRoomIds = userInfo.participatingChattingRooms;
 
       const userRole = userInfo.role;
 
       const result = {
-        normalProposed: [],
+        normalProposed: undefined,
         normalReserved: [],
         selectedProposed: [],
         selectedReserved: [],
       };
 
-      const normalProposedGrouping = {};
-
-      if (userRole == 'student') {
-        const pendingQuestions =
-          await this.questionRepository.getStudentPendingQuestions(userId);
-        pendingQuestions.map((question) => {
-          normalProposedGrouping[question.id] = {
-            teachers: [],
-            isTeacherRoom: false,
-            roomImage: question.problem.mainImage,
-            title: question.problem.description,
-            subject: question.problem.schoolSubject,
-          };
-        });
-      }
-
       if (chattingRoomIds.length > 0) {
         const roomInfos = await this.chattingRepository.getChatRoomsInfo(
-          chattingRoomIds,
+          chattingRoomIds.map((roomId) => {
+            return {
+              id: roomId,
+            };
+          }),
         );
         const roomInfosWithQuestion = await Promise.all(
           roomInfos?.map(async (roomInfo) => {
             const questionInfo = await this.questionRepository.getInfo(
               roomInfo.questionId,
             );
-            console.log(questionInfo);
-            const { status, isSelect, selectedTeacherId } = questionInfo;
-            const { schoolSubject, schoolLevel, description } =
-              questionInfo.problem;
-
-            let chatState: 'pending' | 'reserved' | 'refused' = 'pending';
-
-            if (status == 'pending') {
-              chatState = 'pending';
-            } else if (status == 'reserved') {
-              if (userRole == 'student' || selectedTeacherId == userId) {
-                chatState = 'reserved';
-              } else {
-                // 선생님이 api 부른 경우에 거절 당한 경우.
-                chatState = 'refused';
-              }
-            }
+            const { status, isSelect } = questionInfo;
+            const { schoolSubject, schoolLevel } = questionInfo.problem;
 
             const item = {
               roomImage: undefined,
-              id: roomInfo.id,
-              messages: roomInfo.messages.map((message) => {
-                const isMyMsg = message.sender == userId;
-                const { body, ...rest } = message;
-                return { body: JSON.parse(body), isMyMsg: isMyMsg, ...rest };
-              }),
+              ...roomInfo,
               opponentId: undefined,
-              questionState: chatState,
-              problemImages: questionInfo.problem.mainImage,
+              questionState: status,
               isSelect: isSelect,
-              isTeacherRoom: true,
-              questionId: roomInfo.questionId,
               schoolSubject: schoolSubject,
               schoolLevel: schoolLevel,
               title: undefined,
-              description: description,
             };
 
             if (userRole == 'student') {
@@ -113,43 +73,55 @@ export class ChattingService {
               item.opponentId = studentInfo.id;
             }
 
-            return item;
+            return { ...roomInfo, questionInfo: questionInfo };
           }),
         );
-
         roomInfosWithQuestion.forEach((roomInfo) => {
-          if (roomInfo.isSelect) {
-            //지정 질문
-            if (roomInfo.questionState === 'pending') {
+          if (roomInfo.questionInfo.isSelect) {
+            if (roomInfo.questionInfo.status === 'pending') {
               result.selectedProposed.push(roomInfo);
-            } else if (roomInfo.questionState === 'reserved') {
+            } else if (roomInfo.questionInfo.status === 'reserved') {
               result.selectedReserved.push(roomInfo);
             }
           } else {
-            //일반 질문
-            if (
-              roomInfo.questionState === 'pending' ||
-              roomInfo.questionState === 'refused'
-            ) {
+            if (roomInfo.questionInfo.status === 'pending') {
               if (userRole == 'student') {
                 //grouping by questionId
-                if (normalProposedGrouping[roomInfo.questionId]) {
-                  normalProposedGrouping[roomInfo.questionId].teachers.push(
+                if (result.normalProposed == undefined) {
+                  result.normalProposed = {};
+                }
+                if (result.normalProposed[roomInfo.questionId]) {
+                  result.normalProposed[roomInfo.questionId].teachers.push(
                     roomInfo,
                   );
+                } else {
+                  result.normalProposed[roomInfo.questionId] = {
+                    ...roomInfo.questionInfo,
+                    teachers: [roomInfo],
+                    questionImage: roomInfo.questionInfo.problem.mainImage,
+                  };
                 }
               } else {
+                if (result.normalProposed == undefined) {
+                  result.normalProposed = [];
+                }
                 result.normalProposed.push(roomInfo);
               }
-            } else {
+            } else if (roomInfo.questionInfo.status === 'reserved') {
               result.normalReserved.push(roomInfo);
             }
           }
         });
       }
-      if (Object.keys(normalProposedGrouping).length > 0) {
-        result.normalProposed = Object.values(normalProposedGrouping);
+      if (result.normalProposed == undefined) {
+        result.normalProposed = {};
       }
+      const normalProposed = Object.values(result.normalProposed);
+      if (normalProposed.length > 0) {
+        result.normalProposed = normalProposed;
+      }
+
+      console.log(result);
       return new Success('채팅방 목록을 불러왔습니다.', result);
     } catch (error) {
       return new Fail(error.message);

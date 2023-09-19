@@ -1,11 +1,7 @@
 import { UploadRepository } from '../upload/upload.repository';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
-import {
-  CreateNormalQuestionDto,
-  CreateQuestionDto,
-  CreateSelectedQuestionDto,
-} from './dto/create-question.dto';
+import { CreateQuestionDto } from './dto/create-question.dto';
 import { Question, QuestionKey } from './entities/question.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
@@ -19,10 +15,10 @@ export class QuestionRepository {
     private readonly uploadRepository: UploadRepository,
   ) {}
 
-  async createNormalQuestion(
+  async create(
     questionId: string,
     userId: string,
-    createQuestionDto: CreateNormalQuestionDto,
+    createQuestionDto: CreateQuestionDto,
     problemImages: string[],
   ): Promise<Question> {
     const user: User = await this.userRepository.get(userId);
@@ -46,7 +42,7 @@ export class QuestionRepository {
         selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
-        offerTeachers: [],
+        teacherIds: [],
         tutoringId: '',
         isSelect: false,
       });
@@ -55,58 +51,12 @@ export class QuestionRepository {
     }
   }
 
-  async getStudentPendingQuestions(userId: string) {
-    return await this.questionModel
-      .scan({ studentId: userId, status: 'pending' })
-      .exec();
-  }
-
-  async createSelectedQuestion(
-    questionId: string,
-    userId: string,
-    selectedTeacherId: string,
-    createQuestionDto: CreateSelectedQuestionDto,
-    problemImages: string[],
-  ): Promise<Question> {
-    const user: User = await this.userRepository.get(userId);
-    if (user.role === 'teacher') {
-      throw new Error('선생님은 질문을 생성할 수 없습니다.');
-    }
-
-    try {
-      return await this.questionModel.create({
-        createdAt: new Date().toISOString(),
-        id: questionId,
-        problem: {
-          mainImage: problemImages[createQuestionDto.mainImageIndex],
-          images: problemImages,
-          description: createQuestionDto.description,
-          schoolLevel: createQuestionDto.schoolLevel,
-          schoolSubject: createQuestionDto.schoolSubject,
-        },
-        selectedTeacherId: selectedTeacherId,
-        status: 'pending',
-        studentId: userId,
-        offerTeachers: [],
-        tutoringId: '',
-        isSelect: true,
-      });
-    } catch (error) {
-      throw new Error('질문을 생성할 수 없습니다.');
-    }
-  }
-
-  async getByStatusAndType(status: string, isSelect: boolean) {
+  async getByStatus(status: string) {
     let questions: Question[];
     if (status === 'all') {
       questions = await this.questionModel.scan().exec();
     } else {
-      questions = await this.questionModel
-        .scan({
-          status: { eq: status },
-          isSelect: { eq: isSelect },
-        })
-        .exec();
+      questions = await this.questionModel.scan('status').eq(status).exec();
     }
 
     return await Promise.all(
@@ -122,20 +72,6 @@ export class QuestionRepository {
 
   async getInfo(questionId: string) {
     return await this.questionModel.get({ id: questionId });
-  }
-
-  async changeStatus(questionId: string, status: string) {
-    return await this.questionModel.update(
-      { id: questionId },
-      { status: status },
-    );
-  }
-
-  async setSeletedTeacherId(questionId: string, teacherId: string) {
-    return await this.questionModel.update(
-      { id: questionId },
-      { selectedTeacherId: teacherId },
-    );
   }
 
   async delete(userId: string, questionId: string) {
@@ -191,22 +127,5 @@ export class QuestionRepository {
     }
 
     return images;
-  }
-
-  async appendOffer(questionId: string, teacherId: string) {
-    const question = await this.questionModel.get({ id: questionId });
-    const offerTeacherRooms = question.offerTeachers;
-    if (offerTeacherRooms.includes(teacherId)) {
-      return null;
-    }
-    offerTeacherRooms.push(teacherId);
-    return await this.questionModel.update(
-      { id: questionId },
-      {
-        $ADD: {
-          offerTeachers: [teacherId],
-        },
-      },
-    );
   }
 }
