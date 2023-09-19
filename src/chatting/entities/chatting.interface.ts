@@ -9,6 +9,8 @@ export interface Chat {
 }
 
 export interface Chatting extends ChattingKey {
-  participants: string[];
-  logs: Chat[];
+  studentId: string;
+  teacherId: string;
+  questionId: string;
+  messages: Chat[];
 }

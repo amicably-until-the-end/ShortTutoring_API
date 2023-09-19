@@ -44,6 +44,7 @@ export class QuestionRepository {
         studentId: userId,
         teacherIds: [],
         tutoringId: '',
+        isSelect: false,
       });
     } catch (error) {
       throw new Error('질문을 생성할 수 없습니다.');
@@ -67,6 +68,10 @@ export class QuestionRepository {
         };
       }),
     );
+  }
+
+  async getInfo(questionId: string) {
+    return await this.questionModel.get({ id: questionId });
   }
 
   async delete(userId: string, questionId: string) {

@@ -52,6 +52,9 @@ export const QuestionSchema = new Schema({
     type: Array,
     schema: [String],
   },
+  isSelect: {
+    type: Boolean,
+  },
   hopeImmediately: {
     type: Boolean,
     schema: Boolean,

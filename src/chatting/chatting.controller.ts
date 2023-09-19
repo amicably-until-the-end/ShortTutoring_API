@@ -1,6 +1,6 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { ChattingService } from './chatting.service';
-import { CreateChattingDto, SendMessageDto } from './dto/create-chatting.dto';
+import { CreateChattingDto } from './dto/create-chatting.dto';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
 import {
   Body,
@@ -20,17 +20,24 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class ChattingController {
   constructor(private readonly chattingService: ChattingService) {}
 
+  @Get('/list')
+  getChatList(@Headers() headers: Headers) {
+    return this.chattingService.getChatList(AccessToken.userId(headers));
+  }
+
   @Post()
   create(
     @Headers() headers: Headers,
     @Body() createChattingDto: CreateChattingDto,
   ) {
+    /*
     return this.chattingService.create(
       AccessToken.userId(headers),
       createChattingDto,
-    );
+    );*/
   }
 
+  /*
   @Post('send')
   sendMessage(
     @Headers() headers: Headers,
@@ -41,6 +48,7 @@ export class ChattingController {
       sendMessageDto,
     );
   }
+   */
 
   @Get()
   findAll() {
@@ -58,11 +66,6 @@ export class ChattingController {
     @Body() updateChattingDto: UpdateChattingDto,
   ) {
     return this.chattingService.update(+id, updateChattingDto);
-  }
-
-  @Delete('removeAll')
-  removeAll() {
-    return this.chattingService.removeAll();
   }
 
   @Delete(':id')

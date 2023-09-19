@@ -17,11 +17,16 @@ export const ChattingSchema = new Schema({
     type: String,
     hashKey: true,
   },
-  participants: {
-    type: Array,
-    schema: [String],
+  studentId: {
+    type: String,
   },
-  logs: {
+  teacherId: {
+    type: String,
+  },
+  questionId: {
+    type: String,
+  },
+  messages: {
     type: Array,
     schema: [ChattingMessageSchema],
   },
