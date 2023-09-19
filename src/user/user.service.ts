@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { User } from './entities/user.interface';
-import { Fail, Success } from '../response';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { UploadRepository } from '../upload/upload.repository';
-import { UserRepository } from './user.repository';
 import { AuthRepository } from '../auth/auth.repository';
-import { MessageBuilder } from 'discord-webhook-node';
 import { webhook } from '../config.discord-webhook';
-import { LoginUserDto } from './dto/login-user.dto';
+import { Fail, Success } from '../response';
+import { UploadRepository } from '../upload/upload.repository';
 import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
+import { LoginUserDto } from './dto/login-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities/user.interface';
+import { UserRepository } from './user.repository';
+import { Injectable } from '@nestjs/common';
+import { MessageBuilder } from 'discord-webhook-node';
 import { v4 as uuid } from 'uuid';
 
 @Injectable()

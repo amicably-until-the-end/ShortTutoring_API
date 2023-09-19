@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { User, UserKey } from './entities/user.interface';
-import { InjectModel, Model } from 'nestjs-dynamoose';
 import {
   CreateStudentDto,
   CreateTeacherDto,
   CreateUserDto,
 } from './dto/create-user.dto';
+import { User, UserKey } from './entities/user.interface';
+import { Injectable } from '@nestjs/common';
+import { InjectModel, Model } from 'nestjs-dynamoose';
 
 @Injectable()
 export class UserRepository {

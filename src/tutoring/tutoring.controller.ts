@@ -1,7 +1,7 @@
+import { TutoringOperation } from './descriptions/tutoring.operation';
 import { TutoringService } from './tutoring.service';
 import { Controller, Get, Param } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
-import { TutoringOperation } from './descriptions/tutoring.operation';
 
 @ApiTags('Tutoring')
 @Controller('tutoring')

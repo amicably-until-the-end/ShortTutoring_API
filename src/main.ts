@@ -1,7 +1,7 @@
-import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as dotenv from 'dotenv';
 import { configSwagger } from './config.swagger';
+import { NestFactory } from '@nestjs/core';
+import * as dotenv from 'dotenv';
 import { json, urlencoded } from 'express';
 
 async function bootstrap() {

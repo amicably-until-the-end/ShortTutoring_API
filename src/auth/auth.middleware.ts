@@ -1,5 +1,5 @@
-import { Injectable, NestMiddleware } from '@nestjs/common';
 import { AuthRepository } from './auth.repository';
+import { Injectable, NestMiddleware } from '@nestjs/common';
 
 @Injectable()
 export class AuthMiddleware implements NestMiddleware {

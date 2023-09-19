@@ -1,3 +1,9 @@
+import { AccessToken } from '../auth/entities/auth.entity';
+import { QuestionOperation } from './descriptions/question.operation';
+import { QuestionQuery } from './descriptions/question.query';
+import { QuestionResponse } from './descriptions/question.response';
+import { CreateQuestionDto } from './dto/create-question.dto';
+import { QuestionService } from './question.service';
 import {
   Body,
   Controller,
@@ -7,7 +13,6 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
-import { QuestionService } from './question.service';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -15,11 +20,6 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import { CreateQuestionDto } from './dto/create-question.dto';
-import { AccessToken } from '../auth/entities/auth.entity';
-import { QuestionResponse } from './descriptions/question.response';
-import { QuestionOperation } from './descriptions/question.operation';
-import { QuestionQuery } from './descriptions/question.query';
 
 @Controller()
 export class QuestionController {

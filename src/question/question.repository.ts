@@ -1,10 +1,10 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel, Model } from 'nestjs-dynamoose';
-import { Question, QuestionKey } from './entities/question.interface';
-import { CreateQuestionDto } from './dto/create-question.dto';
+import { UploadRepository } from '../upload/upload.repository';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
-import { UploadRepository } from '../upload/upload.repository';
+import { CreateQuestionDto } from './dto/create-question.dto';
+import { Question, QuestionKey } from './entities/question.interface';
+import { Injectable } from '@nestjs/common';
+import { InjectModel, Model } from 'nestjs-dynamoose';
 
 @Injectable()
 export class QuestionRepository {

@@ -1,14 +1,14 @@
+import { AuthSchema } from './auth/entities/auth.schema';
+import { ChattingSchema } from './chatting/entities/chatting.schema';
+import { QuestionSchema } from './question/entities/question.schema';
+import { TutoringSchema } from './tutoring/entities/tutoring.schema';
+import { UserSchema } from './user/entities/user.schema';
 import {
   DynamooseModule,
   DynamooseModuleOptions,
   DynamooseOptionsFactory,
 } from 'nestjs-dynamoose';
 import * as process from 'process';
-import { UserSchema } from './user/entities/user.schema';
-import { AuthSchema } from './auth/entities/auth.schema';
-import { ChattingSchema } from './chatting/entities/chatting.schema';
-import { QuestionSchema } from './question/entities/question.schema';
-import { TutoringSchema } from './tutoring/entities/tutoring.schema';
 
 export class DynamooseConfig implements DynamooseOptionsFactory {
   createDynamooseOptions(): DynamooseModuleOptions {

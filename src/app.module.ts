@@ -1,3 +1,15 @@
+import { AuthMiddleware } from './auth/auth.middleware';
+import { AuthModule } from './auth/auth.module';
+import { ChattingModule } from './chatting/chatting.module';
+import { DynamooseConfig, dynamooseModule } from './config.dynamoose';
+import { OfferModule } from './offer/offer.module';
+import { QuestionModule } from './question/question.module';
+import { RedisModule } from './redis/redis.module';
+import { SocketModule } from './socket/socket.module';
+import { TutoringModule } from './tutoring/tutoring.module';
+import { UploadModule } from './upload/upload.module';
+import { UserModule } from './user/user.module';
+import { HttpModule } from '@nestjs/axios';
 import {
   MiddlewareConsumer,
   Module,
@@ -5,18 +17,6 @@ import {
   RequestMethod,
 } from '@nestjs/common';
 import { DynamooseModule } from 'nestjs-dynamoose';
-import { DynamooseConfig, dynamooseModule } from './config.dynamoose';
-import { UserModule } from './user/user.module';
-import { UploadModule } from './upload/upload.module';
-import { TutoringModule } from './tutoring/tutoring.module';
-import { AuthModule } from './auth/auth.module';
-import { QuestionModule } from './question/question.module';
-import { OfferModule } from './offer/offer.module';
-import { AuthMiddleware } from './auth/auth.middleware';
-import { HttpModule } from '@nestjs/axios';
-import { SocketModule } from './socket/socket.module';
-import { ChattingModule } from './chatting/chatting.module';
-import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
