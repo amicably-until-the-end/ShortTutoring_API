@@ -47,10 +47,11 @@ export class SocketGateway {
 
   /**
    * 원하는 역할의 온라인 사용자 목록을 가져오는 메소드
+   * @param client
    * @param payload
    */
   @SubscribeMessage('get-role-participants')
-  async getRoleParticipants(payload: any) {
+  async getRoleParticipants(client: any, payload: any) {
     const { role } = payload;
     return await this.redisRepository.get(role);
   }
