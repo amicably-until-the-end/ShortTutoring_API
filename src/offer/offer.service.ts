@@ -44,13 +44,13 @@ export class OfferService {
       //TODO: redis pub/sub으로 변경
       await this.chattingRepository.sendMessage(
         chatRoomId,
-        userId,
+        studentId,
         'problem-image',
         problemMessage,
       );
       await this.chattingRepository.sendMessage(
         chatRoomId,
-        userId,
+        studentId,
         'text',
         requestMessage,
       );

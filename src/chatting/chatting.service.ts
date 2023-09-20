@@ -52,8 +52,9 @@ export class ChattingService {
               roomImage: undefined,
               id: roomInfo.id,
               messages: roomInfo.messages.map((message) => {
+                const isMyMsg = message.sender == userId;
                 const { body, ...rest } = message;
-                return { body: JSON.parse(body), ...rest };
+                return { body: JSON.parse(body), isMyMsg: isMyMsg, ...rest };
               }),
               opponentId: undefined,
               questionState: status,
