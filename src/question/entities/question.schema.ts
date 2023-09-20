@@ -26,7 +26,7 @@ export const QuestionSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'reserved', 'canceled', 'expired', 'completed'],
+    enum: ['pending', 'matched', 'canceled', 'expired', 'completed'],
   },
   studentId: {
     type: String,
@@ -35,7 +35,7 @@ export const QuestionSchema = new Schema({
     type: Object,
     schema: ProblemSchema,
   },
-  offerTeachers: {
+  offerTeacherRooms: {
     type: Array,
     schema: [String],
   },

@@ -61,6 +61,7 @@ export class OfferService {
     }
   }
 
+  /*
   async remove(userId: string, questionId: string) {
     try {
       await this.offerRepository.remove(userId, questionId);
@@ -68,7 +69,9 @@ export class OfferService {
     } catch (error) {
       return new Fail(error.message);
     }
-  }
+  }*/
+
+  /*
 
   async getStatus(userId: string, questionId: string) {
     try {
@@ -77,7 +80,7 @@ export class OfferService {
     } catch (error) {
       return new Fail(error.message);
     }
-  }
+  }*/
 
   async accept(userId: string, questionId: string, teacherId: string) {
     try {
@@ -97,6 +100,7 @@ export class OfferService {
     }
   }
 
+  /*
   async getTeachers(userId: string, questionId: string) {
     try {
       const teachers = await this.offerRepository.getTeachers(
@@ -108,4 +112,6 @@ export class OfferService {
       return new Fail(error.message);
     }
   }
+
+   */
 }
