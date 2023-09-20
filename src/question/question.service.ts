@@ -1,10 +1,6 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { Fail, Success } from '../response';
-import { UserRepository } from '../user/user.repository';
-import {
-  CreateNormalQuestionDto,
-  CreateSelectedQuestionDto,
-} from './dto/create-question.dto';
+import { CreateQuestionDto } from './dto/create-question.dto';
 import { Question } from './entities/question.interface';
 import { QuestionRepository } from './question.repository';
 import { Injectable } from '@nestjs/common';
@@ -15,7 +11,6 @@ export class QuestionService {
   constructor(
     private readonly questionRepository: QuestionRepository,
     private readonly chattingRepository: ChattingRepository,
-    private readonly userRepository: UserRepository,
   ) {}
 
   /**
@@ -24,23 +19,20 @@ export class QuestionService {
    * @param createQuestionDto 질문 생성 정보
    * @returns 생성된 질문의 ID
    */
-  async createNormal(
-    userId: string,
-    createQuestionDto: CreateNormalQuestionDto,
-  ) {
+  async createNormal(userId: string, createQuestionDto: CreateQuestionDto) {
     try {
       const questionId = uuid();
       const problemImages = await this.questionRepository.problemImages(
         questionId,
         createQuestionDto,
       );
-      const question: Question =
-        await this.questionRepository.createNormalQuestion(
-          questionId,
-          userId,
-          createQuestionDto,
-          problemImages,
-        );
+      const question: Question = await this.questionRepository.create(
+        questionId,
+        userId,
+        createQuestionDto,
+        problemImages,
+        false,
+      );
       return new Success('질문이 생성되었습니다.', question);
     } catch (error) {
       return new Fail(error.message);
@@ -50,7 +42,7 @@ export class QuestionService {
   async createSelected(
     userId: string,
     teacherId: string,
-    createQuestionDto: CreateSelectedQuestionDto,
+    createQuestionDto: CreateQuestionDto,
   ) {
     try {
       const questionId = uuid();
@@ -58,48 +50,15 @@ export class QuestionService {
         questionId,
         createQuestionDto,
       );
-      const question: Question =
-        await this.questionRepository.createSelectedQuestion(
-          questionId,
-          userId,
-          teacherId,
-          createQuestionDto,
-          problemImages,
-        );
-
-      const chatRoomId = await this.chattingRepository.makeChatRoom(
-        teacherId,
-        userId,
+      const question: Question = await this.questionRepository.create(
         questionId,
-      );
-
-      await this.userRepository.joinChattingRoom(userId, chatRoomId);
-      await this.userRepository.joinChattingRoom(teacherId, chatRoomId);
-
-      const messageImage = problemImages[createQuestionDto.mainImageIndex];
-
-      const problemMessage = {
-        image: messageImage,
-        description: createQuestionDto.description,
-        questionId: questionId,
-      };
-      const requestMessage = {
-        startDateTime: createQuestionDto.requestTutoringStartTime,
-      };
-
-      //TODO: redis pub/sub으로 변경
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
         userId,
-        'problem-image',
-        problemMessage,
+        createQuestionDto,
+        problemImages,
+        true,
       );
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
-        userId,
-        'appoint-request',
-        requestMessage,
-      );
+
+      //TODO: 질문 생성 시, 선생님들에게 알림을 보내야 합니다. 레디스로 올려야함
 
       return new Success('질문이 생성되었습니다.', question);
     } catch (error) {
@@ -116,10 +75,11 @@ export class QuestionService {
     }
   }
 
-  async getPendingNormalQuestions() {
+  async list(status: string) {
     try {
-      const questions: Question[] =
-        await this.questionRepository.getByStatusAndType('pending', false);
+      const questions: Question[] = await this.questionRepository.getByStatus(
+        status,
+      );
       return new Success('질문 목록을 불러왔습니다.', questions);
     } catch (error) {
       return new Fail(error.message);

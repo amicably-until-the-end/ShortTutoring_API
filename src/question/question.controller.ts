@@ -1,15 +1,22 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { QuestionOperation } from './descriptions/question.operation';
+import { QuestionQuery } from './descriptions/question.query';
 import { QuestionResponse } from './descriptions/question.response';
-import {
-  CreateNormalQuestionDto,
-  CreateSelectedQuestionDto,
-} from './dto/create-question.dto';
+import { CreateQuestionDto } from './dto/create-question.dto';
 import { QuestionService } from './question.service';
-import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -20,14 +27,14 @@ export class QuestionController {
 
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @ApiOperation(QuestionOperation.createNormalQuestion)
+  @ApiOperation(QuestionOperation.create)
   @ApiResponse(QuestionResponse.create.success)
   @Post('student/question/create/normal')
   createNormal(
     @Headers() headers: Headers,
-    @Body() createQuestionDto: CreateNormalQuestionDto,
+    @Body() createQuestionDto: CreateQuestionDto,
   ) {
-    return this.questionService.createNormal(
+    return this.questionService.create(
       AccessToken.userId(headers),
       createQuestionDto,
     );
@@ -35,16 +42,15 @@ export class QuestionController {
 
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @ApiOperation(QuestionOperation.createSelectedQuestion)
+  @ApiOperation(QuestionOperation.create)
   @ApiResponse(QuestionResponse.create.success)
   @Post('student/question/create/selected')
   createSelected(
     @Headers() headers: Headers,
-    @Body() createQuestionDto: CreateSelectedQuestionDto,
+    @Body() createQuestionDto: CreateQuestionDto,
   ) {
-    return this.questionService.createSelected(
+    return this.questionService.create(
       AccessToken.userId(headers),
-      createQuestionDto.requestTeacherId,
       createQuestionDto,
     );
   }
@@ -60,8 +66,9 @@ export class QuestionController {
   @ApiTags('Teacher')
   @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.list)
+  @ApiQuery(QuestionQuery.list)
   @Get('teacher/question/list')
-  list() {
-    return this.questionService.getPendingNormalQuestions();
+  list(@Query('status') status: string) {
+    return this.questionService.list(status);
   }
 }
