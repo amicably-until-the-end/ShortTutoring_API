@@ -2,9 +2,14 @@ export interface ChattingKey {
   id: string;
 }
 
+export interface Message {
+  type: string;
+  body: string;
+}
+
 export interface Chat {
   sender: string;
-  message: string;
+  message: Message;
   createdAt: string;
 }
 
