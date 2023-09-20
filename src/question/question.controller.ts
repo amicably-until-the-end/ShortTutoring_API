@@ -1,25 +1,15 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { QuestionOperation } from './descriptions/question.operation';
-import { QuestionQuery } from './descriptions/question.query';
 import { QuestionResponse } from './descriptions/question.response';
 import {
   CreateNormalQuestionDto,
   CreateSelectedQuestionDto,
 } from './dto/create-question.dto';
 import { QuestionService } from './question.service';
-import {
-  Body,
-  Controller,
-  Get,
-  Headers,
-  Param,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
-  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -70,9 +60,8 @@ export class QuestionController {
   @ApiTags('Teacher')
   @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.list)
-  @ApiQuery(QuestionQuery.list)
   @Get('teacher/question/list')
-  list(@Query('status') status: string) {
-    return this.questionService.list(status);
+  list() {
+    return this.questionService.getPendingNormalQuestions();
   }
 }

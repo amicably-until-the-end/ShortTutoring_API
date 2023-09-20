@@ -19,16 +19,7 @@ export class OfferService {
       //await this.offerRepository.append(userId, questionId);
 
       const questionInfo = await this.questionRepository.getInfo(questionId);
-
       const studentId = questionInfo.studentId;
-
-      const offerSuccess = await this.questionRepository.appendOffer(
-        questionId,
-        userId,
-      );
-      if (offerSuccess == null) {
-        return new Fail('이미 신청한 질문 입니다.');
-      }
 
       const chatRoomId = await this.chattingRepository.makeChatRoom(
         userId,
@@ -53,24 +44,23 @@ export class OfferService {
       //TODO: redis pub/sub으로 변경
       await this.chattingRepository.sendMessage(
         chatRoomId,
-        studentId,
+        userId,
         'problem-image',
         problemMessage,
       );
       await this.chattingRepository.sendMessage(
         chatRoomId,
-        studentId,
+        userId,
         'text',
         requestMessage,
       );
 
-      return new Success('질문 대기열에 추가되었습니다.', { chatRoomId });
+      return new Success('질문 대기열에 추가되었습니다.', { questionId });
     } catch (error) {
       return new Fail(error.message);
     }
   }
 
-  /*
   async remove(userId: string, questionId: string) {
     try {
       await this.offerRepository.remove(userId, questionId);
@@ -78,9 +68,7 @@ export class OfferService {
     } catch (error) {
       return new Fail(error.message);
     }
-  }*/
-
-  /*
+  }
 
   async getStatus(userId: string, questionId: string) {
     try {
@@ -89,47 +77,26 @@ export class OfferService {
     } catch (error) {
       return new Fail(error.message);
     }
-  }*/
+  }
 
-  async accept(userId: string, chattingId: string, questionId: string) {
+  async accept(userId: string, questionId: string, teacherId: string) {
     try {
-      const chatting = await this.chattingRepository.getChatRoomInfo(
-        chattingId,
-      );
       const tutoring = await this.offerRepository.accept(
         userId,
         questionId,
-        chatting.teacherId,
+        teacherId,
       );
 
-      const question = await this.questionRepository.getInfo(questionId);
+      //TODO : 시작 시간 추가
 
-      const offerTeacherIds = question.offerTeachers;
+      //TODO : pending -> reserved
 
-      for (const offerTeacherId of offerTeacherIds) {
-        if (offerTeacherId != chatting.teacherId) {
-          const teacherChatId =
-            await this.chattingRepository.getIdByQuestionAndTeacher(
-              questionId,
-              offerTeacherId,
-            );
-          //TODO: redis pub/sub으로 변경
-          await this.chattingRepository.sendMessage(
-            teacherChatId,
-            userId,
-            'text',
-            '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
-          );
-        }
-      }
-
-      return new Success('선생님 선택이 완료되었습니다.');
+      return new Success('튜터링을 시작합니다.', tutoring);
     } catch (error) {
       return new Fail(error.message);
     }
   }
 
-  /*
   async getTeachers(userId: string, questionId: string) {
     try {
       const teachers = await this.offerRepository.getTeachers(
@@ -141,6 +108,4 @@ export class OfferService {
       return new Fail(error.message);
     }
   }
-
-   */
 }

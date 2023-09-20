@@ -89,12 +89,17 @@ export class QuestionRepository {
     }
   }
 
-  async getByStatus(status: string) {
+  async getByStatusAndType(status: string, isSelect: boolean) {
     let questions: Question[];
     if (status === 'all') {
       questions = await this.questionModel.scan().exec();
     } else {
-      questions = await this.questionModel.scan('status').eq(status).exec();
+      questions = await this.questionModel
+        .scan({
+          status: { eq: status },
+          isSelect: { eq: isSelect },
+        })
+        .exec();
     }
 
     return await Promise.all(
