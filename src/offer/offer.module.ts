@@ -1,4 +1,5 @@
 import { AgoraModule } from '../agora/agora.module';
+import { ChattingRepository } from '../chatting/chatting.repository';
 import { dynamooseModule } from '../config.dynamoose';
 import { QuestionRepository } from '../question/question.repository';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
@@ -19,6 +20,7 @@ import { Module } from '@nestjs/common';
     QuestionRepository,
     TutoringRepository,
     UploadRepository,
+    ChattingRepository,
   ],
 })
 export class OfferModule {}

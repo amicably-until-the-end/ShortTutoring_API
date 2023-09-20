@@ -115,11 +115,10 @@ export class QuestionService {
     }
   }
 
-  async list(status: string) {
+  async getPendingNormalQuestions() {
     try {
-      const questions: Question[] = await this.questionRepository.getByStatus(
-        status,
-      );
+      const questions: Question[] =
+        await this.questionRepository.getByStatusAndType('pending', false);
       return new Success('질문 목록을 불러왔습니다.', questions);
     } catch (error) {
       return new Fail(error.message);
