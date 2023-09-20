@@ -1,4 +1,4 @@
-import { Chatting, ChattingKey, Message } from './entities/chatting.interface';
+import { Chatting, ChattingKey } from './entities/chatting.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { v4 as uuid } from 'uuid';
@@ -51,11 +51,12 @@ export class ChattingRepository {
     }
   }*/
 
-  async sendMessage(roomId: string, senderId: string, message: Message) {
+  async sendMessage(roomId: string, senderId: string, format: string, message) {
     const chatting = await this.chattingModel.get({ id: roomId });
     chatting.messages.push({
       sender: senderId,
-      message: message,
+      format: format,
+      body: JSON.stringify(message),
       createdAt: new Date().toISOString(),
     });
     await this.chattingModel.update(
@@ -63,10 +64,7 @@ export class ChattingRepository {
       { messages: chatting.messages },
     );
 
-    return {
-      chattingRoomId: roomId,
-      message,
-    };
+    return chatting;
   }
 
   async getChatRoomInfo(roomId: string) {

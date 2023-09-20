@@ -49,7 +49,10 @@ export class ChattingService {
             const item = {
               roomImage: undefined,
               id: roomInfo.id,
-              messages: roomInfo.messages,
+              messages: roomInfo.messages.map((message) => {
+                const { body, ...rest } = message;
+                return { body: JSON.parse(body), ...rest };
+              }),
               opponentId: undefined,
               questionState: status,
               problemImages: questionInfo.problem.mainImage,
@@ -120,8 +123,6 @@ export class ChattingService {
       if (Object.keys(normalProposedGrouping).length > 0) {
         result.normalProposed = Object.values(result.normalProposed);
       }
-
-      console.log(result);
       return new Success('채팅방 목록을 불러왔습니다.', result);
     } catch (error) {
       return new Fail(error.message);
