@@ -1,4 +1,4 @@
-import { Chatting, ChattingKey } from './entities/chatting.interface';
+import { Chatting, ChattingKey, Message } from './entities/chatting.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 
@@ -49,6 +49,24 @@ export class ChattingRepository {
       throw new Fail('채팅방을 생성할 수 없습니다.' + error.message);
     }
   }*/
+
+  async sendMessage(roomId: string, senderId: string, message: Message) {
+    const chatting = await this.chattingModel.get({ id: roomId });
+    chatting.messages.push({
+      sender: senderId,
+      message: message,
+      createdAt: new Date().toISOString(),
+    });
+    await this.chattingModel.update(
+      { id: roomId },
+      { messages: chatting.messages },
+    );
+
+    return {
+      chattingRoomId: roomId,
+      message,
+    };
+  }
 
   async getChatRoomInfo(roomId: string) {
     return await this.chattingModel.get({
