@@ -59,6 +59,7 @@ export class ChattingService {
               questionState: status,
               problemImages: questionInfo.problem.mainImage,
               isSelect: isSelect,
+              isTeacherRoom: true,
               questionId: roomInfo.questionId,
               schoolSubject: schoolSubject,
               schoolLevel: schoolLevel,
@@ -107,6 +108,7 @@ export class ChattingService {
                 } else {
                   normalProposedGrouping[roomInfo.questionId] = {
                     teachers: [roomInfo],
+                    isTeacherRoom: false,
                     questionImage: roomInfo.problemImages,
                     title: roomInfo.description,
                     subject: roomInfo.schoolSubject,
