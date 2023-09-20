@@ -33,6 +33,7 @@ export const ChattingListEntity = {
           questionState: 'pending',
           opponentId: 'test-student-id',
           isSelect: false,
+          isTeacherRoom: false,
           questionId: '2397c9a0-9ea7-4584-8d02-e6509ea22aba',
           schoolSubject: '기하',
           schoolLevel: '고등학교',
