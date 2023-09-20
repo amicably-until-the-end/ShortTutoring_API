@@ -1,5 +1,7 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { ChattingService } from './chatting.service';
+import { ChattingOperation } from './description/chatting.operation';
+import { ChattingResponse } from './description/chatting.response';
 import { CreateChattingDto } from './dto/create-chatting.dto';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
 import {
@@ -12,7 +14,12 @@ import {
   Patch,
   Post,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @Controller('chatting')
 @ApiTags('Chatting')
@@ -20,6 +27,8 @@ import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 export class ChattingController {
   constructor(private readonly chattingService: ChattingService) {}
 
+  @ApiOperation(ChattingOperation.list)
+  @ApiResponse(ChattingResponse.list.success)
   @Get('/list')
   getChatList(@Headers() headers: Headers) {
     return this.chattingService.getChatList(AccessToken.userId(headers));
