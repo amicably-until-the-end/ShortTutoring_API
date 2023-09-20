@@ -1,17 +1,15 @@
-import { Fail } from '../response';
-import { UserRepository } from '../user/user.repository';
 import { Chatting, ChattingKey } from './entities/chatting.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
-import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ChattingRepository {
   constructor(
     @InjectModel('Chatting')
     private readonly chattingModel: Model<Chatting, ChattingKey>,
-    private readonly userRepository: UserRepository,
   ) {}
+
+  /*
 
   async areConnected(senderId: string, receiverId: string) {
     const sender = await this.userRepository.get(senderId);
@@ -50,53 +48,53 @@ export class ChattingRepository {
     } catch (error) {
       throw new Fail('채팅방을 생성할 수 없습니다.' + error.message);
     }
+  }*/
+
+  async getChatRoomInfo(roomId: string) {
+    return await this.chattingModel.get({
+      id: roomId,
+    });
   }
 
-  async sendMessage(senderId: string, receiverId: string, message: string) {
-    try {
-      const chattingRoom = await this.chattingModel.scan().exec();
-      const chattingRoomId = chattingRoom.find((chatting) => {
-        return (
-          chatting.participants.includes(senderId) &&
-          chatting.participants.includes(receiverId)
+  async getChatRoomsInfo(roomIds: ChattingKey[]) {
+    return await this.chattingModel.batchGet(roomIds);
+  }
+
+  /*
+    async sendMessage(senderId: string, receiverId: string, message: string) {
+      try {
+        const chattingRoom = await this.chattingModel.scan().exec();
+        const chattingRoomId = chattingRoom.find((chatting) => {
+          return (
+            chatting.participants.includes(senderId) &&
+            chatting.participants.includes(receiverId)
+          );
+        }).id;
+
+        const chatting = await this.chattingModel.get({ id: chattingRoomId });
+        chatting.logs.push({
+          sender: senderId,
+          message,
+          createdAt: new Date().toISOString()
+        });
+        await this.chattingModel.update(
+          { id: chattingRoomId },
+          { logs: chatting.logs }
         );
-      }).id;
 
-      const chatting = await this.chattingModel.get({ id: chattingRoomId });
-      chatting.logs.push({
-        sender: senderId,
-        message,
-        createdAt: new Date().toISOString(),
-      });
-      await this.chattingModel.update(
-        { id: chattingRoomId },
-        { logs: chatting.logs },
-      );
-
-      return {
-        chattingRoomId,
-        message,
-      };
-    } catch (error) {
-      throw new Fail('메시지를 전송할 수 없습니다.' + error.message);
+        return {
+          chattingRoomId,
+          message
+        };
+      } catch (error) {
+        throw new Fail("메시지를 전송할 수 없습니다." + error.message);
+      }
     }
-  }
+
+   */
 
   async findAll() {
     return await this.chattingModel.scan().exec();
-  }
-
-  async removeAll() {
-    await this.chattingModel
-      .scan()
-      .exec()
-      .then((chattingRooms) => {
-        chattingRooms.forEach((chattingRoom) => {
-          this.chattingModel.delete({ id: chattingRoom.id });
-        });
-      });
-
-    await this.userRepository.removeAllChattingRooms();
   }
 
   async findOne(chattingRoomId: string) {

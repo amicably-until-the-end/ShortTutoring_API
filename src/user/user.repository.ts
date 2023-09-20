@@ -241,6 +241,7 @@ export class UserRepository {
     }
   }
 
+  /*
   async addChatting(
     senderId: string,
     receiverId: string,
@@ -285,7 +286,7 @@ export class UserRepository {
     } catch (error) {
       throw new Error('채팅방을 추가할 수 없습니다.');
     }
-  }
+  }*/
 
   async removeAllChattingRooms() {
     return await this.userModel
