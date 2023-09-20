@@ -1,7 +1,6 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { OfferOperations } from './descriptions/offer.operation';
 import { OfferParam } from './descriptions/offer.param';
-import { OfferResponse } from './descriptions/offer.response';
 import { AcceptOfferDto } from './dto/accept-offer.dto';
 import { OfferService } from './offer.service';
 import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
@@ -9,7 +8,6 @@ import {
   ApiBearerAuth,
   ApiOperation,
   ApiParam,
-  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
 
@@ -26,13 +24,16 @@ export class OfferController {
     return this.offerService.append(AccessToken.userId(headers), questionId);
   }
 
+  /*
   @ApiTags('Teacher')
   @Post('teacher/offer/remove/:questionId')
   @ApiParam(OfferParam.questionId)
   @ApiOperation(OfferOperations.remove)
   remove(@Headers() headers: Headers, @Param('questionId') questionId: string) {
     return this.offerService.remove(AccessToken.userId(headers), questionId);
-  }
+  }*/
+
+  /*
 
   @ApiTags('Teacher')
   @Get('teacher/offer/status/:questionId')
@@ -44,8 +45,9 @@ export class OfferController {
     @Param('questionId') questionId: string,
   ) {
     return this.offerService.getStatus(AccessToken.userId(headers), questionId);
-  }
+  }*/
 
+  /*
   @ApiTags('Student')
   @Get('student/offer/teachers/:questionId')
   @ApiParam(OfferParam.questionId)
@@ -58,7 +60,7 @@ export class OfferController {
       AccessToken.userId(headers),
       questionId,
     );
-  }
+  }*/
 
   @ApiTags('Student')
   @Post('student/offer/accept/:questionId')

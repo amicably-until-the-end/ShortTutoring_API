@@ -43,8 +43,10 @@ export class ChattingService {
             const questionInfo = await this.questionRepository.getInfo(
               roomInfo.questionId,
             );
+            console.log(questionInfo);
             const { status, isSelect } = questionInfo;
-            const { schoolSubject, schoolLevel } = questionInfo.problem;
+            const { schoolSubject, schoolLevel, description } =
+              questionInfo.problem;
 
             const item = {
               roomImage: undefined,
@@ -62,6 +64,7 @@ export class ChattingService {
               schoolLevel: schoolLevel,
               title: undefined,
               status: status,
+              description: description,
             };
 
             if (userRole == 'student') {
@@ -103,25 +106,23 @@ export class ChattingService {
                   );
                 } else {
                   normalProposedGrouping[roomInfo.questionId] = {
-                    ...roomInfo,
                     teachers: [roomInfo],
                     questionImage: roomInfo.problemImages,
+                    title: roomInfo.description,
+                    subject: roomInfo.schoolSubject,
                   };
                 }
               } else {
-                if (result.normalProposed == undefined) {
-                  result.normalProposed = [];
-                }
                 result.normalProposed.push(roomInfo);
               }
-            } else if (roomInfo.status === 'reserved') {
+            } else {
               result.normalReserved.push(roomInfo);
             }
           }
         });
       }
       if (Object.keys(normalProposedGrouping).length > 0) {
-        result.normalProposed = Object.values(result.normalProposed);
+        result.normalProposed = Object.values(normalProposedGrouping);
       }
       return new Success('채팅방 목록을 불러왔습니다.', result);
     } catch (error) {

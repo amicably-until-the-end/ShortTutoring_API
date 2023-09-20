@@ -35,7 +35,7 @@ export const QuestionSchema = new Schema({
     type: Object,
     schema: ProblemSchema,
   },
-  teacherIds: {
+  offerTeacherRooms: {
     type: Array,
     schema: [String],
   },

@@ -46,7 +46,7 @@ export class QuestionRepository {
         selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
-        teacherIds: [],
+        offerTeacherRooms: [],
         tutoringId: '',
         isSelect: false,
       });
@@ -80,7 +80,7 @@ export class QuestionRepository {
         selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
-        teacherIds: [],
+        offerTeacherRooms: [],
         tutoringId: '',
         isSelect: true,
       });
