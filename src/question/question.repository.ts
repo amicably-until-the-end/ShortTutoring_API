@@ -1,7 +1,11 @@
 import { UploadRepository } from '../upload/upload.repository';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
-import { CreateQuestionDto } from './dto/create-question.dto';
+import {
+  CreateNormalQuestionDto,
+  CreateQuestionDto,
+  CreateSelectedQuestionDto,
+} from './dto/create-question.dto';
 import { Question, QuestionKey } from './entities/question.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
@@ -15,10 +19,10 @@ export class QuestionRepository {
     private readonly uploadRepository: UploadRepository,
   ) {}
 
-  async create(
+  async createNormalQuestion(
     questionId: string,
     userId: string,
-    createQuestionDto: CreateQuestionDto,
+    createQuestionDto: CreateNormalQuestionDto,
     problemImages: string[],
   ): Promise<Question> {
     const user: User = await this.userRepository.get(userId);
@@ -42,7 +46,7 @@ export class QuestionRepository {
         selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
-        teacherIds: [],
+        offerTeacherRooms: [],
         tutoringId: '',
         isSelect: false,
       });
@@ -51,12 +55,51 @@ export class QuestionRepository {
     }
   }
 
-  async getByStatus(status: string) {
+  async createSelectedQuestion(
+    questionId: string,
+    userId: string,
+    createQuestionDto: CreateSelectedQuestionDto,
+    problemImages: string[],
+  ): Promise<Question> {
+    const user: User = await this.userRepository.get(userId);
+    if (user.role === 'teacher') {
+      throw new Error('선생님은 질문을 생성할 수 없습니다.');
+    }
+
+    try {
+      return await this.questionModel.create({
+        createdAt: new Date().toISOString(),
+        id: questionId,
+        problem: {
+          mainImage: problemImages[createQuestionDto.mainImageIndex],
+          images: problemImages,
+          description: createQuestionDto.description,
+          schoolLevel: createQuestionDto.schoolLevel,
+          schoolSubject: createQuestionDto.schoolSubject,
+        },
+        selectedTeacherId: '',
+        status: 'pending',
+        studentId: userId,
+        offerTeacherRooms: [],
+        tutoringId: '',
+        isSelect: true,
+      });
+    } catch (error) {
+      throw new Error('질문을 생성할 수 없습니다.');
+    }
+  }
+
+  async getByStatusAndType(status: string, isSelect: boolean) {
     let questions: Question[];
     if (status === 'all') {
       questions = await this.questionModel.scan().exec();
     } else {
-      questions = await this.questionModel.scan('status').eq(status).exec();
+      questions = await this.questionModel
+        .scan({
+          status: { eq: status },
+          isSelect: { eq: isSelect },
+        })
+        .exec();
     }
 
     return await Promise.all(

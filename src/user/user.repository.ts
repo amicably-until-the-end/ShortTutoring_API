@@ -241,52 +241,18 @@ export class UserRepository {
     }
   }
 
-  /*
-  async addChatting(
-    senderId: string,
-    receiverId: string,
-    chattingRoomId: string,
-  ) {
-    const sender: User = await this.userModel.get({ id: senderId });
-    const receiver: User = await this.userModel.get({ id: receiverId });
-    if (sender === undefined || receiver === undefined) {
-      throw new Error('사용자를 찾을 수 없습니다.');
-    }
-
-    if (
-      sender.participatingChattingRooms.find(
-        (chattingRoom) => chattingRoom.chatWith === receiverId,
-      )
-    ) {
-      throw new Error('이미 채팅방에 참여 중입니다.');
-    }
-
+  async joinChattingRoom(userId: string, chattingRoomId: string) {
     try {
-      sender.participatingChattingRooms.push({
-        id: chattingRoomId,
-        chatWith: receiverId,
-      });
+      const user: User = await this.userModel.get({ id: userId });
+      user.participatingChattingRooms.push(chattingRoomId);
       await this.userModel.update(
-        { id: senderId },
-        {
-          participatingChattingRooms: sender.participatingChattingRooms,
-        },
-      );
-
-      receiver.participatingChattingRooms.push({
-        id: chattingRoomId,
-        chatWith: senderId,
-      });
-      await this.userModel.update(
-        { id: receiverId },
-        {
-          participatingChattingRooms: receiver.participatingChattingRooms,
-        },
+        { id: userId },
+        { participatingChattingRooms: user.participatingChattingRooms },
       );
     } catch (error) {
       throw new Error('채팅방을 추가할 수 없습니다.');
     }
-  }*/
+  }
 
   async removeAllChattingRooms() {
     return await this.userModel

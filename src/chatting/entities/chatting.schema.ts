@@ -4,10 +4,13 @@ export const ChattingMessageSchema = new Schema({
   sender: {
     type: String,
   },
-  message: {
+  body: {
     type: String,
   },
   createdAt: {
+    type: String,
+  },
+  format: {
     type: String,
   },
 });

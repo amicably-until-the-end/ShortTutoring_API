@@ -14,24 +14,23 @@ export class OfferRepository {
     private readonly tutoringRepository: TutoringRepository,
   ) {}
 
-  async append(userId: string, questionId: string) {
-    const teacher = await this.userRepository.get(userId);
-    if (teacher.role === 'student') {
-      throw new Error('선생님만 질문 대기열에 추가할 수 있습니다.');
-    }
-
+  /**
+   * 일반 질문에 선생님의 신청을 추가함
+   */
+  async appendOfferTeacherRoom(questionId: string, chattingId: string) {
     const question = await this.questionModel.get({ id: questionId });
-    if (question.teacherIds.includes(userId)) {
+    if (question.offerTeacherRooms.includes(chattingId)) {
       throw new Error('이미 질문 대기열에 추가되었습니다.');
     }
 
-    question.teacherIds.push(userId);
+    question.offerTeacherRooms.push(chattingId);
     await this.questionModel.update(
       { id: questionId },
-      { teacherIds: question.teacherIds },
+      { offerTeacherRooms: question.offerTeacherRooms },
     );
   }
 
+  /*
   async getTeachers(userId: string, questionId: string) {
     const user = await this.userRepository.get(userId);
 
@@ -46,20 +45,24 @@ export class OfferRepository {
       return await this.userRepository.getOther(teacherId);
     });
     return await Promise.all(teachers);
-  }
+  }*/
 
-  async remove(userId: string, questionId: string) {
-    const question = await this.questionModel.get({ id: questionId });
-    if (!question.teacherIds.includes(userId)) {
-      throw new Error('질문 대기열에 존재하지 않습니다.');
+  /*
+    async remove(chattingId: string, questionId: string) {
+      const question = await this.questionModel.get({ id: questionId });
+      if (!question.offerTeacherRooms.includes(userId)) {
+        throw new Error('질문 대기열에 존재하지 않습니다.');
+      }
+  
+      question.teacherIds = question.teacherIds.filter((id) => id !== userId);
+      await this.offerTeacherRooms.update(
+        { id: questionId },
+        { teacherIds: question.teacherIds },
+      );
     }
+  ]*/
 
-    question.teacherIds = question.teacherIds.filter((id) => id !== userId);
-    await this.questionModel.update(
-      { id: questionId },
-      { teacherIds: question.teacherIds },
-    );
-  }
+  /*
 
   async getStatus(userId: string, questionId: string) {
     const question = await this.questionModel.get({ id: questionId });
@@ -88,9 +91,9 @@ export class OfferRepository {
         status: 'rejected',
       };
     }
-  }
+  }*/
 
-  async accept(userId: string, questionId: string, teacherId: string) {
+  async accept(userId: string, questionId: string, chattingId: string) {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
       throw new Error('선생님은 질문을 수락할 수 없습니다.');
@@ -101,7 +104,7 @@ export class OfferRepository {
       throw new Error('질문을 찾을 수 없습니다.');
     } else if (question.studentId !== userId) {
       throw new Error('본인의 질문이 아닙니다.');
-    } else if (!question.teacherIds.includes(teacherId)) {
+    } else if (!question.offerTeacherRooms.includes(chattingId)) {
       throw new Error('질문 대기열에 존재하지 않는 선생님입니다.');
     }
 
@@ -117,7 +120,7 @@ export class OfferRepository {
       { id: questionId },
       {
         status: 'matched',
-        selectedTeacherId: teacherId,
+        selectedTeacherId: chattingId,
         tutoringId,
       },
     );
