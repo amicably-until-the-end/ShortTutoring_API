@@ -29,8 +29,23 @@ export class QuestionController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.create)
   @ApiResponse(QuestionResponse.create.success)
-  @Post('student/question/create')
-  create(
+  @Post('student/question/create/normal')
+  createNormal(
+    @Headers() headers: Headers,
+    @Body() createQuestionDto: CreateQuestionDto,
+  ) {
+    return this.questionService.create(
+      AccessToken.userId(headers),
+      createQuestionDto,
+    );
+  }
+
+  @ApiTags('Student')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(QuestionOperation.create)
+  @ApiResponse(QuestionResponse.create.success)
+  @Post('student/question/create/selected')
+  createSelected(
     @Headers() headers: Headers,
     @Body() createQuestionDto: CreateQuestionDto,
   ) {

@@ -20,6 +20,7 @@ export class QuestionRepository {
     userId: string,
     createQuestionDto: CreateQuestionDto,
     problemImages: string[],
+    isSelect: boolean,
   ): Promise<Question> {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
@@ -44,7 +45,7 @@ export class QuestionRepository {
         studentId: userId,
         teacherIds: [],
         tutoringId: '',
-        isSelect: false,
+        isSelect: isSelect,
       });
     } catch (error) {
       throw new Error('질문을 생성할 수 없습니다.');
