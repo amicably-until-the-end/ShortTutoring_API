@@ -24,20 +24,6 @@ export class CreateQuestionDto {
   schoolSubject: string;
 
   @ApiProperty({
-    description: '희망하는 과외 시각입니다. (ISO Timestamp)',
-    type: Array,
-    example: [new Date().toISOString()],
-  })
-  hopeTutoringTime: string[];
-
-  @ApiProperty({
-    description: '즉시 과외를 원하는지 여부입니다.',
-    type: Boolean,
-    example: true,
-  })
-  hopeImmediately: boolean;
-
-  @ApiProperty({
     description: '대표 사진의 인덱스입니다.',
     type: Number,
     default: 0,
@@ -52,4 +38,41 @@ export class CreateQuestionDto {
     ],
   })
   images: string[];
+}
+
+export class CreateNormalQuestionDto extends CreateQuestionDto {
+  @ApiProperty({
+    description: '희망하는 과외 시각입니다. (ISO Timestamp)',
+    type: Array,
+    example: [new Date().toISOString()],
+  })
+  hopeTutoringTime?: string[];
+
+  @ApiProperty({
+    description: '즉시 과외를 원하는지 여부입니다.',
+    type: Boolean,
+    example: true,
+  })
+  hopeImmediately: boolean;
+}
+
+export class CreateSelectedQuestionDto extends CreateQuestionDto {
+  @ApiProperty({
+    description: '학생이 원하는 과외 시작 시각입니다. (ISO Timestamp)',
+    type: Date,
+    example: [new Date().toISOString()],
+  })
+  requestTutoringStartTime?: Date;
+
+  @ApiProperty({
+    description: '학생이 원하는 과외 종료 시각입니다. (ISO Timestamp)',
+    type: Date,
+    example: [new Date().toISOString()],
+  })
+  requestTutoringEndTime?: Date;
+
+  @ApiProperty({
+    description: '질문을 받는 선생님의 아이디',
+  })
+  requestTeacherId?: string;
 }

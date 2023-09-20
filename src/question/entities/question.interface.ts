@@ -21,4 +21,5 @@ export interface Question extends QuestionKey {
   isSelect: boolean;
   hopeTutoringTime?: string[];
   hopeImmediately?: boolean;
+  requestTutoringTime?: Date;
 }
