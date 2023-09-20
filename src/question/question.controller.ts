@@ -2,7 +2,10 @@ import { AccessToken } from '../auth/entities/auth.entity';
 import { QuestionOperation } from './descriptions/question.operation';
 import { QuestionQuery } from './descriptions/question.query';
 import { QuestionResponse } from './descriptions/question.response';
-import { CreateQuestionDto } from './dto/create-question.dto';
+import {
+  CreateNormalQuestionDto,
+  CreateSelectedQuestionDto,
+} from './dto/create-question.dto';
 import { QuestionService } from './question.service';
 import {
   Body,
@@ -32,9 +35,9 @@ export class QuestionController {
   @Post('student/question/create/normal')
   createNormal(
     @Headers() headers: Headers,
-    @Body() createQuestionDto: CreateQuestionDto,
+    @Body() createQuestionDto: CreateNormalQuestionDto,
   ) {
-    return this.questionService.create(
+    return this.questionService.createNormal(
       AccessToken.userId(headers),
       createQuestionDto,
     );
@@ -47,9 +50,10 @@ export class QuestionController {
   @Post('student/question/create/selected')
   createSelected(
     @Headers() headers: Headers,
-    @Body() createQuestionDto: CreateQuestionDto,
+    @Body() createQuestionDto: CreateSelectedQuestionDto,
   ) {
-    return this.questionService.create(
+    return this.questionService.createSelected(
+      createQuestionDto.requestTeacherId,
       AccessToken.userId(headers),
       createQuestionDto,
     );

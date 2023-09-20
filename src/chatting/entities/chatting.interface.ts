@@ -4,7 +4,7 @@ export interface ChattingKey {
 
 export interface Message {
   type: string;
-  body: string;
+  body: object;
 }
 
 export interface Chat {

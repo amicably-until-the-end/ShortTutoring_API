@@ -1,6 +1,7 @@
 import { Chatting, ChattingKey, Message } from './entities/chatting.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ChattingRepository {
@@ -76,6 +77,19 @@ export class ChattingRepository {
 
   async getChatRoomsInfo(roomIds: ChattingKey[]) {
     return await this.chattingModel.batchGet(roomIds);
+  }
+
+  async makeChatRoom(teacherId: string, studentId: string, questionId: string) {
+    const chattingRoomId = uuid();
+    const chatting: Chatting = {
+      id: chattingRoomId,
+      teacherId,
+      studentId,
+      questionId,
+      messages: [],
+    };
+    await this.chattingModel.create(chatting);
+    return chattingRoomId;
   }
 
   /*
