@@ -30,7 +30,7 @@ export class QuestionController {
 
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @ApiOperation(QuestionOperation.create)
+  @ApiOperation(QuestionOperation.createNormalQuestion)
   @ApiResponse(QuestionResponse.create.success)
   @Post('student/question/create/normal')
   createNormal(
@@ -45,7 +45,7 @@ export class QuestionController {
 
   @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @ApiOperation(QuestionOperation.create)
+  @ApiOperation(QuestionOperation.createSelectedQuestion)
   @ApiResponse(QuestionResponse.create.success)
   @Post('student/question/create/selected')
   createSelected(
@@ -53,8 +53,8 @@ export class QuestionController {
     @Body() createQuestionDto: CreateSelectedQuestionDto,
   ) {
     return this.questionService.createSelected(
-      createQuestionDto.requestTeacherId,
       AccessToken.userId(headers),
+      createQuestionDto.requestTeacherId,
       createQuestionDto,
     );
   }
