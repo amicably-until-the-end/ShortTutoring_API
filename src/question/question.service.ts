@@ -1,4 +1,5 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
+import { Message } from '../chatting/entities/chatting.interface';
 import { Fail, Success } from '../response';
 import { UserRepository } from '../user/user.repository';
 import {
@@ -77,28 +78,28 @@ export class QuestionService {
 
       const messageImage = problemImages[createQuestionDto.mainImageIndex];
 
-      const problemMessage = {
-        image: messageImage,
-        description: createQuestionDto.description,
-        questionId: questionId,
+      const problemMessage: Message = {
+        sender: userId,
+        format: 'problem-image',
+        body: JSON.stringify({
+          image: messageImage,
+          description: createQuestionDto.description,
+          questionId: questionId,
+        }),
+        createdAt: new Date().toISOString(),
       };
       const requestMessage = {
-        startDateTime: createQuestionDto.requestTutoringStartTime,
+        sender: userId,
+        format: 'appoint-request',
+        body: JSON.stringify({
+          startDateTime: createQuestionDto.requestTutoringStartTime,
+        }),
+        createdAt: new Date().toISOString(),
       };
 
       //TODO: redis pub/sub으로 변경
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
-        userId,
-        'problem-image',
-        problemMessage,
-      );
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
-        userId,
-        'appoint-request',
-        requestMessage,
-      );
+      await this.chattingRepository.sendMessage(chatRoomId, problemMessage);
+      await this.chattingRepository.sendMessage(chatRoomId, requestMessage);
 
       return new Success('질문이 생성되었습니다.', question);
     } catch (error) {

@@ -1,4 +1,4 @@
-import { Chatting, ChattingKey } from './entities/chatting.interface';
+import { Chatting, ChattingKey, Message } from './entities/chatting.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { v4 as uuid } from 'uuid';
@@ -51,16 +51,16 @@ export class ChattingRepository {
     }
   }*/
 
-  async sendMessage(roomId: string, senderId: string, format: string, message) {
-    const chatting = await this.chattingModel.get({ id: roomId });
-    chatting.messages.push({
-      sender: senderId,
-      format: format,
-      body: JSON.stringify(message),
-      createdAt: new Date().toISOString(),
-    });
+  /**
+   * 채팅방에 메시지를 전송합니다.
+   * @param chattingId
+   * @param message
+   */
+  async sendMessage(chattingId: string, message: Message) {
+    const chatting = await this.chattingModel.get({ id: chattingId });
+    chatting.messages.push(message);
     await this.chattingModel.update(
-      { id: roomId },
+      { id: chattingId },
       { messages: chatting.messages },
     );
 

@@ -42,18 +42,18 @@ export class OfferService {
       };
 
       //TODO: redis pub/sub으로 변경
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
-        userId,
-        'problem-image',
-        problemMessage,
-      );
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
-        userId,
-        'text',
-        requestMessage,
-      );
+      await this.chattingRepository.sendMessage(chatRoomId, {
+        sender: userId,
+        format: 'problem-image',
+        body: JSON.stringify(problemMessage),
+        createdAt: new Date().toISOString(),
+      });
+      await this.chattingRepository.sendMessage(chatRoomId, {
+        sender: userId,
+        format: 'text',
+        body: JSON.stringify(requestMessage),
+        createdAt: new Date().toISOString(),
+      });
 
       return new Success('질문 대기열에 추가되었습니다.', { questionId });
     } catch (error) {
