@@ -1,4 +1,5 @@
 import { AuthRepository } from '../auth/auth.repository';
+import { ChattingRepository } from '../chatting/chatting.repository';
 import { dynamooseModule } from '../config.dynamoose';
 import { redisProvider } from '../config.redis';
 import { RedisRepository } from '../redis/redis.repository';
@@ -17,6 +18,7 @@ import { JwtService } from '@nestjs/jwt';
   providers: [
     SocketRepository,
     SocketGateway,
+    ChattingRepository,
     RedisRepository,
     redisProvider,
     AuthRepository,

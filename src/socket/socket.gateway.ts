@@ -1,3 +1,5 @@
+import { ChattingRepository } from '../chatting/chatting.repository';
+import { Message } from '../chatting/entities/chatting.interface';
 import { RedisRepository } from '../redis/redis.repository';
 import { SocketRepository } from './socket.repository';
 import {
@@ -13,6 +15,7 @@ export class SocketGateway {
   server: Server;
 
   constructor(
+    private readonly chattingRepository: ChattingRepository,
     private readonly redisRepository: RedisRepository,
     private readonly socketRepository: SocketRepository,
   ) {}
@@ -26,10 +29,9 @@ export class SocketGateway {
       client.handshake.headers,
     );
 
+    // 접속 확인용 로그
     console.log(user.name, client.id);
-    client.join(user.role);
     await this.redisRepository.set(user.id, client.id);
-    await this.redisRepository.push(user.role, user.id);
   }
 
   /**
@@ -74,20 +76,33 @@ export class SocketGateway {
    */
   @SubscribeMessage('message')
   async handleMessage(client: any, payload: any) {
-    const { receiverId, questionId, type, body } = payload;
-    const senderId = await this.socketRepository
+    const { receiverId, chattingId, format, body } = payload;
+    const sender = await this.socketRepository
       .getUserFromAuthorization(client.handshake.headers)
       .then((user) => user.id);
 
     const receiverSocketId = await this.redisRepository.get(receiverId);
+    const message: Message = {
+      sender,
+      format,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+
+    // 로컬 소켓 브로드캐스트
     client.broadcast
       .to(receiverSocketId)
-      .emit('message', { senderId, questionId, type, body });
-    // TODO: EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
+      .emit('message', { chattingId, message });
+
+    // TODO: 레디스 브로드캐스트
+    // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
     await this.redisRepository.publish(
       receiverSocketId,
-      JSON.stringify({ senderId, questionId, type, body }),
+      JSON.stringify({ chattingId, message }),
     );
+
+    // DynamoDB에 메시지 저장
+    await this.chattingRepository.sendMessage(chattingId, message);
   }
 
   /**
