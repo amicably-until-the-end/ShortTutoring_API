@@ -46,13 +46,19 @@ export class QuestionRepository {
         selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
-        offerTeacherRooms: [],
+        offerTeachers: [],
         tutoringId: '',
         isSelect: false,
       });
     } catch (error) {
       throw new Error('질문을 생성할 수 없습니다.');
     }
+  }
+
+  async getStudentPendingQuestions(userId: string) {
+    return await this.questionModel
+      .scan({ studentId: userId, status: 'pending' })
+      .exec();
   }
 
   async createSelectedQuestion(
@@ -80,7 +86,7 @@ export class QuestionRepository {
         selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
-        offerTeacherRooms: [],
+        offerTeachers: [],
         tutoringId: '',
         isSelect: true,
       });
@@ -170,5 +176,22 @@ export class QuestionRepository {
     }
 
     return images;
+  }
+
+  async appendOffer(questionId: string, teacherId: string) {
+    const question = await this.questionModel.get({ id: questionId });
+    const offerTeacherRooms = question.offerTeachers;
+    if (offerTeacherRooms.includes(teacherId)) {
+      return null;
+    }
+    offerTeacherRooms.push(teacherId);
+    return await this.questionModel.update(
+      { id: questionId },
+      {
+        $ADD: {
+          offerTeachers: [teacherId],
+        },
+      },
+    );
   }
 }
