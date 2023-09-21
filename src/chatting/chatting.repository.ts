@@ -130,4 +130,11 @@ export class ChattingRepository {
   async findOne(chattingRoomId: string) {
     return await this.chattingModel.get({ id: chattingRoomId });
   }
+
+  async getTeachersId(chattingIds: string[]) {
+    const chatRooms = await this.chattingModel.batchGet(
+      chattingIds.map((id) => ({ id })),
+    );
+    return chatRooms.map((chatRoom) => chatRoom.teacherId);
+  }
 }
