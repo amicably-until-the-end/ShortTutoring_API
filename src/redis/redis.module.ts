@@ -11,6 +11,6 @@ import { Module } from '@nestjs/common';
     }),
   ],
   providers: [RedisRepository, redisPubProvider, redisSubProvider],
-  exports: [RedisRepository, redisPubProvider, redisSubProvider],
+  exports: [RedisRepository],
 })
 export class RedisModule {}

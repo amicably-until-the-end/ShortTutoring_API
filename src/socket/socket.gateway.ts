@@ -2,11 +2,13 @@ import { ChattingRepository } from '../chatting/chatting.repository';
 import { Message } from '../chatting/entities/chatting.interface';
 import { RedisRepository } from '../redis/redis.repository';
 import { SocketRepository } from './socket.repository';
+import { Inject } from '@nestjs/common';
 import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { RedisClientType } from 'redis';
 import { Server } from 'socket.io';
 
 @WebSocketGateway()
@@ -18,6 +20,7 @@ export class SocketGateway {
     private readonly chattingRepository: ChattingRepository,
     private readonly redisRepository: RedisRepository,
     private readonly socketRepository: SocketRepository,
+    @Inject('REDIS_SUB') private redisSub: RedisClientType,
   ) {}
 
   /**
@@ -30,7 +33,10 @@ export class SocketGateway {
     );
 
     await this.redisRepository.set(user.id, client.id);
-    await this.redisRepository.subscribe(client.id);
+    await this.redisSub.subscribe(client.id, (message) => {
+      client.emit('message', message);
+      console.log(message);
+    });
 
     // 접속 확인용 로그
     console.log(user.name, client.id);

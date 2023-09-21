@@ -1,13 +1,18 @@
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable } from '@nestjs/common';
+import { WebSocketServer } from '@nestjs/websockets';
 import { Cache } from 'cache-manager';
 import * as process from 'process';
 import { RedisClientType } from 'redis';
+import { Server } from 'socket.io';
 
 const ttl = 60 * 60 * 24;
 
 @Injectable()
 export class RedisRepository {
+  @WebSocketServer()
+  server: Server;
+
   constructor(
     @Inject(CACHE_MANAGER) private cache: Cache,
     @Inject('REDIS_PUB') private redisPub: RedisClientType,
@@ -80,6 +85,7 @@ export class RedisRepository {
     } else {
       await this.redisSub.subscribe(channel, (message) => {
         console.log('message : ', message);
+        console.log(this.server.sockets.adapter.rooms);
       });
     }
   }
