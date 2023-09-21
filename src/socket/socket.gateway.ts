@@ -29,9 +29,11 @@ export class SocketGateway {
       client.handshake.headers,
     );
 
+    await this.redisRepository.set(user.id, client.id);
+    await this.redisRepository.subscribe(client.id);
+
     // 접속 확인용 로그
     console.log(user.name, client.id);
-    await this.redisRepository.set(user.id, client.id);
   }
 
   /**
@@ -44,7 +46,7 @@ export class SocketGateway {
     );
 
     await this.redisRepository.del(user.id);
-    await this.redisRepository.del(user.role);
+    await this.redisRepository.unsubscribe(client.id);
   }
 
   /**

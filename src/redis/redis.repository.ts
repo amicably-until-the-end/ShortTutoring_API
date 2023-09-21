@@ -13,6 +13,24 @@ export class RedisRepository {
     @Inject('REDIS_CLIENT') private redis: RedisClientType,
   ) {}
 
+  async subscribe(channel: string) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
+    } else {
+      await this.redis.subscribe(channel, (message) => {
+        console.log('message : ', message);
+      });
+    }
+  }
+
+  async unsubscribe(channel: string) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
+    } else {
+      await this.redis.unsubscribe(channel);
+    }
+  }
+
   async set(key: string, value: any) {
     if (process.env.NODE_ENV === 'local') {
       await this.cache.set(key, value, ttl);
