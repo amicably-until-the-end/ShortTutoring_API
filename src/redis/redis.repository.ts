@@ -4,6 +4,8 @@ import { Cache } from 'cache-manager';
 import * as process from 'process';
 import { RedisClientType } from 'redis';
 
+const ttl = 60 * 60 * 24;
+
 @Injectable()
 export class RedisRepository {
   constructor(
@@ -13,7 +15,7 @@ export class RedisRepository {
 
   async set(key: string, value: any) {
     if (process.env.NODE_ENV === 'local') {
-      await this.cache.set(key, value, 60 * 60 * 24);
+      await this.cache.set(key, value, ttl);
     } else {
       await this.redis.set(key, value);
     }
@@ -47,7 +49,7 @@ export class RedisRepository {
     if (process.env.NODE_ENV === 'local') {
       const currentValue: Array<any> = await this.cache.get(key);
       if (currentValue === undefined) {
-        await this.cache.set(key, [value], 60 * 60 * 24);
+        await this.cache.set(key, [value], ttl);
       } else {
         currentValue.push(value);
         await this.cache.set(key, currentValue);
