@@ -10,32 +10,18 @@ const ttl = 60 * 60 * 24;
 export class RedisRepository {
   constructor(
     @Inject(CACHE_MANAGER) private cache: Cache,
-    @Inject('REDIS_CLIENT') private redis: RedisClientType,
+    @Inject('REDIS_PUB') private redisPub: RedisClientType,
+    @Inject('REDIS_SUB') private redisSub: RedisClientType,
   ) {}
 
-  async subscribe(channel: string) {
-    if (process.env.NODE_ENV === 'local') {
-      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
-    } else {
-      await this.redis.subscribe(channel, (message) => {
-        console.log('message : ', message);
-      });
-    }
-  }
-
-  async unsubscribe(channel: string) {
-    if (process.env.NODE_ENV === 'local') {
-      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
-    } else {
-      await this.redis.unsubscribe(channel);
-    }
-  }
-
+  /*
+   REDIS_PUB
+   */
   async set(key: string, value: any) {
     if (process.env.NODE_ENV === 'local') {
       await this.cache.set(key, value, ttl);
     } else {
-      await this.redis.set(key, value);
+      await this.redisPub.set(key, value);
     }
   }
 
@@ -43,7 +29,7 @@ export class RedisRepository {
     if (process.env.NODE_ENV === 'local') {
       return await this.cache.get(key);
     } else {
-      return await this.redis.get(key);
+      return await this.redisPub.get(key);
     }
   }
 
@@ -51,7 +37,7 @@ export class RedisRepository {
     if (process.env.NODE_ENV === 'local') {
       return await this.cache.store.keys();
     } else {
-      return await this.redis.keys('*');
+      return await this.redisPub.keys('*');
     }
   }
 
@@ -59,7 +45,7 @@ export class RedisRepository {
     if (process.env.NODE_ENV === 'local') {
       await this.cache.del(key);
     } else {
-      await this.redis.del(key);
+      await this.redisPub.del(key);
     }
   }
 
@@ -73,7 +59,7 @@ export class RedisRepository {
         await this.cache.set(key, currentValue);
       }
     } else {
-      await this.redis.rPush(key, value);
+      await this.redisPub.rPush(key, value);
     }
   }
 
@@ -81,7 +67,28 @@ export class RedisRepository {
     if (process.env.NODE_ENV === 'local') {
       // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
     } else {
-      await this.redis.publish(channel, message);
+      await this.redisPub.publish(channel, message);
+    }
+  }
+
+  /*
+    REDIS_SUB
+   */
+  async subscribe(channel: string) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
+    } else {
+      await this.redisSub.subscribe(channel, (message) => {
+        console.log('message : ', message);
+      });
+    }
+  }
+
+  async unsubscribe(channel: string) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
+    } else {
+      await this.redisSub.unsubscribe(channel);
     }
   }
 }
