@@ -117,7 +117,8 @@ export class OfferService {
           await this.chattingRepository.sendMessage(
             teacherChatId,
             userId,
-            'select-other',
+            'text',
+            '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
           );
         }
       }
