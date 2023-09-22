@@ -36,12 +36,6 @@ export class ChattingService {
           return this.makeChatItem({ roomInfo, questionInfo }, userInfo);
         }),
       );
-      console.log(
-        'rooms',
-        chatRooms.map((room) => {
-          room.id, room.questionId;
-        }),
-      );
 
       const chatLists = this.groupChatRoomByState(chatRooms);
       if (userInfo.role == 'student') {
@@ -49,7 +43,6 @@ export class ChattingService {
           chatLists.normalReserved,
         );
       }
-      console.log('chatLists', chatLists);
 
       return new Success('채팅방 목록을 불러왔습니다.', chatLists);
     } catch (error) {
@@ -67,11 +60,12 @@ export class ChattingService {
           teachers: [chatRoom],
           isTeacherRoom: false,
           roomImage: chatRoom.problemImage,
-          title: chatRoom.problemImage,
+          title: chatRoom.questionInfo.problem.description,
           schoolSubject: chatRoom.schoolSubject,
           schoolLevel: chatRoom.schoolLevel,
           status: ChattingStatus.pending,
           questionId: chatRoom.questionId,
+          problemImage: chatRoom.problemImage,
           isSelect: false,
         };
         result[chatRoom.questionId] = questionRoom;
@@ -81,7 +75,6 @@ export class ChattingService {
   }
 
   groupChatRoomByState(chatRooms: ChatRoom[]): ChatList {
-    console.log('chatRooms function', chatRooms.length);
     const result: ChatList = {
       normalProposed: [],
       normalReserved: [],
@@ -109,7 +102,9 @@ export class ChattingService {
     return result;
   }
 
-  makeChatItem(nestChatRoom: NestedChatRoomInfo, userInfo: User): ChatRoom {
+  async makeChatItem(nestChatRoom: NestedChatRoomInfo, userInfo: User) {
+    //DB의 질문 정보와 채팅 정보를 API를 호출 한 사람에 맞게 가공한다.
+
     const { roomInfo, questionInfo } = nestChatRoom;
 
     let status: ChattingStatus;
@@ -121,18 +116,41 @@ export class ChattingService {
           ? ChattingStatus.reserved
           : ChattingStatus.pending;
     }
+    let roomImage: string;
+    try {
+      if (userInfo.role == 'student') {
+        const teacherInfo = await this.userRepository.get(roomInfo.teacherId);
+        roomImage = teacherInfo.profileImage;
+      } else {
+        const studentInfo = await this.userRepository.get(roomInfo.studentId);
+        roomImage = studentInfo.profileImage;
+      }
+    } catch (error) {
+      //유저 정보를 가져오는데 실패한 경우.
+      roomImage = undefined;
+    }
 
     const chatRoom: ChatRoom = {
       id: roomInfo.id,
-      messages: roomInfo.messages,
-      opponentId: undefined,
+      messages: roomInfo.messages.map((message) => {
+        const { body, ...rest } = message;
+        try {
+          return { body: JSON.parse(body), ...rest };
+        } catch (e) {
+          return { body: { text: body }, ...rest, format: 'text' };
+        }
+      }),
       status: status,
-      roomImage: questionInfo.problem.mainImage,
+      roomImage: roomImage,
       questionId: questionInfo.id,
       schoolSubject: questionInfo.problem.schoolSubject,
       schoolLevel: questionInfo.problem.schoolLevel,
+      problemImage: questionInfo.problem.mainImage,
       isSelect: questionInfo.isSelect,
+      opponentId:
+        userInfo.role == 'student' ? roomInfo.teacherId : roomInfo.studentId,
       isTeacherRoom: true,
+      questionInfo: questionInfo,
       title: undefined,
     };
     return chatRoom;
