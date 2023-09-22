@@ -73,8 +73,8 @@ export class OfferController {
   ) {
     return this.offerService.accept(
       AccessToken.userId(headers),
+      acceptOfferDto.chattingId,
       questionId,
-      acceptOfferDto.teacherId,
     );
   }
 }

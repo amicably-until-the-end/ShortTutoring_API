@@ -34,6 +34,20 @@ export class ChattingService {
 
       const normalProposedGrouping = {};
 
+      if (userRole == 'student') {
+        const pendingQuestions =
+          await this.questionRepository.getStudentPendingQuestions(userId);
+        pendingQuestions.map((question) => {
+          normalProposedGrouping[question.id] = {
+            teachers: [],
+            isTeacherRoom: false,
+            roomImage: question.problem.mainImage,
+            title: question.problem.description,
+            subject: question.problem.schoolSubject,
+          };
+        });
+      }
+
       if (chattingRoomIds.length > 0) {
         const roomInfos = await this.chattingRepository.getChatRoomsInfo(
           chattingRoomIds,
@@ -52,8 +66,9 @@ export class ChattingService {
               roomImage: undefined,
               id: roomInfo.id,
               messages: roomInfo.messages.map((message) => {
+                const isMyMsg = message.sender == userId;
                 const { body, ...rest } = message;
-                return { body: JSON.parse(body), ...rest };
+                return { body: JSON.parse(body), isMyMsg: isMyMsg, ...rest };
               }),
               opponentId: undefined,
               questionState: status,
@@ -105,14 +120,6 @@ export class ChattingService {
                   normalProposedGrouping[roomInfo.questionId].teachers.push(
                     roomInfo,
                   );
-                } else {
-                  normalProposedGrouping[roomInfo.questionId] = {
-                    teachers: [roomInfo],
-                    isTeacherRoom: false,
-                    questionImage: roomInfo.problemImages,
-                    title: roomInfo.description,
-                    subject: roomInfo.schoolSubject,
-                  };
                 }
               } else {
                 result.normalProposed.push(roomInfo);

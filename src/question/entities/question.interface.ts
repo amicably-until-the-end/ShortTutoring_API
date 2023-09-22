@@ -13,7 +13,7 @@ export interface Problem {
 export interface Question extends QuestionKey {
   status: string;
   studentId: string;
-  offerTeacherRooms: string[];
+  offerTeachers: string[];
   problem: Problem;
   selectedTeacherId?: string;
   tutoringId: string;

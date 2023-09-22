@@ -17,8 +17,8 @@ export class TutoringController {
 
   @ApiBearerAuth('Authorization')
   @ApiOperation(TutoringOperation.info)
-  @Get('info/:tutoringId')
-  info(@Param('tutoringId') tutoringId: string) {
-    return this.tutoringService.info(tutoringId);
+  @Get('info/:questionId')
+  info(@Param('questionId') questionId: string) {
+    return this.tutoringService.info(questionId);
   }
 }
