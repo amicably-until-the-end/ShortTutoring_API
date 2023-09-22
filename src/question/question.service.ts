@@ -62,6 +62,7 @@ export class QuestionService {
         await this.questionRepository.createSelectedQuestion(
           questionId,
           userId,
+          teacherId,
           createQuestionDto,
           problemImages,
         );

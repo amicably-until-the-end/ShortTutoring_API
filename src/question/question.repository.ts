@@ -64,6 +64,7 @@ export class QuestionRepository {
   async createSelectedQuestion(
     questionId: string,
     userId: string,
+    selectedTeacherId: string,
     createQuestionDto: CreateSelectedQuestionDto,
     problemImages: string[],
   ): Promise<Question> {
@@ -83,7 +84,7 @@ export class QuestionRepository {
           schoolLevel: createQuestionDto.schoolLevel,
           schoolSubject: createQuestionDto.schoolSubject,
         },
-        selectedTeacherId: '',
+        selectedTeacherId: selectedTeacherId,
         status: 'pending',
         studentId: userId,
         offerTeachers: [],
@@ -127,6 +128,13 @@ export class QuestionRepository {
     return await this.questionModel.update(
       { id: questionId },
       { status: status },
+    );
+  }
+
+  async setSeletedTeacherId(questionId: string, teacherId: string) {
+    return await this.questionModel.update(
+      { id: questionId },
+      { selectedTeacherId: teacherId },
     );
   }
 
