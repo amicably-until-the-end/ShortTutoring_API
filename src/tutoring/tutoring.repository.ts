@@ -33,8 +33,6 @@ export class TutoringRepository {
       teacherId,
       status: 'reserved',
       matchedAt: new Date().toISOString(),
-      startedAt: '',
-      endedAt: '',
       whiteBoardAppId,
       whiteBoardUUID,
       whiteBoardToken,
