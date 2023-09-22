@@ -1,4 +1,4 @@
-import { redisProvider } from '../config.redis';
+import { redisPubProvider, redisSubProvider } from '../config.redis';
 import { RedisRepository } from './redis.repository';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
@@ -10,7 +10,7 @@ import { Module } from '@nestjs/common';
       isGlobal: true,
     }),
   ],
-  providers: [RedisRepository, redisProvider],
-  exports: [RedisRepository, redisProvider],
+  providers: [RedisRepository, redisPubProvider, redisSubProvider],
+  exports: [RedisRepository],
 })
 export class RedisModule {}

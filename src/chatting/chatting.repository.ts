@@ -51,6 +51,13 @@ export class ChattingRepository {
     }
   }*/
 
+  /**
+   * 채팅방에 메시지를 전송합니다.
+   * @param roomId
+   * @param senderId
+   * @param format
+   * @param message
+   */
   async sendMessage(
     roomId: string,
     senderId: string,
