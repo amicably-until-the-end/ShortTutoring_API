@@ -58,6 +58,13 @@ export class QuestionService {
         questionId,
         createQuestionDto,
       );
+
+      try {
+        await this.userRepository.get(teacherId);
+      } catch (e) {
+        return new Fail('해당 선생님을 찾을 수 없습니다.');
+      }
+
       const question: Question =
         await this.questionRepository.createSelectedQuestion(
           questionId,
