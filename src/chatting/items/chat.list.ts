@@ -31,6 +31,7 @@ export interface ChatRoom {
   schoolLevel: string;
   isSelect: boolean;
   isTeacherRoom: boolean;
+  questionInfo?: Question;
   teachers?: ChatRoom[];
   questionId: string;
 }
