@@ -33,6 +33,8 @@ export class TutoringRepository {
       teacherId,
       status: 'reserved',
       matchedAt: new Date().toISOString(),
+      startedAt: '',
+      endedAt: '',
       whiteBoardAppId,
       whiteBoardUUID,
       whiteBoardToken,
@@ -55,21 +57,6 @@ export class TutoringRepository {
     return await this.tutoringModel.update(
       { id: tutoringId },
       { reservedStart: startTime, reservedEnd: endTime },
-    );
-  }
-
-  async startTutoring(tutoringId: string) {
-    const tutoring = await this.tutoringModel.get({ id: tutoringId });
-    if (tutoring === undefined) {
-      throw new Error('숏과외를 찾을 수 없습니다.');
-    }
-    if (tutoring.startedAt != undefined) {
-      throw new Error('이미 시작된 과외입니다.');
-    }
-
-    return await this.tutoringModel.update(
-      { id: tutoringId },
-      { startedAt: new Date().toISOString(), status: 'going' },
     );
   }
 
