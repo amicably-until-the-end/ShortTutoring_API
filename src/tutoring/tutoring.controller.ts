@@ -1,6 +1,8 @@
+import { AccessToken } from '../auth/entities/auth.entity';
 import { TutoringOperation } from './descriptions/tutoring.operation';
+import { AppointTutoringDto } from './dto/create-tutoring.dto';
 import { TutoringService } from './tutoring.service';
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Tutoring')
@@ -18,7 +20,31 @@ export class TutoringController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(TutoringOperation.info)
   @Get('info/:questionId')
-  info(@Param('questionId') questionId: string) {
-    return this.tutoringService.info(questionId);
+  info(@Param('questionId') questionId: string, @Headers() headers: Headers) {
+    return this.tutoringService.info(questionId, AccessToken.userId(headers));
+  }
+
+  @ApiTags('Teacher')
+  @ApiBearerAuth('Authorization')
+  @Get('start/:questionId')
+  start(@Param('questionId') questionId: string, @Headers() headers: Headers) {
+    return this.tutoringService.startTutoring(
+      AccessToken.userId(headers),
+      questionId,
+    );
+  }
+
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(TutoringOperation.appoint)
+  @Post('appoint/:questionId')
+  appoint(
+    @Param('questionId') questionId: string,
+    @Body() appointTutoringDto: AppointTutoringDto,
+  ) {
+    return this.tutoringService.reserveTutoring(
+      questionId,
+      appointTutoringDto.startTime,
+      appointTutoringDto.endTime,
+    );
   }
 }

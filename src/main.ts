@@ -1,5 +1,6 @@
 import { AppModule } from './app.module';
 import { configSwagger } from './config.swagger';
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import * as dotenv from 'dotenv';
 import { json, urlencoded } from 'express';
@@ -9,7 +10,7 @@ async function bootstrap() {
   app.enableCors();
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ limit: '50mb', extended: false }));
-
+  app.useGlobalPipes(new ValidationPipe({ transform: true }));
   dotenv.config();
   configSwagger(app);
 
