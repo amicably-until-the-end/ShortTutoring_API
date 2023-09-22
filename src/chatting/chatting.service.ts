@@ -1,8 +1,15 @@
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
+import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
 import { ChattingRepository } from './chatting.repository';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
+import {
+  ChatList,
+  ChatRoom,
+  ChattingStatus,
+  NestedChatRoomInfo,
+} from './items/chat.list';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -17,143 +24,118 @@ export class ChattingService {
     try {
       const userInfo = await this.userRepository.get(userId);
 
-      const chattingRoomIds = userInfo.participatingChattingRooms.map(
-        (roomId) => {
-          return { id: roomId };
-        },
+      const chatRooms: ChatRoom[] = await Promise.all(
+        //Join Chatting & Question
+        userInfo.participatingChattingRooms.map(async (roomId) => {
+          const roomInfo = await this.chattingRepository.getChatRoomInfo(
+            roomId,
+          );
+          const questionInfo = await this.questionRepository.getInfo(
+            roomInfo.questionId,
+          );
+          return this.makeChatItem({ roomInfo, questionInfo }, userInfo);
+        }),
+      );
+      console.log(
+        'rooms',
+        chatRooms.map((room) => {
+          room.id, room.questionId;
+        }),
       );
 
-      const userRole = userInfo.role;
-
-      const result = {
-        normalProposed: [],
-        normalReserved: [],
-        selectedProposed: [],
-        selectedReserved: [],
-      };
-
-      const normalProposedGrouping = {};
-
-      if (userRole == 'student') {
-        const pendingQuestions =
-          await this.questionRepository.getStudentPendingQuestions(userId);
-        pendingQuestions.map((question) => {
-          normalProposedGrouping[question.id] = {
-            teachers: [],
-            isTeacherRoom: false,
-            roomImage: question.problem.mainImage,
-            title: question.problem.description,
-            subject: question.problem.schoolSubject,
-          };
-        });
-      }
-
-      if (chattingRoomIds.length > 0) {
-        const roomInfos = await this.chattingRepository.getChatRoomsInfo(
-          chattingRoomIds,
+      const chatLists = this.groupChatRoomByState(chatRooms);
+      if (userInfo.role == 'student') {
+        chatLists.normalProposed = this.groupNormalProposedForStudent(
+          chatLists.normalReserved,
         );
-        const roomInfosWithQuestion = await Promise.all(
-          roomInfos?.map(async (roomInfo) => {
-            const questionInfo = await this.questionRepository.getInfo(
-              roomInfo.questionId,
-            );
-            console.log(questionInfo);
-            const { status, isSelect, selectedTeacherId } = questionInfo;
-            const { schoolSubject, schoolLevel, description } =
-              questionInfo.problem;
-
-            let chatState: 'pending' | 'reserved' | 'refused' = 'pending';
-
-            if (status == 'pending') {
-              chatState = 'pending';
-            } else if (status == 'reserved') {
-              if (userRole == 'student' || selectedTeacherId == userId) {
-                chatState = 'reserved';
-              } else {
-                // 선생님이 api 부른 경우에 거절 당한 경우.
-                chatState = 'refused';
-              }
-            }
-
-            const item = {
-              roomImage: undefined,
-              id: roomInfo.id,
-              messages: roomInfo.messages.map((message) => {
-                const isMyMsg = message.sender == userId;
-                const { body, ...rest } = message;
-                return { body: JSON.parse(body), isMyMsg: isMyMsg, ...rest };
-              }),
-              opponentId: undefined,
-              questionState: chatState,
-              problemImages: questionInfo.problem.mainImage,
-              isSelect: isSelect,
-              isTeacherRoom: true,
-              questionId: roomInfo.questionId,
-              schoolSubject: schoolSubject,
-              schoolLevel: schoolLevel,
-              title: undefined,
-              description: description,
-            };
-
-            if (userRole == 'student') {
-              const teacherInfo = await this.userRepository.get(
-                roomInfo.teacherId,
-              );
-              const { profileImage, name } = teacherInfo;
-              item.roomImage = profileImage;
-              item.title = name;
-              item.opponentId = teacherInfo.id;
-            } else {
-              const studentInfo = await this.userRepository.get(
-                roomInfo.studentId,
-              );
-              const { profileImage, name } = studentInfo;
-              item.roomImage = profileImage;
-              item.title = name;
-              item.opponentId = studentInfo.id;
-            }
-
-            return item;
-          }),
-        );
-
-        roomInfosWithQuestion.forEach((roomInfo) => {
-          if (roomInfo.isSelect) {
-            //지정 질문
-            if (roomInfo.questionState === 'pending') {
-              result.selectedProposed.push(roomInfo);
-            } else if (roomInfo.questionState === 'reserved') {
-              result.selectedReserved.push(roomInfo);
-            }
-          } else {
-            //일반 질문
-            if (
-              roomInfo.questionState === 'pending' ||
-              roomInfo.questionState === 'refused'
-            ) {
-              if (userRole == 'student') {
-                //grouping by questionId
-                if (normalProposedGrouping[roomInfo.questionId]) {
-                  normalProposedGrouping[roomInfo.questionId].teachers.push(
-                    roomInfo,
-                  );
-                }
-              } else {
-                result.normalProposed.push(roomInfo);
-              }
-            } else {
-              result.normalReserved.push(roomInfo);
-            }
-          }
-        });
       }
-      if (Object.keys(normalProposedGrouping).length > 0) {
-        result.normalProposed = Object.values(normalProposedGrouping);
-      }
-      return new Success('채팅방 목록을 불러왔습니다.', result);
+      console.log('chatLists', chatLists);
+
+      return new Success('채팅방 목록을 불러왔습니다.', chatLists);
     } catch (error) {
       return new Fail(error.message);
     }
+  }
+
+  groupNormalProposedForStudent(chatRooms: ChatRoom[]): ChatRoom[] {
+    const result = {};
+    chatRooms.forEach((chatRoom) => {
+      if (chatRoom.questionId in result) {
+        result[chatRoom.questionId].teachers.push(chatRoom);
+      } else {
+        const questionRoom: ChatRoom = {
+          teachers: [chatRoom],
+          isTeacherRoom: false,
+          roomImage: chatRoom.problemImage,
+          title: chatRoom.problemImage,
+          schoolSubject: chatRoom.schoolSubject,
+          schoolLevel: chatRoom.schoolLevel,
+          status: ChattingStatus.pending,
+          questionId: chatRoom.questionId,
+          isSelect: false,
+        };
+        result[chatRoom.questionId] = questionRoom;
+      }
+    });
+    return Object.values(result);
+  }
+
+  groupChatRoomByState(chatRooms: ChatRoom[]): ChatList {
+    console.log('chatRooms function', chatRooms.length);
+    const result: ChatList = {
+      normalProposed: [],
+      normalReserved: [],
+      selectedProposed: [],
+      selectedReserved: [],
+    };
+
+    chatRooms.forEach((chatRoom) => {
+      if (chatRoom.isSelect) {
+        if (chatRoom.status == ChattingStatus.pending) {
+          result.selectedProposed.push(chatRoom);
+        }
+        if (chatRoom.status == ChattingStatus.reserved) {
+          result.selectedReserved.push(chatRoom);
+        }
+      } else {
+        if (chatRoom.status == ChattingStatus.pending) {
+          result.normalProposed.push(chatRoom);
+        }
+        if (chatRoom.status == ChattingStatus.reserved) {
+          result.normalReserved.push(chatRoom);
+        }
+      }
+    });
+    return result;
+  }
+
+  makeChatItem(nestChatRoom: NestedChatRoomInfo, userInfo: User): ChatRoom {
+    const { roomInfo, questionInfo } = nestChatRoom;
+
+    let status: ChattingStatus;
+    if (questionInfo.status == 'pending') {
+      status = ChattingStatus.pending;
+    } else if (questionInfo.status == 'reserved') {
+      status =
+        roomInfo.teacherId == questionInfo.selectedTeacherId
+          ? ChattingStatus.reserved
+          : ChattingStatus.pending;
+    }
+
+    const chatRoom: ChatRoom = {
+      id: roomInfo.id,
+      messages: roomInfo.messages,
+      opponentId: undefined,
+      status: status,
+      roomImage: questionInfo.problem.mainImage,
+      questionId: questionInfo.id,
+      schoolSubject: questionInfo.problem.schoolSubject,
+      schoolLevel: questionInfo.problem.schoolLevel,
+      isSelect: questionInfo.isSelect,
+      isTeacherRoom: true,
+      title: undefined,
+    };
+    return chatRoom;
   }
 
   /*
