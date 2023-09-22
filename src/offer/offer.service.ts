@@ -102,7 +102,27 @@ export class OfferService {
         chatting.teacherId,
       );
 
-      return new Success('선생님 선택이 완료되었습니다.', tutoring);
+      const question = await this.questionRepository.getInfo(questionId);
+
+      const offerTeacherIds = question.offerTeachers;
+
+      for (const offerTeacherId of offerTeacherIds) {
+        if (offerTeacherId != chatting.teacherId) {
+          const teacherChatId =
+            await this.chattingRepository.getIdByQuestionAndTeacher(
+              questionId,
+              offerTeacherId,
+            );
+          //TODO: redis pub/sub으로 변경
+          await this.chattingRepository.sendMessage(
+            teacherChatId,
+            userId,
+            'select-other',
+          );
+        }
+      }
+
+      return new Success('선생님 선택이 완료되었습니다.');
     } catch (error) {
       return new Fail(error.message);
     }

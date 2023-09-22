@@ -51,7 +51,12 @@ export class ChattingRepository {
     }
   }*/
 
-  async sendMessage(roomId: string, senderId: string, format: string, message) {
+  async sendMessage(
+    roomId: string,
+    senderId: string,
+    format: string,
+    message?: any,
+  ) {
     const chatting = await this.chattingModel.get({ id: roomId });
     chatting.messages.push({
       sender: senderId,
@@ -71,6 +76,16 @@ export class ChattingRepository {
     return await this.chattingModel.get({
       id: roomId,
     });
+  }
+
+  async getIdByQuestionAndTeacher(questionId: string, teacherId: string) {
+    const result = await this.chattingModel
+      .scan({ questionId, teacherId })
+      .exec();
+    if (result.length > 0) {
+      return result[0].id;
+    }
+    throw new Error('채팅방을 찾을 수 없습니다.');
   }
 
   async getChatRoomsInfo(roomIds: ChattingKey[]) {
