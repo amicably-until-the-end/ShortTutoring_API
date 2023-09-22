@@ -68,12 +68,13 @@ export class QuestionRepository {
     createQuestionDto: CreateSelectedQuestionDto,
     problemImages: string[],
   ): Promise<Question> {
-    const user: User = await this.userRepository.get(userId);
-    if (user.role === 'teacher') {
-      throw new Error('선생님은 질문을 생성할 수 없습니다.');
-    }
-
     try {
+      const user: User = await this.userRepository.get(userId);
+
+      if (user.role === 'teacher') {
+        throw new Error('선생님은 질문을 생성할 수 없습니다.');
+      }
+
       return await this.questionModel.create({
         createdAt: new Date().toISOString(),
         id: questionId,
