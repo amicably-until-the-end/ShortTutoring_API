@@ -117,17 +117,16 @@ export class ChattingService {
           : ChattingStatus.pending;
     }
     let roomImage: string;
+    let opponentInfo: User | undefined;
+
     try {
       if (userInfo.role == 'student') {
-        const teacherInfo = await this.userRepository.get(roomInfo.teacherId);
-        roomImage = teacherInfo.profileImage;
+        opponentInfo = await this.userRepository.get(roomInfo.teacherId);
       } else {
-        const studentInfo = await this.userRepository.get(roomInfo.studentId);
-        roomImage = studentInfo.profileImage;
+        opponentInfo = await this.userRepository.get(roomInfo.studentId);
       }
     } catch (error) {
       //유저 정보를 가져오는데 실패한 경우.
-      roomImage = undefined;
     }
 
     const chatRoom: ChatRoom = {
@@ -147,11 +146,10 @@ export class ChattingService {
       schoolLevel: questionInfo.problem.schoolLevel,
       problemImage: questionInfo.problem.mainImage,
       isSelect: questionInfo.isSelect,
-      opponentId:
-        userInfo.role == 'student' ? roomInfo.teacherId : roomInfo.studentId,
+      opponentId: opponentInfo?.id,
       isTeacherRoom: true,
       questionInfo: questionInfo,
-      title: undefined,
+      title: opponentInfo?.name,
     };
     return chatRoom;
   }
