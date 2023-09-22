@@ -26,10 +26,6 @@ export const ChattingSchema = new Schema({
   teacherId: {
     type: String,
   },
-  status: {
-    type: String,
-    enum: ['pending', 'reserved', 'refused'],
-  },
   questionId: {
     type: String,
   },
