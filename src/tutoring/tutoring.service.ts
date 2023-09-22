@@ -25,6 +25,33 @@ export class TutoringService {
     }
   }
 
+  async reserveTutoring(questionId: string, startTime: Date, endTime: Date) {
+    try {
+      const question = await this.questionRepository.getInfo(questionId);
+
+      if (question.tutoringId != null)
+        return new Fail('이미 과외가 확정되었습니다.');
+
+      const tutoring = await this.tutoringRepository.create(
+        questionId,
+        question.studentId,
+        question.selectedTeacherId,
+      );
+
+      const result = await this.tutoringRepository.reserveTutoring(
+        tutoring.id,
+        startTime,
+        endTime,
+      );
+
+      await this.questionRepository.changeStatus(questionId, 'reserved');
+
+      return new Success('수업 시간이 확정되었습니다.', { result });
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
   async info(questionId: string) {
     try {
       const question = await this.questionRepository.getInfo(questionId);

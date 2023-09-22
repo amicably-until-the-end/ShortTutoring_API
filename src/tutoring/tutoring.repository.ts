@@ -12,11 +12,7 @@ export class TutoringRepository {
     private readonly agoraService: AgoraService,
   ) {}
 
-  async create(
-    questionId: string,
-    studentId: string,
-    teacherId: string,
-  ): Promise<Tutoring> {
+  async create(questionId: string, studentId: string, teacherId: string) {
     const tutoringId = uuid();
 
     const { whiteBoardAppId, whiteBoardUUID, whiteBoardToken }: WhiteBoardData =
@@ -30,12 +26,12 @@ export class TutoringRepository {
       throw new Error('화이트보드 토큰을 생성할 수 없습니다');
     }
 
-    const tutoring = {
+    const tutoringInfo = {
       id: tutoringId,
       questionId,
       studentId,
       teacherId,
-      status: 'matched',
+      status: 'reserved',
       matchedAt: new Date().toISOString(),
       startedAt: '',
       endedAt: '',
@@ -46,8 +42,22 @@ export class TutoringRepository {
       studentRTCToken: studentToken,
       RTCAppId: process.env.AGORA_RTC_APP_ID,
     };
-    await this.tutoringModel.create(tutoring);
-    return tutoring;
+    return await this.tutoringModel.create(tutoringInfo);
+  }
+
+  async reserveTutoring(tutoringId: string, startTime: Date, endTime: Date) {
+    const tutoring = await this.tutoringModel.get({ id: tutoringId });
+    if (tutoring === undefined) {
+      throw new Error('숏과외를 찾을 수 없습니다.');
+    }
+    if (tutoring.reservedStart != undefined) {
+      throw new Error('이미 예약된 과외입니다.');
+    }
+
+    return await this.tutoringModel.update(
+      { id: tutoringId },
+      { reservedStart: startTime, reservedEnd: endTime },
+    );
   }
 
   async get(tutoringId: string): Promise<Tutoring> {

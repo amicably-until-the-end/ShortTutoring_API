@@ -3,7 +3,7 @@ export interface TutoringKey {
 }
 
 export interface Tutoring extends TutoringKey {
-  requestId?: string;
+  questionId: string;
   studentId: string;
   teacherId: string;
   status: string;
@@ -16,4 +16,6 @@ export interface Tutoring extends TutoringKey {
   teacherRTCToken?: string;
   studentRTCToken?: string;
   RTCAppId?: string;
+  reservedStart?: Date;
+  reservedEnd?: Date;
 }

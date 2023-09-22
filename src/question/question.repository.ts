@@ -123,6 +123,13 @@ export class QuestionRepository {
     return await this.questionModel.get({ id: questionId });
   }
 
+  async changeStatus(questionId: string, status: string) {
+    return await this.questionModel.update(
+      { id: questionId },
+      { status: status },
+    );
+  }
+
   async delete(userId: string, questionId: string) {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
