@@ -58,9 +58,22 @@ export class ChattingService {
               roomInfo.questionId,
             );
             console.log(questionInfo);
-            const { status, isSelect } = questionInfo;
+            const { status, isSelect, selectedTeacherId } = questionInfo;
             const { schoolSubject, schoolLevel, description } =
               questionInfo.problem;
+
+            let chatState: 'pending' | 'reserved' | 'refused' = 'pending';
+
+            if (status == 'pending') {
+              chatState = 'pending';
+            } else if (status == 'reserved') {
+              if (userRole == 'student' || selectedTeacherId == userId) {
+                chatState = 'reserved';
+              } else {
+                // 선생님이 api 부른 경우에 거절 당한 경우.
+                chatState = 'refused';
+              }
+            }
 
             const item = {
               roomImage: undefined,
@@ -71,7 +84,7 @@ export class ChattingService {
                 return { body: JSON.parse(body), isMyMsg: isMyMsg, ...rest };
               }),
               opponentId: undefined,
-              questionState: status,
+              questionState: chatState,
               problemImages: questionInfo.problem.mainImage,
               isSelect: isSelect,
               isTeacherRoom: true,
@@ -79,7 +92,6 @@ export class ChattingService {
               schoolSubject: schoolSubject,
               schoolLevel: schoolLevel,
               title: undefined,
-              status: status,
               description: description,
             };
 
@@ -107,13 +119,18 @@ export class ChattingService {
 
         roomInfosWithQuestion.forEach((roomInfo) => {
           if (roomInfo.isSelect) {
-            if (roomInfo.status === 'pending') {
+            //지정 질문
+            if (roomInfo.questionState === 'pending') {
               result.selectedProposed.push(roomInfo);
-            } else if (roomInfo.status === 'reserved') {
+            } else if (roomInfo.questionState === 'reserved') {
               result.selectedReserved.push(roomInfo);
             }
           } else {
-            if (roomInfo.status === 'pending') {
+            //일반 질문
+            if (
+              roomInfo.questionState === 'pending' ||
+              roomInfo.questionState === 'refused'
+            ) {
               if (userRole == 'student') {
                 //grouping by questionId
                 if (normalProposedGrouping[roomInfo.questionId]) {
