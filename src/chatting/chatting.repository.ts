@@ -103,7 +103,11 @@ export class ChattingRepository {
    * 채팅 객체를 생성 합니다
    * 이 함수는 user.participantingChattingRooms 에 추가 해주지 않음
    */
-  async makeChatRoom(teacherId: string, studentId: string, questionId: string) {
+  async makeChatRoom(
+    teacherId: string,
+    studentId: string,
+    questionId: string,
+  ): Promise<string> {
     const chattingRoomId = uuid();
     const chatting: Chatting = {
       id: chattingRoomId,
