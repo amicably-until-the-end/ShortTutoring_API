@@ -19,7 +19,16 @@ export class OfferService {
       //await this.offerRepository.append(userId, questionId);
 
       const questionInfo = await this.questionRepository.getInfo(questionId);
+
       const studentId = questionInfo.studentId;
+
+      const offerSuccess = await this.questionRepository.appendOffer(
+        questionId,
+        userId,
+      );
+      if (offerSuccess == null) {
+        return new Fail('이미 신청한 질문 입니다.');
+      }
 
       const chatRoomId = await this.chattingRepository.makeChatRoom(
         userId,
@@ -42,20 +51,20 @@ export class OfferService {
       };
 
       //TODO: redis pub/sub으로 변경
-      await this.chattingRepository.sendMessage(chatRoomId, {
-        sender: userId,
-        format: 'problem-image',
-        body: JSON.stringify(problemMessage),
-        createdAt: new Date().toISOString(),
-      });
-      await this.chattingRepository.sendMessage(chatRoomId, {
-        sender: userId,
-        format: 'text',
-        body: JSON.stringify(requestMessage),
-        createdAt: new Date().toISOString(),
-      });
+      await this.chattingRepository.sendMessage(
+        chatRoomId,
+        studentId,
+        'problem-image',
+        problemMessage,
+      );
+      await this.chattingRepository.sendMessage(
+        chatRoomId,
+        studentId,
+        'text',
+        requestMessage,
+      );
 
-      return new Success('질문 대기열에 추가되었습니다.', { questionId });
+      return new Success('질문 대기열에 추가되었습니다.', { chatRoomId });
     } catch (error) {
       return new Fail(error.message);
     }
@@ -82,19 +91,39 @@ export class OfferService {
     }
   }*/
 
-  async accept(userId: string, questionId: string, teacherId: string) {
+  async accept(userId: string, chattingId: string, questionId: string) {
     try {
+      const chatting = await this.chattingRepository.getChatRoomInfo(
+        chattingId,
+      );
       const tutoring = await this.offerRepository.accept(
         userId,
         questionId,
-        teacherId,
+        chatting.teacherId,
       );
 
-      //TODO : 시작 시간 추가
+      const question = await this.questionRepository.getInfo(questionId);
 
-      //TODO : pending -> reserved
+      const offerTeacherIds = question.offerTeachers;
 
-      return new Success('튜터링을 시작합니다.', tutoring);
+      for (const offerTeacherId of offerTeacherIds) {
+        if (offerTeacherId != chatting.teacherId) {
+          const teacherChatId =
+            await this.chattingRepository.getIdByQuestionAndTeacher(
+              questionId,
+              offerTeacherId,
+            );
+          //TODO: redis pub/sub으로 변경
+          await this.chattingRepository.sendMessage(
+            teacherChatId,
+            userId,
+            'text',
+            '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
+          );
+        }
+      }
+
+      return new Success('선생님 선택이 완료되었습니다.');
     } catch (error) {
       return new Fail(error.message);
     }

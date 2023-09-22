@@ -110,7 +110,7 @@ export class SocketGateway {
     );
 
     // DynamoDB에 메시지 저장
-    await this.chattingRepository.sendMessage(chattingId, message);
+    await this.chattingRepository.sendMessage(chattingId, sender, format, body);
   }
 
   /**

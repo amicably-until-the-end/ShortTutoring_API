@@ -5,7 +5,7 @@ export const TutoringSchema = new Schema({
     type: String,
     hashKey: true,
   },
-  requestId: {
+  questionId: {
     type: String,
   },
   studentId: {
@@ -43,5 +43,11 @@ export const TutoringSchema = new Schema({
   },
   RTCAppId: {
     type: String,
+  },
+  reservedStart: {
+    type: Date,
+  },
+  reservedEnd: {
+    type: Date,
   },
 });

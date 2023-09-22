@@ -34,6 +34,20 @@ export class ChattingService {
 
       const normalProposedGrouping = {};
 
+      if (userRole == 'student') {
+        const pendingQuestions =
+          await this.questionRepository.getStudentPendingQuestions(userId);
+        pendingQuestions.map((question) => {
+          normalProposedGrouping[question.id] = {
+            teachers: [],
+            isTeacherRoom: false,
+            roomImage: question.problem.mainImage,
+            title: question.problem.description,
+            subject: question.problem.schoolSubject,
+          };
+        });
+      }
+
       if (chattingRoomIds.length > 0) {
         const roomInfos = await this.chattingRepository.getChatRoomsInfo(
           chattingRoomIds,
@@ -44,19 +58,33 @@ export class ChattingService {
               roomInfo.questionId,
             );
             console.log(questionInfo);
-            const { status, isSelect } = questionInfo;
+            const { status, isSelect, selectedTeacherId } = questionInfo;
             const { schoolSubject, schoolLevel, description } =
               questionInfo.problem;
+
+            let chatState: 'pending' | 'reserved' | 'refused' = 'pending';
+
+            if (status == 'pending') {
+              chatState = 'pending';
+            } else if (status == 'reserved') {
+              if (userRole == 'student' || selectedTeacherId == userId) {
+                chatState = 'reserved';
+              } else {
+                // 선생님이 api 부른 경우에 거절 당한 경우.
+                chatState = 'refused';
+              }
+            }
 
             const item = {
               roomImage: undefined,
               id: roomInfo.id,
               messages: roomInfo.messages.map((message) => {
+                const isMyMsg = message.sender == userId;
                 const { body, ...rest } = message;
-                return { body: JSON.parse(body), ...rest };
+                return { body: JSON.parse(body), isMyMsg: isMyMsg, ...rest };
               }),
               opponentId: undefined,
-              questionState: status,
+              questionState: chatState,
               problemImages: questionInfo.problem.mainImage,
               isSelect: isSelect,
               isTeacherRoom: true,
@@ -64,7 +92,6 @@ export class ChattingService {
               schoolSubject: schoolSubject,
               schoolLevel: schoolLevel,
               title: undefined,
-              status: status,
               description: description,
             };
 
@@ -92,27 +119,24 @@ export class ChattingService {
 
         roomInfosWithQuestion.forEach((roomInfo) => {
           if (roomInfo.isSelect) {
-            if (roomInfo.status === 'pending') {
+            //지정 질문
+            if (roomInfo.questionState === 'pending') {
               result.selectedProposed.push(roomInfo);
-            } else if (roomInfo.status === 'reserved') {
+            } else if (roomInfo.questionState === 'reserved') {
               result.selectedReserved.push(roomInfo);
             }
           } else {
-            if (roomInfo.status === 'pending') {
+            //일반 질문
+            if (
+              roomInfo.questionState === 'pending' ||
+              roomInfo.questionState === 'refused'
+            ) {
               if (userRole == 'student') {
                 //grouping by questionId
                 if (normalProposedGrouping[roomInfo.questionId]) {
                   normalProposedGrouping[roomInfo.questionId].teachers.push(
                     roomInfo,
                   );
-                } else {
-                  normalProposedGrouping[roomInfo.questionId] = {
-                    teachers: [roomInfo],
-                    isTeacherRoom: false,
-                    questionImage: roomInfo.problemImages,
-                    title: roomInfo.description,
-                    subject: roomInfo.schoolSubject,
-                  };
                 }
               } else {
                 result.normalProposed.push(roomInfo);

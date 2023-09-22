@@ -1,4 +1,4 @@
-import { Chatting, ChattingKey, Message } from './entities/chatting.interface';
+import { Chatting, ChattingKey } from './entities/chatting.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { v4 as uuid } from 'uuid';
@@ -53,14 +53,26 @@ export class ChattingRepository {
 
   /**
    * 채팅방에 메시지를 전송합니다.
-   * @param chattingId
+   * @param roomId
+   * @param senderId
+   * @param format
    * @param message
    */
-  async sendMessage(chattingId: string, message: Message) {
-    const chatting = await this.chattingModel.get({ id: chattingId });
-    chatting.messages.push(message);
+  async sendMessage(
+    roomId: string,
+    senderId: string,
+    format: string,
+    message?: any,
+  ) {
+    const chatting = await this.chattingModel.get({ id: roomId });
+    chatting.messages.push({
+      sender: senderId,
+      format: format,
+      body: JSON.stringify(message),
+      createdAt: new Date().toISOString(),
+    });
     await this.chattingModel.update(
-      { id: chattingId },
+      { id: roomId },
       { messages: chatting.messages },
     );
 
@@ -73,10 +85,24 @@ export class ChattingRepository {
     });
   }
 
+  async getIdByQuestionAndTeacher(questionId: string, teacherId: string) {
+    const result = await this.chattingModel
+      .scan({ questionId, teacherId })
+      .exec();
+    if (result.length > 0) {
+      return result[0].id;
+    }
+    throw new Error('채팅방을 찾을 수 없습니다.');
+  }
+
   async getChatRoomsInfo(roomIds: ChattingKey[]) {
     return await this.chattingModel.batchGet(roomIds);
   }
 
+  /*
+   * 채팅 객체를 생성 합니다
+   * 이 함수는 user.participantingChattingRooms 에 추가 해주지 않음
+   */
   async makeChatRoom(teacherId: string, studentId: string, questionId: string) {
     const chattingRoomId = uuid();
     const chatting: Chatting = {
@@ -129,5 +155,12 @@ export class ChattingRepository {
 
   async findOne(chattingRoomId: string) {
     return await this.chattingModel.get({ id: chattingRoomId });
+  }
+
+  async getTeachersId(chattingIds: string[]) {
+    const chatRooms = await this.chattingModel.batchGet(
+      chattingIds.map((id) => ({ id })),
+    );
+    return chatRooms.map((chatRoom) => chatRoom.teacherId);
   }
 }

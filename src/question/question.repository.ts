@@ -46,7 +46,7 @@ export class QuestionRepository {
         selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
-        offerTeacherRooms: [],
+        offerTeachers: [],
         tutoringId: '',
         isSelect: false,
       });
@@ -55,9 +55,16 @@ export class QuestionRepository {
     }
   }
 
+  async getStudentPendingQuestions(userId: string) {
+    return await this.questionModel
+      .scan({ studentId: userId, status: 'pending' })
+      .exec();
+  }
+
   async createSelectedQuestion(
     questionId: string,
     userId: string,
+    selectedTeacherId: string,
     createQuestionDto: CreateSelectedQuestionDto,
     problemImages: string[],
   ): Promise<Question> {
@@ -77,10 +84,10 @@ export class QuestionRepository {
           schoolLevel: createQuestionDto.schoolLevel,
           schoolSubject: createQuestionDto.schoolSubject,
         },
-        selectedTeacherId: '',
+        selectedTeacherId: selectedTeacherId,
         status: 'pending',
         studentId: userId,
-        offerTeacherRooms: [],
+        offerTeachers: [],
         tutoringId: '',
         isSelect: true,
       });
@@ -115,6 +122,20 @@ export class QuestionRepository {
 
   async getInfo(questionId: string) {
     return await this.questionModel.get({ id: questionId });
+  }
+
+  async changeStatus(questionId: string, status: string) {
+    return await this.questionModel.update(
+      { id: questionId },
+      { status: status },
+    );
+  }
+
+  async setSeletedTeacherId(questionId: string, teacherId: string) {
+    return await this.questionModel.update(
+      { id: questionId },
+      { selectedTeacherId: teacherId },
+    );
   }
 
   async delete(userId: string, questionId: string) {
@@ -170,5 +191,22 @@ export class QuestionRepository {
     }
 
     return images;
+  }
+
+  async appendOffer(questionId: string, teacherId: string) {
+    const question = await this.questionModel.get({ id: questionId });
+    const offerTeacherRooms = question.offerTeachers;
+    if (offerTeacherRooms.includes(teacherId)) {
+      return null;
+    }
+    offerTeacherRooms.push(teacherId);
+    return await this.questionModel.update(
+      { id: questionId },
+      {
+        $ADD: {
+          offerTeachers: [teacherId],
+        },
+      },
+    );
   }
 }
