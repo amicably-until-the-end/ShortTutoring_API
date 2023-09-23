@@ -1,29 +1,20 @@
-import { AuthRepository } from '../auth/auth.repository';
+import { AuthModule } from '../auth/auth.module';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { dynamooseModule } from '../config.dynamoose';
-import { redisPubProvider, redisSubProvider } from '../config.redis';
-import { RedisRepository } from '../redis/redis.repository';
+import { redisSubProvider } from '../config.redis';
+import { RedisModule } from '../redis/redis.module';
 import { UserRepository } from '../user/user.repository';
 import { SocketGateway } from './socket.gateway';
 import { SocketRepository } from './socket.repository';
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    HttpModule.register({ timeout: 5000, maxRedirects: 5 }),
-    dynamooseModule,
-  ],
+  imports: [dynamooseModule, AuthModule, RedisModule],
   providers: [
     SocketRepository,
     SocketGateway,
     ChattingRepository,
-    RedisRepository,
-    redisPubProvider,
     redisSubProvider,
-    AuthRepository,
-    JwtService,
     UserRepository,
   ],
   exports: [SocketRepository, SocketGateway],
