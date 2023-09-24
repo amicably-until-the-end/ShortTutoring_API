@@ -11,6 +11,7 @@ import {
   NestedChatRoomInfo,
 } from './items/chat.list';
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ChattingService {
@@ -23,6 +24,8 @@ export class ChattingService {
   async getChatList(userId: string) {
     try {
       const userInfo = await this.userRepository.get(userId);
+
+      const insertedQuestions = new Set<string>();
 
       const chatRooms: ChatRoom[] = await Promise.all(
         //Join Chatting & Question
@@ -37,41 +40,30 @@ export class ChattingService {
         }),
       );
 
-      const chatLists = this.groupChatRoomByState(chatRooms);
       if (userInfo.role == 'student') {
-        chatLists.normalProposed = this.groupNormalProposedForStudent(
-          chatLists.normalReserved,
-        );
+        const questions =
+          await this.questionRepository.getStudentPendingQuestions(userId);
+        for (let i = 0; i < questions.count; i++) {
+          if (insertedQuestions.has(questions[i].id)) continue;
+          const question = questions[i];
+          const questionRoom: ChatRoom = {
+            id: uuid(),
+            roomImage: question.problem.mainImage,
+            title: question.problem.description,
+            questionInfo: question,
+            status: ChattingStatus.pending,
+            isSelect: false,
+            questionId: question.id,
+          };
+          chatRooms.push(questionRoom);
+        }
       }
+      console.log(chatRooms);
 
-      return new Success('채팅방 목록을 불러왔습니다.', chatLists);
+      return new Success('채팅방 목록을 불러왔습니다.', chatRooms);
     } catch (error) {
       return new Fail(error.message);
     }
-  }
-
-  groupNormalProposedForStudent(chatRooms: ChatRoom[]): ChatRoom[] {
-    const result = {};
-    chatRooms.forEach((chatRoom) => {
-      if (chatRoom.questionId in result) {
-        result[chatRoom.questionId].teachers.push(chatRoom);
-      } else {
-        const questionRoom: ChatRoom = {
-          teachers: [chatRoom],
-          isTeacherRoom: false,
-          roomImage: chatRoom.problemImage,
-          title: chatRoom.questionInfo.problem.description,
-          schoolSubject: chatRoom.schoolSubject,
-          schoolLevel: chatRoom.schoolLevel,
-          status: ChattingStatus.pending,
-          questionId: chatRoom.questionId,
-          problemImage: chatRoom.problemImage,
-          isSelect: false,
-        };
-        result[chatRoom.questionId] = questionRoom;
-      }
-    });
-    return Object.values(result);
   }
 
   groupChatRoomByState(chatRooms: ChatRoom[]): ChatList {
@@ -133,21 +125,23 @@ export class ChattingService {
       id: roomInfo.id,
       messages: roomInfo.messages.map((message) => {
         const { body, ...rest } = message;
+        const isMyMsg = message.sender == userInfo.id;
         try {
-          return { body: JSON.parse(body), ...rest };
+          return { body: JSON.parse(body), ...rest, isMyMsg: isMyMsg };
         } catch (e) {
-          return { body: { text: body }, ...rest, format: 'text' };
+          return {
+            body: { text: body },
+            ...rest,
+            isMyMsg: isMyMsg,
+            format: 'text',
+          };
         }
       }),
       status: status,
-      roomImage: roomImage,
+      roomImage: opponentInfo.profileImage,
       questionId: questionInfo.id,
-      schoolSubject: questionInfo.problem.schoolSubject,
-      schoolLevel: questionInfo.problem.schoolLevel,
-      problemImage: questionInfo.problem.mainImage,
       isSelect: questionInfo.isSelect,
       opponentId: opponentInfo?.id,
-      isTeacherRoom: true,
       questionInfo: questionInfo,
       title: opponentInfo?.name,
     };
