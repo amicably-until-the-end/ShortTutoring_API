@@ -39,8 +39,11 @@ export class ChattingService {
 
       const chatLists = this.groupChatRoomByState(chatRooms);
       if (userInfo.role == 'student') {
-        chatLists.normalProposed = this.groupNormalProposedForStudent(
+        const questions =
+          await this.questionRepository.getStudentPendingQuestions(userId);
+        chatLists.normalProposed = await this.groupNormalProposedForStudent(
           chatLists.normalReserved,
+          questions.map((q) => q.id),
         );
       }
 
@@ -50,7 +53,10 @@ export class ChattingService {
     }
   }
 
-  groupNormalProposedForStudent(chatRooms: ChatRoom[]): ChatRoom[] {
+  async groupNormalProposedForStudent(
+    chatRooms: ChatRoom[],
+    pendingQuestionIds: string[],
+  ): Promise<ChatRoom[]> {
     const result = {};
     chatRooms.forEach((chatRoom) => {
       if (chatRoom.questionId in result) {
@@ -71,6 +77,23 @@ export class ChattingService {
         result[chatRoom.questionId] = questionRoom;
       }
     });
+
+    for (const questionId of pendingQuestionIds) {
+      if (!(questionId in result)) {
+        const questionInfo = await this.questionRepository.getInfo(questionId);
+        result[questionId] = {
+          teachers: [],
+          isTeacherRoom: false,
+          roomImage: questionInfo.problem.mainImage,
+          title: questionInfo.problem.description,
+          isSelect: false,
+          status: ChattingStatus.pending,
+          questionId: questionId,
+          problemImage: questionInfo.problem.mainImage,
+        };
+      }
+    }
+
     return Object.values(result);
   }
 
