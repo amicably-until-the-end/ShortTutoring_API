@@ -41,9 +41,13 @@ export class ChattingService {
       if (userInfo.role == 'student') {
         const questions =
           await this.questionRepository.getStudentPendingQuestions(userId);
+        const questionIds = [];
+        for (let i = 0; i < questions.count; i++) {
+          questionIds.push(questions[i].id);
+        }
         chatLists.normalProposed = await this.groupNormalProposedForStudent(
           chatLists.normalProposed,
-          questions.map((q) => q.id),
+          questionIds,
         );
       }
 
