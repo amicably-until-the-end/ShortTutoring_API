@@ -40,9 +40,10 @@ export class ChattingService {
       const chatLists = this.groupChatRoomByState(chatRooms);
       if (userInfo.role == 'student') {
         chatLists.normalProposed = this.groupNormalProposedForStudent(
-          chatLists.normalReserved,
+          chatLists.normalProposed,
         );
       }
+      console.log(chatLists);
 
       return new Success('채팅방 목록을 불러왔습니다.', chatLists);
     } catch (error) {
@@ -133,14 +134,20 @@ export class ChattingService {
       id: roomInfo.id,
       messages: roomInfo.messages.map((message) => {
         const { body, ...rest } = message;
+        const isMyMsg = message.sender == userInfo.id;
         try {
-          return { body: JSON.parse(body), ...rest };
+          return { body: JSON.parse(body), ...rest, isMyMsg: isMyMsg };
         } catch (e) {
-          return { body: { text: body }, ...rest, format: 'text' };
+          return {
+            body: { text: body },
+            ...rest,
+            isMyMsg: isMyMsg,
+            format: 'text',
+          };
         }
       }),
       status: status,
-      roomImage: roomImage,
+      roomImage: opponentInfo.profileImage,
       questionId: questionInfo.id,
       schoolSubject: questionInfo.problem.schoolSubject,
       schoolLevel: questionInfo.problem.schoolLevel,
