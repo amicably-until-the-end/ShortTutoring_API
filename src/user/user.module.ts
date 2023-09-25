@@ -1,26 +1,15 @@
-import { AuthRepository } from '../auth/auth.repository';
+import { AuthModule } from '../auth/auth.module';
 import { dynamooseModule } from '../config.dynamoose';
 import { UploadRepository } from '../upload/upload.repository';
 import { UserController } from './user.controller';
 import { UserRepository } from './user.repository';
 import { UserService } from './user.service';
-import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
 
 @Module({
-  imports: [
-    HttpModule.register({ timeout: 5000, maxRedirects: 5 }),
-    dynamooseModule,
-  ],
+  imports: [dynamooseModule, AuthModule],
   controllers: [UserController],
-  providers: [
-    UserService,
-    UserRepository,
-    AuthRepository,
-    JwtService,
-    UploadRepository,
-  ],
+  providers: [UserService, UserRepository, UploadRepository],
   exports: [UserRepository],
 })
 export class UserModule {}
