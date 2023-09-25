@@ -41,9 +41,13 @@ export class ChattingService {
       if (userInfo.role == 'student') {
         const questions =
           await this.questionRepository.getStudentPendingQuestions(userId);
+        const questionIds = [];
+        for (let i = 0; i < questions.count; i++) {
+          questionIds.push(questions[i].id);
+        }
         chatLists.normalProposed = await this.groupNormalProposedForStudent(
-          chatLists.normalReserved,
-          questions.map((q) => q.id),
+          chatLists.normalProposed,
+          questionIds,
         );
       }
 
@@ -156,14 +160,20 @@ export class ChattingService {
       id: roomInfo.id,
       messages: roomInfo.messages.map((message) => {
         const { body, ...rest } = message;
+        const isMyMsg = message.sender == userInfo.id;
         try {
-          return { body: JSON.parse(body), ...rest };
+          return { body: JSON.parse(body), ...rest, isMyMsg: isMyMsg };
         } catch (e) {
-          return { body: { text: body }, ...rest, format: 'text' };
+          return {
+            body: { text: body },
+            ...rest,
+            isMyMsg: isMyMsg,
+            format: 'text',
+          };
         }
       }),
       status: status,
-      roomImage: roomImage,
+      roomImage: opponentInfo.profileImage,
       questionId: questionInfo.id,
       schoolSubject: questionInfo.problem.schoolSubject,
       schoolLevel: questionInfo.problem.schoolLevel,
