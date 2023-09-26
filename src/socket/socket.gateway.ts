@@ -1,5 +1,6 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { Message } from '../chatting/entities/chatting.interface';
+import { socketErrorWebhook } from '../config.discord-webhook';
 import { RedisRepository } from '../redis/redis.repository';
 import { SocketRepository } from './socket.repository';
 import { Inject } from '@nestjs/common';
@@ -45,7 +46,11 @@ export class SocketGateway {
       // 접속 확인용 로그
       console.log(user.name, client.id);
     } catch (error) {
-      console.log(error);
+      const message = `소켓 연결에 실패했습니다. ${error.message}`;
+
+      console.log(message);
+      await socketErrorWebhook.send(message);
+
       return new Error('소켓 연결에 실패했습니다.');
     }
   }
@@ -63,21 +68,26 @@ export class SocketGateway {
       await this.redisRepository.del(user.id);
       await this.redisRepository.unsubscribe(client.id);
     } catch (error) {
-      console.log(error);
+      const message = `소켓 연결을 끊을 수 없습니다. ${error.message}`;
+
+      console.log(message);
+      await socketErrorWebhook.send(message);
+
       return new Error('소켓 연결을 끊을 수 없습니다.');
     }
   }
 
-  /**
-   * 원하는 역할의 온라인 사용자 목록을 가져오는 메소드
-   * @param client
-   * @param payload
-   */
-  @SubscribeMessage('get-role-participants')
-  async getRoleParticipants(client: any, payload: any) {
-    const { role } = payload;
-    return await this.redisRepository.get(role);
-  }
+  //
+  // /**
+  //  * 원하는 역할의 온라인 사용자 목록을 가져오는 메소드
+  //  * @param client
+  //  * @param payload
+  //  */
+  // @SubscribeMessage('get-role-participants')
+  // async getRoleParticipants(client: any, payload: any) {
+  //   const { role } = payload;
+  //   return await this.redisRepository.get(role);
+  // }
 
   /**
    * 원하는 사용자의 정보를 가져오는 메소드
@@ -90,7 +100,11 @@ export class SocketGateway {
         client.handshake.headers,
       );
     } catch (error) {
-      console.log(error);
+      const message = `사용자 정보를 가져올 수 없습니다. ${error.message}`;
+
+      console.log(message);
+      await socketErrorWebhook.send(message);
+
       return new Error('사용자 정보를 가져올 수 없습니다.');
     }
   }
@@ -138,7 +152,11 @@ export class SocketGateway {
         body,
       );
     } catch (error) {
-      console.log(error);
+      const message = `메시지를 전송할 수 없습니다. ${error.message}`;
+
+      console.log(message);
+      await socketErrorWebhook.send(message);
+
       return new Error('메시지를 전송할 수 없습니다.');
     }
   }
@@ -148,12 +166,16 @@ export class SocketGateway {
    * 현재 서버에 접속한 클라이언트의 소켓 정보 및 레디스에 저장된 키 목록을 가져옴
    */
   @SubscribeMessage('debug')
-  handleDebug() {
+  async handleDebug() {
     try {
       console.log(this.server.sockets.adapter.rooms);
       return this.redisRepository.getAllKeys();
     } catch (error) {
-      console.log(error);
+      const message = `디버깅에 실패했습니다. ${error.message}`;
+
+      console.log(message);
+      await socketErrorWebhook.send(message);
+
       return new Error('디버깅에 실패했습니다.');
     }
   }
