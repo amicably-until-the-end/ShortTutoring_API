@@ -64,19 +64,16 @@ export class ChattingRepository {
     format: string,
     message?: any,
   ) {
-    const chatting = await this.chattingModel.get({ id: roomId });
-    chatting.messages.push({
+    const newMessage = {
       sender: senderId,
       format: format,
       body: JSON.stringify(message),
       createdAt: new Date().toISOString(),
-    });
-    await this.chattingModel.update(
+    };
+    return await this.chattingModel.update(
       { id: roomId },
-      { messages: chatting.messages },
+      { $ADD: { messages: [newMessage] } },
     );
-
-    return chatting;
   }
 
   async getChatRoomInfo(roomId: string) {
