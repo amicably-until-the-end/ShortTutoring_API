@@ -29,20 +29,25 @@ export class SocketGateway {
    * @param client
    */
   async handleConnection(client: any) {
-    const user = await this.socketRepository.getUserFromAuthorization(
-      client.handshake.headers,
-    );
+    try {
+      const user = await this.socketRepository.getUserFromAuthorization(
+        client.handshake.headers,
+      );
 
-    await this.redisRepository.set(user.id, client.id);
-    if (process.env.NODE_ENV === 'dev') {
-      await this.redisSub.subscribe(client.id, (message) => {
-        client.emit('message', message);
-        console.log(message);
-      });
+      await this.redisRepository.set(user.id, client.id);
+      if (process.env.NODE_ENV === 'dev') {
+        await this.redisSub.subscribe(client.id, (message) => {
+          client.emit('message', message);
+          console.log(message);
+        });
+      }
+
+      // 접속 확인용 로그
+      console.log(user.name, client.id);
+    } catch (error) {
+      console.log(error);
+      return new Error('소켓 연결에 실패했습니다.');
     }
-
-    // 접속 확인용 로그
-    console.log(user.name, client.id);
   }
 
   /**
@@ -50,12 +55,17 @@ export class SocketGateway {
    * @param client
    */
   async handleDisconnect(client: any) {
-    const user = await this.socketRepository.getUserFromAuthorization(
-      client.handshake.headers,
-    );
+    try {
+      const user = await this.socketRepository.getUserFromAuthorization(
+        client.handshake.headers,
+      );
 
-    await this.redisRepository.del(user.id);
-    await this.redisRepository.unsubscribe(client.id);
+      await this.redisRepository.del(user.id);
+      await this.redisRepository.unsubscribe(client.id);
+    } catch (error) {
+      console.log(error);
+      return new Error('소켓 연결을 끊을 수 없습니다.');
+    }
   }
 
   /**
@@ -75,9 +85,14 @@ export class SocketGateway {
    */
   @SubscribeMessage('get-user-info')
   async getUserInfo(client: any) {
-    return await this.socketRepository.getUserFromAuthorization(
-      client.handshake.headers,
-    );
+    try {
+      return await this.socketRepository.getUserFromAuthorization(
+        client.handshake.headers,
+      );
+    } catch (error) {
+      console.log(error);
+      return new Error('사용자 정보를 가져올 수 없습니다.');
+    }
   }
 
   /**
@@ -134,7 +149,12 @@ export class SocketGateway {
    */
   @SubscribeMessage('debug')
   handleDebug() {
-    console.log(this.server.sockets.adapter.rooms);
-    return this.redisRepository.getAllKeys();
+    try {
+      console.log(this.server.sockets.adapter.rooms);
+      return this.redisRepository.getAllKeys();
+    } catch (error) {
+      console.log(error);
+      return new Error('디버깅에 실패했습니다.');
+    }
   }
 }
