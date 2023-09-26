@@ -66,13 +66,14 @@ export class TutoringService {
 
       const tutoring = await this.tutoringRepository.get(question.tutoringId);
 
+      /*
       const userInfo = await this.userRepository.get(userId);
-
       if (userInfo.role == 'student') {
         if (tutoring.status != 'going') {
           return new Fail('수업 시작 전입니다.');
         }
       }
+      */
       return new Success('과외 정보를 가져왔습니다.', { tutoring });
     } catch (error) {
       return new Fail(error.message);
