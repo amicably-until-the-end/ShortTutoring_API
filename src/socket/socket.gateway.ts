@@ -8,6 +8,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import * as process from 'process';
 import { RedisClientType } from 'redis';
 import { Server } from 'socket.io';
 
@@ -33,10 +34,12 @@ export class SocketGateway {
     );
 
     await this.redisRepository.set(user.id, client.id);
-    await this.redisSub.subscribe(client.id, (message) => {
-      client.emit('message', message);
-      console.log(message);
-    });
+    if (process.env.NODE_ENV === 'dev') {
+      await this.redisSub.subscribe(client.id, (message) => {
+        client.emit('message', message);
+        console.log(message);
+      });
+    }
 
     // 접속 확인용 로그
     console.log(user.name, client.id);
@@ -85,32 +88,44 @@ export class SocketGateway {
   @SubscribeMessage('message')
   async handleMessage(client: any, payload: any) {
     const { receiverId, chattingId, format, body } = payload;
-    const sender = await this.socketRepository
-      .getUserFromAuthorization(client.handshake.headers)
-      .then((user) => user.id);
 
-    const receiverSocketId = await this.redisRepository.get(receiverId);
-    const message: Message = {
-      sender,
-      format,
-      body,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      // 메시지를 보낸 사용자의 정보를 가져옴
+      const sender = await this.socketRepository
+        .getUserFromAuthorization(client.handshake.headers)
+        .then((user) => user.id);
 
-    // 로컬 소켓 브로드캐스트
-    client.broadcast
-      .to(receiverSocketId)
-      .emit('message', { chattingId, message });
+      // 메시지를 받을 사용자의 소켓 아이디를 가져옴
+      const receiverSocketId = await this.redisRepository.get(receiverId);
+      const message: Message = {
+        sender,
+        format,
+        body,
+        createdAt: new Date().toISOString(),
+      };
 
-    // TODO: 레디스 브로드캐스트
-    // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
-    await this.redisRepository.publish(
-      receiverSocketId,
-      JSON.stringify({ chattingId, message }),
-    );
+      // 로컬 소켓 브로드캐스트
+      client.broadcast
+        .to(receiverSocketId)
+        .emit('message', { chattingId, message });
 
-    // DynamoDB에 메시지 저장
-    await this.chattingRepository.sendMessage(chattingId, sender, format, body);
+      // 레디스 Pub
+      await this.redisRepository.publish(
+        receiverSocketId,
+        JSON.stringify({ chattingId, message }),
+      );
+
+      // DynamoDB에 메시지 저장
+      await this.chattingRepository.sendMessage(
+        chattingId,
+        sender,
+        format,
+        body,
+      );
+    } catch (error) {
+      console.log(error);
+      return new Error('메시지를 전송할 수 없습니다.');
+    }
   }
 
   /**

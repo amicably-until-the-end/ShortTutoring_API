@@ -19,10 +19,14 @@ export class SocketRepository {
   async getUserFromAuthorization(headers: any) {
     const { authorization } = headers;
 
-    const { userId } = this.authRepository.decodeJwt(
-      authorization.replace('Bearer ', ''),
-    );
+    try {
+      const { userId } = this.authRepository.decodeJwt(
+        authorization.replace('Bearer ', ''),
+      );
 
-    return await this.userRepository.get(userId);
+      return await this.userRepository.get(userId);
+    } catch (error) {
+      return null;
+    }
   }
 }
