@@ -119,8 +119,8 @@ export class QuestionService {
 
   async getQuestionInfo(questionId: string) {
     try {
-      await this.questionRepository.getInfo(questionId);
-      return new Success('질문 정보를 가져왔습니다.', { questionId });
+      const info = await this.questionRepository.getInfo(questionId);
+      return new Success('질문 정보를 가져왔습니다.', info);
     } catch (error) {
       return new Fail(error.message);
     }
