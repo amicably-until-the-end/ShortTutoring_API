@@ -124,6 +124,7 @@ export class SocketGateway {
         .getUserFromAuthorization(client.handshake.headers)
         .then((user) => user.id);
 
+      console.log('test', sender, receiverId, chattingId, format, body);
       // user에게 메시지 전송
       await this.sendMessageToUser(
         sender,
