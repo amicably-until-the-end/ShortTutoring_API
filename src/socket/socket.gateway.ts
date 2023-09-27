@@ -201,7 +201,6 @@ export class SocketGateway {
     };
     const receiverSocketId = await this.redisRepository.get(receiverId);
 
-    console.log('sender-receiver', senderId, receiverId);
     if (receiverSocketId != null) {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
     } else {
@@ -214,6 +213,14 @@ export class SocketGateway {
     } else {
       console.log('FCM 메시지 보내기');
     }
+    console.log(
+      'sender-receiver',
+      senderId,
+      senderSocketId,
+      receiverId,
+      receiverSocketId,
+    );
+
     // TODO: 레디스 브로드캐스트
     // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
     await this.redisRepository.publish(
