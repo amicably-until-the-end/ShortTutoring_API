@@ -53,14 +53,14 @@ export class OfferService {
       };
 
       //TODO: redis pub/sub으로 변경
-      await this.socketGateway.sendMessageToUser(
+      await this.socketGateway.sendMessageToBothUser(
         studentId,
         userId,
         chatRoomId,
         'problem-image',
         JSON.stringify(problemMessage),
       );
-      await this.socketGateway.sendMessageToUser(
+      await this.socketGateway.sendMessageToBothUser(
         studentId,
         userId,
         chatRoomId,
@@ -118,7 +118,7 @@ export class OfferService {
               offerTeacherId,
             );
           //TODO: redis pub/sub으로 변경
-          await this.socketGateway.sendMessageToUser(
+          await this.socketGateway.sendMessageToBothUser(
             userId,
             offerTeacherId,
             teacherChatId,

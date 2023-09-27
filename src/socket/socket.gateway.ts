@@ -185,6 +185,47 @@ export class SocketGateway {
     );
   }
 
+  async sendMessageToBothUser(
+    senderId: string,
+    receiverId: string,
+    chattingId: string,
+    format: string,
+    body: string,
+  ) {
+    const message: Message = {
+      sender: senderId,
+      format,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+    const receiverSocketId = await this.redisRepository.get(receiverId);
+    if (receiverSocketId != null) {
+      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
+    } else {
+      //TODO: FCM 메시지 보내기
+    }
+    const senderSocketId = await this.redisRepository.get(senderId);
+    if (senderSocketId != null) {
+      this.sendMessageToSocketClient(senderSocketId, chattingId, message);
+    } else {
+      //TODO: FCM 메시지 보내기
+    }
+    // TODO: 레디스 브로드캐스트
+    // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
+    await this.redisRepository.publish(
+      receiverSocketId,
+      JSON.stringify({ chattingId, message }),
+    );
+
+    // DynamoDB에 메시지 저장
+    await this.chattingRepository.sendMessage(
+      chattingId,
+      senderId,
+      format,
+      body,
+    );
+  }
+
   sendMessageToSocketClient(
     receiverSocketId: string,
     chattingId: string,
