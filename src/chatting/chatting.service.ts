@@ -101,11 +101,16 @@ export class ChattingService {
     let status: ChattingStatus;
     if (questionInfo.status == 'pending') {
       status = ChattingStatus.pending;
-    } else if (questionInfo.status == 'reserved') {
+    } else if (
+      questionInfo.status == 'reserved' &&
+      userInfo.role == 'teacher'
+    ) {
       status =
         roomInfo.teacherId == questionInfo.selectedTeacherId
           ? ChattingStatus.reserved
           : ChattingStatus.pending;
+    } else {
+      status = ChattingStatus.reserved;
     }
     let roomImage: string;
     let opponentInfo: User | undefined;
