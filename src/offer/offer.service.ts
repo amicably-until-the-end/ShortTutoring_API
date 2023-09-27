@@ -132,6 +132,8 @@ export class OfferService {
 
       const offerTeacherIds = question.offerTeachers;
 
+      await this.questionRepository.changeStatus(questionId, 'reserved');
+
       const confirmMessage = {
         text: `선생님과 수업이 확정되었습니다.\n수업 시간은 ${startTime} ~ ${endTime} 입니다.`,
       };
