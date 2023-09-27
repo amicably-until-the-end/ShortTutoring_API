@@ -1,6 +1,7 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
+import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UserRepository } from '../user/user.repository';
 import { OfferRepository } from './offer.repository';
 import { Injectable } from '@nestjs/common';
@@ -12,6 +13,7 @@ export class OfferService {
     private readonly userRepository: UserRepository,
     private readonly chattingRepository: ChattingRepository,
     private readonly questionRepository: QuestionRepository,
+    private readonly tutoringRepository: TutoringRepository,
   ) {}
 
   async append(userId: string, questionId: string) {
@@ -91,15 +93,27 @@ export class OfferService {
     }
   }*/
 
-  async accept(userId: string, chattingId: string, questionId: string) {
+  async accept(
+    userId: string,
+    chattingId: string,
+    questionId: string,
+    startTime: Date,
+    endTime: Date,
+  ) {
     try {
       const chatting = await this.chattingRepository.getChatRoomInfo(
         chattingId,
       );
-      const tutoring = await this.offerRepository.accept(
-        userId,
+      const tutoring = await this.tutoringRepository.create(
         questionId,
+        userId,
         chatting.teacherId,
+      );
+
+      await this.tutoringRepository.reserveTutoring(
+        tutoring.id,
+        startTime,
+        endTime,
       );
 
       const question = await this.questionRepository.getInfo(questionId);
