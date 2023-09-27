@@ -64,4 +64,12 @@ export class QuestionController {
   list() {
     return this.questionService.getPendingNormalQuestions();
   }
+
+  @ApiTags('Question')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(QuestionOperation.list)
+  @Get('question/info/:questionId')
+  getQuestionInfo(@Param('questionId') questionId: string) {
+    return this.questionService.getQuestionInfo(questionId);
+  }
 }

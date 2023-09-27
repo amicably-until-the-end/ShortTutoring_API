@@ -11,6 +11,7 @@ import {
   NestedChatRoomInfo,
 } from './items/chat.list';
 import { Injectable } from '@nestjs/common';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ChattingService {
@@ -23,6 +24,8 @@ export class ChattingService {
   async getChatList(userId: string) {
     try {
       const userInfo = await this.userRepository.get(userId);
+
+      const insertedQuestions = new Set<string>();
 
       const chatRooms: ChatRoom[] = await Promise.all(
         //Join Chatting & Question
@@ -37,68 +40,29 @@ export class ChattingService {
         }),
       );
 
-      const chatLists = this.groupChatRoomByState(chatRooms);
       if (userInfo.role == 'student') {
         const questions =
           await this.questionRepository.getStudentPendingQuestions(userId);
-        const questionIds = [];
         for (let i = 0; i < questions.count; i++) {
-          questionIds.push(questions[i].id);
+          if (insertedQuestions.has(questions[i].id)) continue;
+          const question = questions[i];
+          const questionRoom: ChatRoom = {
+            id: uuid(),
+            roomImage: question.problem.mainImage,
+            title: question.problem.description,
+            questionInfo: question,
+            status: ChattingStatus.pending,
+            isSelect: false,
+            questionId: question.id,
+          };
+          chatRooms.push(questionRoom);
         }
-        chatLists.normalProposed = await this.groupNormalProposedForStudent(
-          chatLists.normalProposed,
-          questionIds,
-        );
       }
 
-      return new Success('채팅방 목록을 불러왔습니다.', chatLists);
+      return new Success('채팅방 목록을 불러왔습니다.', chatRooms);
     } catch (error) {
       return new Fail(error.message);
     }
-  }
-
-  async groupNormalProposedForStudent(
-    chatRooms: ChatRoom[],
-    pendingQuestionIds: string[],
-  ): Promise<ChatRoom[]> {
-    const result = {};
-    chatRooms.forEach((chatRoom) => {
-      if (chatRoom.questionId in result) {
-        result[chatRoom.questionId].teachers.push(chatRoom);
-      } else {
-        const questionRoom: ChatRoom = {
-          teachers: [chatRoom],
-          isTeacherRoom: false,
-          roomImage: chatRoom.problemImage,
-          title: chatRoom.questionInfo.problem.description,
-          schoolSubject: chatRoom.schoolSubject,
-          schoolLevel: chatRoom.schoolLevel,
-          status: ChattingStatus.pending,
-          questionId: chatRoom.questionId,
-          problemImage: chatRoom.problemImage,
-          isSelect: false,
-        };
-        result[chatRoom.questionId] = questionRoom;
-      }
-    });
-
-    for (const questionId of pendingQuestionIds) {
-      if (!(questionId in result)) {
-        const questionInfo = await this.questionRepository.getInfo(questionId);
-        result[questionId] = {
-          teachers: [],
-          isTeacherRoom: false,
-          roomImage: questionInfo.problem.mainImage,
-          title: questionInfo.problem.description,
-          isSelect: false,
-          status: ChattingStatus.pending,
-          questionId: questionId,
-          problemImage: questionInfo.problem.mainImage,
-        };
-      }
-    }
-
-    return Object.values(result);
   }
 
   groupChatRoomByState(chatRooms: ChatRoom[]): ChatList {
@@ -175,12 +139,8 @@ export class ChattingService {
       status: status,
       roomImage: opponentInfo.profileImage,
       questionId: questionInfo.id,
-      schoolSubject: questionInfo.problem.schoolSubject,
-      schoolLevel: questionInfo.problem.schoolLevel,
-      problemImage: questionInfo.problem.mainImage,
       isSelect: questionInfo.isSelect,
       opponentId: opponentInfo?.id,
-      isTeacherRoom: true,
       questionInfo: questionInfo,
       title: opponentInfo?.name,
     };
@@ -231,8 +191,25 @@ export class ChattingService {
     return await this.chattingRepository.findAll();
   }
 
-  async findOne(chattingRoomId: string) {
-    return await this.chattingRepository.findOne(chattingRoomId);
+  async findOne(chattingRoomId: string, userId: string) {
+    try {
+      const room = await this.chattingRepository.findOne(chattingRoomId);
+      if (room.studentId == userId || room.teacherId == userId) {
+        const userInfo = await this.userRepository.get(userId);
+        const questionInfo = await this.questionRepository.getInfo(
+          room.questionId,
+        );
+        const roomInfo = await this.makeChatItem(
+          { roomInfo: room, questionInfo },
+          userInfo,
+        );
+        return new Success('채팅방 정보를 불러왔습니다.', roomInfo);
+      } else {
+        return new Fail('해당 채팅방에 대한 권한이 없습니다.');
+      }
+    } catch (error) {
+      return new Fail('해당 채팅방 정보가 없습니다.');
+    }
   }
 
   update(id: number, updateChattingDto: UpdateChattingDto) {

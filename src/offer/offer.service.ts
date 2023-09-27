@@ -1,6 +1,7 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
+import { SocketGateway } from '../socket/socket.gateway';
 import { UserRepository } from '../user/user.repository';
 import { OfferRepository } from './offer.repository';
 import { Injectable } from '@nestjs/common';
@@ -12,6 +13,7 @@ export class OfferService {
     private readonly userRepository: UserRepository,
     private readonly chattingRepository: ChattingRepository,
     private readonly questionRepository: QuestionRepository,
+    private readonly socketGateway: SocketGateway,
   ) {}
 
   async append(userId: string, questionId: string) {
@@ -49,19 +51,29 @@ export class OfferService {
       const requestMessage = {
         text: '안녕하세요 선생님! 언제 수업 가능하신가요?',
       };
+      console.log(
+        'chatRoomId',
+        chatRoomId,
+        'studentId',
+        studentId,
+        'userId',
+        userId,
+      );
 
       //TODO: redis pub/sub으로 변경
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
+      await this.socketGateway.sendMessageToBothUser(
         studentId,
+        userId,
+        chatRoomId,
         'problem-image',
-        problemMessage,
+        JSON.stringify(problemMessage),
       );
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
+      await this.socketGateway.sendMessageToBothUser(
         studentId,
+        userId,
+        chatRoomId,
         'text',
-        requestMessage,
+        JSON.stringify(requestMessage),
       );
 
       return new Success('질문 대기열에 추가되었습니다.', { chatRoomId });
@@ -114,9 +126,10 @@ export class OfferService {
               offerTeacherId,
             );
           //TODO: redis pub/sub으로 변경
-          await this.chattingRepository.sendMessage(
-            teacherChatId,
+          await this.socketGateway.sendMessageToBothUser(
             userId,
+            offerTeacherId,
+            teacherChatId,
             'text',
             '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
           );
