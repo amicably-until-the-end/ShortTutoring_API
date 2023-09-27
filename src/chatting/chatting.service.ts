@@ -192,8 +192,13 @@ export class ChattingService {
     return await this.chattingRepository.findAll();
   }
 
-  async findOne(chattingRoomId: string) {
-    return await this.chattingRepository.findOne(chattingRoomId);
+  async findOne(chattingRoomId: string, userId: string) {
+    const room = await this.chattingRepository.findOne(chattingRoomId);
+    if (room.studentId == userId || room.teacherId == userId) {
+      return new Success('채팅방 정보를 불러왔습니다.', room);
+    } else {
+      return new Fail('해당 채팅방에 대한 권한이 없습니다.');
+    }
   }
 
   update(id: number, updateChattingDto: UpdateChattingDto) {

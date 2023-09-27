@@ -2,7 +2,6 @@ import { AccessToken } from '../auth/entities/auth.entity';
 import { ChattingService } from './chatting.service';
 import { ChattingOperation } from './description/chatting.operation';
 import { ChattingResponse } from './description/chatting.response';
-import { CreateChattingDto } from './dto/create-chatting.dto';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
 import {
   Body,
@@ -12,7 +11,6 @@ import {
   Headers,
   Param,
   Patch,
-  Post,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -34,39 +32,14 @@ export class ChattingController {
     return this.chattingService.getChatList(AccessToken.userId(headers));
   }
 
-  @Post()
-  create(
-    @Headers() headers: Headers,
-    @Body() createChattingDto: CreateChattingDto,
-  ) {
-    /*
-    return this.chattingService.create(
-      AccessToken.userId(headers),
-      createChattingDto,
-    );*/
-  }
-
-  /*
-  @Post('send')
-  sendMessage(
-    @Headers() headers: Headers,
-    @Body() sendMessageDto: SendMessageDto,
-  ) {
-    return this.chattingService.sendMessage(
-      AccessToken.userId(headers),
-      sendMessageDto,
-    );
-  }
-   */
-
   @Get()
   findAll() {
     return this.chattingService.findAll();
   }
 
   @Get(':chattingRoomId')
-  findOne(@Param('chattingRoomId') id: string) {
-    return this.chattingService.findOne(id);
+  findOne(@Param('chattingRoomId') id: string, @Headers() headers: Headers) {
+    return this.chattingService.findOne(id, AccessToken.userId(headers));
   }
 
   @Patch(':id')
