@@ -1,5 +1,6 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { Fail, Success } from '../response';
+import { SocketGateway } from '../socket/socket.gateway';
 import { UserRepository } from '../user/user.repository';
 import {
   CreateNormalQuestionDto,
@@ -16,6 +17,7 @@ export class QuestionService {
     private readonly questionRepository: QuestionRepository,
     private readonly chattingRepository: ChattingRepository,
     private readonly userRepository: UserRepository,
+    private readonly socketGateway: SocketGateway,
   ) {}
 
   /**
@@ -94,21 +96,31 @@ export class QuestionService {
         startDateTime: createQuestionDto.requestTutoringStartTime,
       };
 
-      //TODO: redis pub/sub으로 변경
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
+      await this.socketGateway.sendMessageToBothUser(
         userId,
+        teacherId,
+        chatRoomId,
         'problem-image',
-        problemMessage,
+        JSON.stringify(problemMessage),
       );
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
+      await this.socketGateway.sendMessageToBothUser(
         userId,
+        teacherId,
+        chatRoomId,
         'appoint-request',
-        requestMessage,
+        JSON.stringify(requestMessage),
       );
 
       return new Success('질문이 생성되었습니다.', question);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
+  async getQuestionInfo(questionId: string) {
+    try {
+      const info = await this.questionRepository.getInfo(questionId);
+      return new Success('질문 정보를 가져왔습니다.', info);
     } catch (error) {
       return new Fail(error.message);
     }

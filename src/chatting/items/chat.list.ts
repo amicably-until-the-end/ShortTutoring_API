@@ -25,14 +25,9 @@ export interface ChatRoom {
   id?: string;
   title: string;
   roomImage: string;
-  problemImage?: string;
   opponentId?: string;
-  schoolSubject: string;
-  schoolLevel: string;
   isSelect: boolean;
-  isTeacherRoom: boolean;
   questionInfo?: Question;
-  teachers?: ChatRoom[];
   questionId: string;
 }
 

@@ -62,12 +62,12 @@ export class ChattingRepository {
     roomId: string,
     senderId: string,
     format: string,
-    message?: any,
+    body?: any,
   ) {
     const newMessage = {
       sender: senderId,
       format: format,
-      body: JSON.stringify(message),
+      body: JSON.stringify(body),
       createdAt: new Date().toISOString(),
     };
     return await this.chattingModel.update(

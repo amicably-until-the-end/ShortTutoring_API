@@ -124,30 +124,12 @@ export class SocketGateway {
         .getUserFromAuthorization(client.handshake.headers)
         .then((user) => user.id);
 
-      // 메시지를 받을 사용자의 소켓 아이디를 가져옴
-      const receiverSocketId = await this.redisRepository.get(receiverId);
-      const message: Message = {
+      console.log('test', sender, receiverId, chattingId, format, body);
+      // user에게 메시지 전송
+      await this.sendMessageToUser(
         sender,
-        format,
-        body,
-        createdAt: new Date().toISOString(),
-      };
-
-      // 로컬 소켓 브로드캐스트
-      client.broadcast
-        .to(receiverSocketId)
-        .emit('message', { chattingId, message });
-
-      // 레디스 Pub
-      await this.redisRepository.publish(
-        receiverSocketId,
-        JSON.stringify({ chattingId, message }),
-      );
-
-      // DynamoDB에 메시지 저장
-      await this.chattingRepository.sendMessage(
+        receiverId,
         chattingId,
-        sender,
         format,
         body,
       );
@@ -159,6 +141,108 @@ export class SocketGateway {
 
       return new Error('메시지를 전송할 수 없습니다.');
     }
+  }
+
+  /**
+   * 다른 사용자에게 메시지를 전송하는 메소드
+   * @param senderId : 메시지를 보내는 사용자의 ID
+   * @param receiverId : 메시지를 받는 사용자의 ID
+   * @param chattingId : 메시지를 보내는 채팅방의 ID
+   * @param format : 메시지의 형식 (text, appoint-request , ...)
+   * @param body : 메시지의 내용 (JSON 형식 ex: { "text" : "안녕하세요" } )
+   */
+  async sendMessageToUser(
+    senderId: string,
+    receiverId: string,
+    chattingId: string,
+    format: string,
+    body: string,
+  ) {
+    const message: Message = {
+      sender: senderId,
+      format,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+    const receiverSocketId = await this.redisRepository.get(receiverId);
+    if (receiverSocketId != null) {
+      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
+    } else {
+      //FCM 메시지 보내기
+    }
+    // TODO: 레디스 브로드캐스트
+    // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
+    await this.redisRepository.publish(
+      receiverSocketId,
+      JSON.stringify({ chattingId, message }),
+    );
+
+    // DynamoDB에 메시지 저장
+    await this.chattingRepository.sendMessage(
+      chattingId,
+      senderId,
+      format,
+      body,
+    );
+  }
+
+  async sendMessageToBothUser(
+    senderId: string,
+    receiverId: string,
+    chattingId: string,
+    format: string,
+    body: string,
+  ) {
+    const message: Message = {
+      sender: senderId,
+      format,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+    const receiverSocketId = await this.redisRepository.get(receiverId);
+
+    if (receiverSocketId != null) {
+      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
+    } else {
+      //TODO: FCM 메시지 보내기
+      console.log('FCM 메시지 보내기');
+    }
+    const senderSocketId = await this.redisRepository.get(senderId);
+    if (senderSocketId != null) {
+      this.sendMessageToSocketClient(senderSocketId, chattingId, message);
+    } else {
+      console.log('FCM 메시지 보내기');
+    }
+    console.log(
+      'sender-receiver',
+      senderId,
+      senderSocketId,
+      receiverId,
+      receiverSocketId,
+    );
+
+    // TODO: 레디스 브로드캐스트
+    // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
+    await this.redisRepository.publish(
+      receiverSocketId,
+      JSON.stringify({ chattingId, message }),
+    );
+
+    // DynamoDB에 메시지 저장
+    await this.chattingRepository.sendMessage(
+      chattingId,
+      senderId,
+      format,
+      body,
+    );
+  }
+
+  sendMessageToSocketClient(
+    receiverSocketId: string,
+    chattingId: string,
+    message: Message,
+  ) {
+    this.server.to(receiverSocketId).emit('message', { chattingId, message });
   }
 
   /**
