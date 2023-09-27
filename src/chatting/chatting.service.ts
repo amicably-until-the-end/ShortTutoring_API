@@ -192,19 +192,23 @@ export class ChattingService {
   }
 
   async findOne(chattingRoomId: string, userId: string) {
-    const room = await this.chattingRepository.findOne(chattingRoomId);
-    if (room.studentId == userId || room.teacherId == userId) {
-      const userInfo = await this.userRepository.get(userId);
-      const questionInfo = await this.questionRepository.getInfo(
-        room.questionId,
-      );
-      const roomInfo = await this.makeChatItem(
-        { roomInfo: room, questionInfo },
-        userInfo,
-      );
-      return new Success('채팅방 정보를 불러왔습니다.', roomInfo);
-    } else {
-      return new Fail('해당 채팅방에 대한 권한이 없습니다.');
+    try {
+      const room = await this.chattingRepository.findOne(chattingRoomId);
+      if (room.studentId == userId || room.teacherId == userId) {
+        const userInfo = await this.userRepository.get(userId);
+        const questionInfo = await this.questionRepository.getInfo(
+          room.questionId,
+        );
+        const roomInfo = await this.makeChatItem(
+          { roomInfo: room, questionInfo },
+          userInfo,
+        );
+        return new Success('채팅방 정보를 불러왔습니다.', roomInfo);
+      } else {
+        return new Fail('해당 채팅방에 대한 권한이 없습니다.');
+      }
+    } catch (error) {
+      return new Fail('해당 채팅방 정보가 없습니다.');
     }
   }
 
