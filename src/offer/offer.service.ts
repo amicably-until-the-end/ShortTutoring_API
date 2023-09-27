@@ -2,6 +2,7 @@ import { ChattingRepository } from '../chatting/chatting.repository';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketGateway } from '../socket/socket.gateway';
+import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UserRepository } from '../user/user.repository';
 import { OfferRepository } from './offer.repository';
 import { Injectable } from '@nestjs/common';
@@ -131,6 +132,22 @@ export class OfferService {
 
       const offerTeacherIds = question.offerTeachers;
 
+      const confirmMessage = {
+        text: `선생님과 수업이 확정되었습니다.\n수업 시간은 ${startTime} ~ ${endTime} 입니다.`,
+      };
+
+      await this.socketGateway.sendMessageToBothUser(
+        userId,
+        chatting.teacherId,
+        chattingId,
+        'text',
+        JSON.stringify(confirmMessage),
+      );
+
+      const rejectMessage = {
+        text: '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
+      };
+
       for (const offerTeacherId of offerTeacherIds) {
         if (offerTeacherId != chatting.teacherId) {
           const teacherChatId =
@@ -144,7 +161,7 @@ export class OfferService {
             offerTeacherId,
             teacherChatId,
             'text',
-            '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
+            JSON.stringify(rejectMessage),
           );
         }
       }
