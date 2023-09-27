@@ -200,6 +200,8 @@ export class SocketGateway {
       createdAt: new Date().toISOString(),
     };
     const receiverSocketId = await this.redisRepository.get(receiverId);
+
+    console.log('sender-receiver', senderId, receiverId);
     if (receiverSocketId != null) {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
     } else {

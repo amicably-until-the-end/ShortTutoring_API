@@ -58,7 +58,6 @@ export class ChattingService {
           chatRooms.push(questionRoom);
         }
       }
-      console.log(chatRooms);
 
       return new Success('채팅방 목록을 불러왔습니다.', chatRooms);
     } catch (error) {
