@@ -204,12 +204,13 @@ export class SocketGateway {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
     } else {
       //TODO: FCM 메시지 보내기
+      console.log('FCM 메시지 보내기');
     }
     const senderSocketId = await this.redisRepository.get(senderId);
     if (senderSocketId != null) {
       this.sendMessageToSocketClient(senderSocketId, chattingId, message);
     } else {
-      //TODO: FCM 메시지 보내기
+      console.log('FCM 메시지 보내기');
     }
     // TODO: 레디스 브로드캐스트
     // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
