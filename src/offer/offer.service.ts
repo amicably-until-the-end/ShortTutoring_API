@@ -2,6 +2,7 @@ import { ChattingRepository } from '../chatting/chatting.repository';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketGateway } from '../socket/socket.gateway';
+import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UserRepository } from '../user/user.repository';
 import { OfferRepository } from './offer.repository';
 import { Injectable } from '@nestjs/common';
@@ -13,6 +14,7 @@ export class OfferService {
     private readonly userRepository: UserRepository,
     private readonly chattingRepository: ChattingRepository,
     private readonly questionRepository: QuestionRepository,
+    private readonly tutoringRepository: TutoringRepository,
     private readonly socketGateway: SocketGateway,
   ) {}
 
@@ -51,13 +53,13 @@ export class OfferService {
       const requestMessage = {
         text: '안녕하세요 선생님! 언제 수업 가능하신가요?',
       };
-      console.log(
-        'chatRoomId',
+
+      //TODO: redis pub/sub으로 변경
+      await this.chattingRepository.sendMessage(
         chatRoomId,
-        'studentId',
         studentId,
-        'userId',
-        userId,
+        'problem-image',
+        problemMessage,
       );
 
       //TODO: redis pub/sub으로 변경
@@ -103,20 +105,50 @@ export class OfferService {
     }
   }*/
 
-  async accept(userId: string, chattingId: string, questionId: string) {
+  async accept(
+    userId: string,
+    chattingId: string,
+    questionId: string,
+    startTime: Date,
+    endTime: Date,
+  ) {
     try {
       const chatting = await this.chattingRepository.getChatRoomInfo(
         chattingId,
       );
-      const tutoring = await this.offerRepository.accept(
-        userId,
+      const tutoring = await this.tutoringRepository.create(
         questionId,
+        userId,
         chatting.teacherId,
+      );
+
+      await this.tutoringRepository.reserveTutoring(
+        tutoring.id,
+        startTime,
+        endTime,
       );
 
       const question = await this.questionRepository.getInfo(questionId);
 
       const offerTeacherIds = question.offerTeachers;
+
+      await this.questionRepository.changeStatus(questionId, 'reserved');
+
+      const confirmMessage = {
+        text: `선생님과 수업이 확정되었습니다.\n수업 시간은 ${startTime} ~ ${endTime} 입니다.`,
+      };
+
+      await this.socketGateway.sendMessageToBothUser(
+        userId,
+        chatting.teacherId,
+        chattingId,
+        'text',
+        JSON.stringify(confirmMessage),
+      );
+
+      const rejectMessage = {
+        text: '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
+      };
 
       for (const offerTeacherId of offerTeacherIds) {
         if (offerTeacherId != chatting.teacherId) {
@@ -131,7 +163,7 @@ export class OfferService {
             offerTeacherId,
             teacherChatId,
             'text',
-            '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
+            JSON.stringify(rejectMessage),
           );
         }
       }

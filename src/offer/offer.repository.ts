@@ -93,7 +93,12 @@ export class OfferRepository {
     }
   }*/
 
-  async accept(userId: string, questionId: string, teacherId: string) {
+  async accept(
+    userId: string,
+    questionId: string,
+    teacherId: string,
+    tutoringId: string,
+  ) {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
       throw new Error('선생님은 질문을 수락할 수 없습니다.');
@@ -108,15 +113,7 @@ export class OfferRepository {
       throw new Error('질문 대기열에 존재하지 않는 선생님입니다.');
     }
 
-    const tutoring = await this.tutoringRepository.create(
-      questionId,
-      userId,
-      question.selectedTeacherId,
-    );
-
-    const tutoringId = tutoring.id;
-
-    await this.questionModel.update(
+    return await this.questionModel.update(
       { id: questionId },
       {
         status: 'reserved',
@@ -124,7 +121,5 @@ export class OfferRepository {
         tutoringId,
       },
     );
-
-    return tutoring;
   }
 }

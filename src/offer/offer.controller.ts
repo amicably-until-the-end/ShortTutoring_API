@@ -75,6 +75,8 @@ export class OfferController {
       AccessToken.userId(headers),
       acceptOfferDto.chattingId,
       questionId,
+      acceptOfferDto.startTime,
+      acceptOfferDto.endTime,
     );
   }
 }
