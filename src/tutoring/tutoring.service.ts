@@ -61,22 +61,25 @@ export class TutoringService {
   async info(questionId: string, userId: string) {
     try {
       const question = await this.questionRepository.getInfo(questionId);
+      console.log(question);
 
       if (question.tutoringId == null) return new Fail('과외 정보가 없습니다.');
 
+      const userInfo = await this.userRepository.get(userId);
+
       const tutoring = await this.tutoringRepository.get(question.tutoringId);
 
-      /*
-      const userInfo = await this.userRepository.get(userId);
-      if (userInfo.role == 'student') {
-        if (tutoring.status != 'going') {
-          return new Fail('수업 시작 전입니다.');
-        }
+      if (userInfo.role == 'student' && tutoring.status != 'going') {
+        return new Success('수업 시작 전입니다.');
       }
-      */
+
+      if (question.tutoringId == null) {
+        return new Fail('과외 정보가 없습니다.');
+      }
+
       return new Success('과외 정보를 가져왔습니다.', { tutoring });
     } catch (error) {
-      return new Fail(error.message);
+      return new Fail('과외 정보를 가져오는데 실패했습니다.');
     }
   }
 

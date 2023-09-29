@@ -61,6 +61,13 @@ export class QuestionRepository {
       .exec();
   }
 
+  async setTutoringId(questionId: string, tutoringId: string) {
+    return await this.questionModel.update(
+      { id: questionId },
+      { tutoringId: tutoringId },
+    );
+  }
+
   async createSelectedQuestion(
     questionId: string,
     userId: string,

@@ -134,6 +134,13 @@ export class OfferService {
 
       await this.questionRepository.changeStatus(questionId, 'reserved');
 
+      await this.questionRepository.setTutoringId(questionId, tutoring.id);
+
+      await this.questionRepository.setSeletedTeacherId(
+        questionId,
+        chatting.teacherId,
+      );
+
       const confirmMessage = {
         text: `선생님과 수업이 확정되었습니다.\n수업 시간은 ${startTime} ~ ${endTime} 입니다.`,
       };
