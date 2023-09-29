@@ -31,7 +31,7 @@ export class TutoringController {
   }
 
   @ApiBearerAuth('Authorization')
-  @ApiOperation(TutoringOperation.info)
+  @ApiOperation(TutoringOperation.classroomInfo)
   @Get('classroom/info/:questionId')
   classroomInfo(
     @Param('questionId') questionId: string,
