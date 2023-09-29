@@ -24,6 +24,19 @@ export class TutoringController {
     return this.tutoringService.info(questionId, AccessToken.userId(headers));
   }
 
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(TutoringOperation.info)
+  @Get('classroom/info/:questionId')
+  classroomInfo(
+    @Param('questionId') questionId: string,
+    @Headers() headers: Headers,
+  ) {
+    return this.tutoringService.classroomInfo(
+      questionId,
+      AccessToken.userId(headers),
+    );
+  }
+
   @ApiTags('Teacher')
   @ApiBearerAuth('Authorization')
   @Get('start/:questionId')

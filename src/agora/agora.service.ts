@@ -14,7 +14,7 @@ export class AgoraService {
     const expirationTimeInSeconds = 3600;
     const currentTimestamp = Math.floor(Date.now() / 1000);
     const privilegeExpiredTs = currentTimestamp + expirationTimeInSeconds;
-    const studentToken = RtcTokenBuilder.buildTokenWithUid(
+    const token = RtcTokenBuilder.buildTokenWithUid(
       appID,
       appCertificate,
       channelName,
@@ -22,18 +22,10 @@ export class AgoraService {
       RtcRole.PUBLISHER,
       privilegeExpiredTs,
     );
-    const teacherToken = RtcTokenBuilder.buildTokenWithUid(
-      appID,
-      appCertificate,
-      channelName,
-      1,
-      RtcRole.PUBLISHER,
-      privilegeExpiredTs,
-    );
-    return { studentToken: studentToken, teacherToken: teacherToken };
+    return token;
   }
 
-  async makeWhiteBoardChannel(): Promise<WhiteBoardData> {
+  async makeWhiteBoardChannel(): Promise<WhiteBoardChannelInfo> {
     const { data } = await firstValueFrom(
       this.httpService.post(
         'https://api.netless.link/v5/rooms',
@@ -56,7 +48,6 @@ export class AgoraService {
     return {
       whiteBoardAppId: `${data?.teamUUID}/${data?.appUUID}`,
       whiteBoardUUID: data?.uuid,
-      whiteBoardToken: token,
     };
   }
 
@@ -108,8 +99,11 @@ export class AgoraService {
   }
 }
 
-export interface WhiteBoardData {
-  whiteBoardAppId: string | null;
-  whiteBoardUUID: string | null;
-  whiteBoardToken: string | null;
+export interface ClassRoomTicket {
+  token: string | null;
+}
+
+export interface WhiteBoardChannelInfo {
+  whiteBoardAppId: string;
+  whiteBoardUUID: string;
 }

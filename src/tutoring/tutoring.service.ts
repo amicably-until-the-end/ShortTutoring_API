@@ -2,6 +2,7 @@ import { AgoraService } from '../agora/agora.service';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { UserRepository } from '../user/user.repository';
+import { ClassroomInfo, TutoringInfo } from './entities/tutoring.entity';
 import { TutoringRepository } from './tutoring.repository';
 import { Injectable } from '@nestjs/common';
 
@@ -58,7 +59,7 @@ export class TutoringService {
     }
   }
 
-  async info(questionId: string, userId: string) {
+  async classroomInfo(questionId: string, userId: string) {
     try {
       const question = await this.questionRepository.getInfo(questionId);
       console.log(question);
@@ -70,16 +71,52 @@ export class TutoringService {
       const tutoring = await this.tutoringRepository.get(question.tutoringId);
 
       if (userInfo.role == 'student' && tutoring.status != 'going') {
-        return new Success('수업 시작 전입니다.');
+        return new Fail('수업 시작 전입니다.');
       }
+      const whiteBoardToken = await this.agoraService.makeWhiteBoardToken(
+        tutoring.whiteBoardUUID,
+      );
+      const rtcToken = await this.agoraService.makeRtcToken(questionId);
 
       if (question.tutoringId == null) {
-        return new Fail('과외 정보가 없습니다.');
+        return new Fail('강의실 정보가 없습니다.');
       }
 
-      return new Success('과외 정보를 가져왔습니다.', { tutoring });
+      const accessInfo: ClassroomInfo = {
+        boardAppId: tutoring.whiteBoardAppId,
+        rtcAppId: tutoring.RTCAppId,
+        boardUUID: tutoring.whiteBoardUUID,
+        boardToken: whiteBoardToken,
+        rtcToken: rtcToken,
+      };
+      return new Success('강의실 정보를 가져왔습니다.', accessInfo);
     } catch (error) {
-      return new Fail('과외 정보를 가져오는데 실패했습니다.');
+      return new Fail('강의실 정보를 가져오는데 실패했습니다.');
+    }
+  }
+
+  async info(questionId: string, userId: string) {
+    try {
+      const question = await this.questionRepository.getInfo(questionId);
+      if (
+        question.studentId != userId &&
+        question.selectedTeacherId != userId
+      ) {
+        return new Fail('해당 과외 정보를 볼 수 없습니다.');
+      }
+      const tutoring = await this.tutoringRepository.get(question.tutoringId);
+      const tutoringInfo: TutoringInfo = {
+        id: tutoring.id,
+        questionId: tutoring.questionId,
+        studentId: tutoring.studentId,
+        teacherId: tutoring.teacherId,
+        status: tutoring.status,
+        reservedStart: tutoring.reservedStart,
+        reservedEnd: tutoring.reservedEnd,
+      };
+      return new Success('과외 정보를 가져왔습니다.', tutoringInfo);
+    } catch (e) {
+      return new Fail('해당 과외 정보를 가져오는 데 실패했습니다.');
     }
   }
 
@@ -89,7 +126,9 @@ export class TutoringService {
       if (tutoring.teacherId != teacherId) {
         return new Fail('해당 과외를 진행할 수 없습니다.');
       }
-      return await this.tutoringRepository.startTutoring(tutoringId);
+      await this.tutoringRepository.startTutoring(tutoringId);
+
+      return await this.classroomInfo(tutoring.questionId, teacherId);
     } catch (error) {
       return new Fail('과외 시작에 실패했습니다.');
     }

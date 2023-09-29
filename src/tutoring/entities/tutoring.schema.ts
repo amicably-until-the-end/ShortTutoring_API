@@ -27,27 +27,27 @@ export const TutoringSchema = new Schema({
     type: String,
   },
   whiteBoardAppId: {
-    type: String,
+    type: String || null,
   },
   whiteBoardToken: {
-    type: String,
+    type: String || null,
   },
   whiteBoardUUID: {
-    type: String,
+    type: String || null,
   },
   teacherRTCToken: {
-    type: String,
+    type: String || null,
   },
   studentRTCToken: {
-    type: String,
+    type: String || null,
   },
   RTCAppId: {
-    type: String,
+    type: String || null,
   },
   reservedStart: {
-    type: Date,
+    type: Date || null,
   },
   reservedEnd: {
-    type: Date,
+    type: Date || null,
   },
 });

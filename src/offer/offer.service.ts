@@ -121,6 +121,7 @@ export class OfferService {
         userId,
         chatting.teacherId,
       );
+      console.log(tutoring);
 
       await this.tutoringRepository.reserveTutoring(
         tutoring.id,
@@ -164,7 +165,6 @@ export class OfferService {
               questionId,
               offerTeacherId,
             );
-          //TODO: redis pub/sub으로 변경
           await this.socketGateway.sendMessageToBothUser(
             userId,
             offerTeacherId,
