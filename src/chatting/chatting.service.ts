@@ -1,5 +1,6 @@
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
+import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
 import { ChattingRepository } from './chatting.repository';
@@ -18,6 +19,7 @@ export class ChattingService {
     private readonly chattingRepository: ChattingRepository,
     private readonly userRepository: UserRepository,
     private readonly questionRepository: QuestionRepository,
+    private readonly tutoringRepository: TutoringRepository,
   ) {}
 
   async getChatList(userId: string) {
@@ -150,6 +152,14 @@ export class ChattingService {
       questionInfo: questionInfo,
       title: opponentInfo?.name,
     };
+
+    if (questionInfo.tutoringId != null) {
+      const tutoringInfo = await this.tutoringRepository.get(
+        questionInfo.tutoringId,
+      );
+      chatRoom.reservedStart = tutoringInfo.reservedStart;
+    }
+
     return chatRoom;
   }
 

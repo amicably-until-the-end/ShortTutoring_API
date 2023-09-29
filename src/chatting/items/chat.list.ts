@@ -29,6 +29,7 @@ export interface ChatRoom {
   isSelect: boolean;
   questionInfo?: Question;
   questionId: string;
+  reservedStart?: Date;
 }
 
 export interface Message {
