@@ -45,7 +45,7 @@ export class TutoringService {
         question.selectedTeacherId,
       );
 
-      const result = await this.tutoringRepository.reserveTutoring(
+      await this.tutoringRepository.reserveTutoring(
         tutoring.id,
         startTime,
         endTime,
@@ -53,7 +53,7 @@ export class TutoringService {
 
       await this.questionRepository.changeStatus(questionId, 'reserved');
 
-      return new Success('수업 시간이 확정되었습니다.', { result });
+      return new Success('수업 시간이 확정되었습니다.');
     } catch (error) {
       return new Fail(error.message);
     }
@@ -62,7 +62,6 @@ export class TutoringService {
   async classroomInfo(questionId: string, userId: string) {
     try {
       const question = await this.questionRepository.getInfo(questionId);
-      console.log(question);
 
       if (question.tutoringId == null) return new Fail('과외 정보가 없습니다.');
 

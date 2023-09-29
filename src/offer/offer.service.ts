@@ -54,15 +54,6 @@ export class OfferService {
         text: '안녕하세요 선생님! 언제 수업 가능하신가요?',
       };
 
-      //TODO: redis pub/sub으로 변경
-      await this.chattingRepository.sendMessage(
-        chatRoomId,
-        studentId,
-        'problem-image',
-        problemMessage,
-      );
-
-      //TODO: redis pub/sub으로 변경
       await this.socketGateway.sendMessageToBothUser(
         studentId,
         userId,
@@ -121,7 +112,6 @@ export class OfferService {
         userId,
         chatting.teacherId,
       );
-      console.log(tutoring);
 
       await this.tutoringRepository.reserveTutoring(
         tutoring.id,
@@ -143,14 +133,14 @@ export class OfferService {
       );
 
       const confirmMessage = {
-        text: `선생님과 수업이 확정되었습니다.\n수업 시간은 ${startTime} ~ ${endTime} 입니다.`,
+        startTime: startTime,
       };
 
       await this.socketGateway.sendMessageToBothUser(
         userId,
         chatting.teacherId,
         chattingId,
-        'text',
+        'reserve-confirm',
         JSON.stringify(confirmMessage),
       );
 

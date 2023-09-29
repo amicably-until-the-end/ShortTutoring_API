@@ -39,7 +39,6 @@ export class SocketGateway {
       if (process.env.NODE_ENV === 'dev') {
         await this.redisSub.subscribe(client.id, (message) => {
           client.emit('message', message);
-          console.log(message);
         });
       }
 
@@ -48,7 +47,6 @@ export class SocketGateway {
     } catch (error) {
       const message = `소켓 연결에 실패했습니다. ${error.message}`;
 
-      console.log(message);
       await socketErrorWebhook.send(message);
 
       return new Error('소켓 연결에 실패했습니다.');
@@ -124,7 +122,6 @@ export class SocketGateway {
         .getUserFromAuthorization(client.handshake.headers)
         .then((user) => user.id);
 
-      console.log('test', sender, receiverId, chattingId, format, body);
       // user에게 메시지 전송
       await this.sendMessageToUser(
         sender,
@@ -136,7 +133,6 @@ export class SocketGateway {
     } catch (error) {
       const message = `메시지를 전송할 수 없습니다. ${error.message}`;
 
-      console.log(message);
       await socketErrorWebhook.send(message);
 
       return new Error('메시지를 전송할 수 없습니다.');
@@ -205,21 +201,12 @@ export class SocketGateway {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
     } else {
       //TODO: FCM 메시지 보내기
-      console.log('FCM 메시지 보내기');
     }
     const senderSocketId = await this.redisRepository.get(senderId);
     if (senderSocketId != null) {
       this.sendMessageToSocketClient(senderSocketId, chattingId, message);
     } else {
-      console.log('FCM 메시지 보내기');
     }
-    console.log(
-      'sender-receiver',
-      senderId,
-      senderSocketId,
-      receiverId,
-      receiverSocketId,
-    );
 
     // TODO: 레디스 브로드캐스트
     // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요

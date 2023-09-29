@@ -1,9 +1,15 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { TutoringOperation } from './descriptions/tutoring.operation';
+import { TutoringResponse } from './descriptions/tutoring.response';
 import { AppointTutoringDto } from './dto/create-tutoring.dto';
 import { TutoringService } from './tutoring.service';
 import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Tutoring')
 @Controller('tutoring')
@@ -39,6 +45,8 @@ export class TutoringController {
 
   @ApiTags('Teacher')
   @ApiBearerAuth('Authorization')
+  @ApiOperation(TutoringOperation.start)
+  @ApiResponse(TutoringResponse.classroomInfo)
   @Get('start/:questionId')
   start(@Param('questionId') questionId: string, @Headers() headers: Headers) {
     return this.tutoringService.startTutoring(
