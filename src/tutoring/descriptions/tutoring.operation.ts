@@ -12,7 +12,7 @@ export const TutoringOperation = {
     description: '특정 과외의 정보, 예약시간을 확인 합니다.',
   },
   classroomInfo: {
-    summary: '학생의 과외 강의실 토큰 확인',
+    summary: '학생용:과외 시작여부 확인 및 강의실 토큰 발급',
     description:
       '학생이 과외 강의실에 접속하기 위한 토큰을 확인합니다. 선생님이 수업을 시작하지 않으면 토큰이 발급되지 않습니다.',
   },
