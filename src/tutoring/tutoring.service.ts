@@ -1,4 +1,5 @@
 import { AgoraService } from '../agora/agora.service';
+import { ChattingRepository } from '../chatting/chatting.repository';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketGateway } from '../socket/socket.gateway';
@@ -15,6 +16,7 @@ export class TutoringService {
     private readonly agoraService: AgoraService,
     private readonly socketGateway: SocketGateway,
     private readonly userRepository: UserRepository,
+    private readonly chattingRepository: ChattingRepository,
   ) {}
 
   async finish(tutoringId: string) {
@@ -123,15 +125,15 @@ export class TutoringService {
 
   async decline(chattingId: string, userId: string) {
     try {
-      const question = await this.questionRepository.getInfo(chattingId);
-      if (question.selectedTeacherId != userId) {
-        return new Fail('잘못된 접근입니다.');
-      }
+      const chatRoomInfo = await this.chattingRepository.getChatRoomInfo(
+        chattingId,
+      );
+
       await this.questionRepository.changeStatus(chattingId, 'declined');
 
       await this.socketGateway.sendMessageToBothUser(
-        question.selectedTeacherId,
-        question.studentId,
+        chatRoomInfo.teacherId,
+        chatRoomInfo.studentId,
         chattingId,
         'request-decline',
         null,
