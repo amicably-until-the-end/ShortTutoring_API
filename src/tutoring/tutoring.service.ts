@@ -128,6 +128,7 @@ export class TutoringService {
       const chatRoomInfo = await this.chattingRepository.getChatRoomInfo(
         chattingId,
       );
+      console.log(chatRoomInfo, chattingId);
       if (userId != chatRoomInfo.teacherId) {
         return new Fail('해당 과외를 거절할 수 없습니다.');
       }
@@ -144,6 +145,7 @@ export class TutoringService {
 
       return new Success('과외를 거절했습니다.');
     } catch (e) {
+      console.log(e);
       return new Fail('과외 거절에 실패했습니다.');
     }
   }
