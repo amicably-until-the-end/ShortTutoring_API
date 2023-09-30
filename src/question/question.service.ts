@@ -92,6 +92,7 @@ export class QuestionService {
         description: createQuestionDto.description,
         questionId: questionId,
       };
+      console.log(createQuestionDto.requestTutoringStartTime);
       const requestMessage = {
         startDateTime: createQuestionDto.requestTutoringStartTime.toISOString(),
       };
