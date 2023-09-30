@@ -128,6 +128,9 @@ export class TutoringService {
       const chatRoomInfo = await this.chattingRepository.getChatRoomInfo(
         chattingId,
       );
+      if (userId != chatRoomInfo.teacherId) {
+        return new Fail('해당 과외를 거절할 수 없습니다.');
+      }
 
       await this.questionRepository.changeStatus(chattingId, 'declined');
 
