@@ -140,7 +140,7 @@ export class TutoringService {
         chatRoomInfo.studentId,
         chattingId,
         'request-decline',
-        null,
+        JSON.stringify({}),
       );
 
       return new Success('과외를 거절했습니다.');
