@@ -127,7 +127,7 @@ export class TutoringService {
       }
       await this.tutoringRepository.startTutoring(tutoringId);
 
-      return await this.classroomInfo(tutoring.questionId, teacherId);
+      return await this.classroomInfo(tutoring.id, teacherId);
     } catch (error) {
       return new Fail('과외 시작에 실패했습니다.');
     }
