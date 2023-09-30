@@ -2,7 +2,7 @@ import { AccessToken } from '../auth/entities/auth.entity';
 import { ChattingService } from './chatting.service';
 import { ChattingOperation } from './description/chatting.operation';
 import { ChattingResponse } from './description/chatting.response';
-import { Controller, Get, Headers } from '@nestjs/common';
+import { Controller, Get, Headers, Param } from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -21,5 +21,18 @@ export class ChattingController {
   @Get('/list')
   getChatList(@Headers() headers: Headers) {
     return this.chattingService.getChatList(AccessToken.userId(headers));
+  }
+
+  @ApiOperation(ChattingOperation.list)
+  @ApiResponse(ChattingResponse.list.success)
+  @Get('/:chattingId')
+  getChatRoomInfo(
+    @Param('chattingId') chattingId: string,
+    @Headers() headers: Headers,
+  ) {
+    return this.chattingService.findOne(
+      chattingId,
+      AccessToken.userId(headers),
+    );
   }
 }
