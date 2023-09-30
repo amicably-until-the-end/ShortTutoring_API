@@ -23,6 +23,7 @@ export class TutoringController {
     return this.tutoringService.finish(tutoringId);
   }
 
+  @ApiTags('Teacher')
   @ApiBearerAuth('Authorization')
   @ApiOperation(TutoringOperation.info)
   @Get('info/:questionId')
@@ -30,6 +31,7 @@ export class TutoringController {
     return this.tutoringService.info(questionId, AccessToken.userId(headers));
   }
 
+  @ApiTags('Tutoring')
   @ApiBearerAuth('Authorization')
   @ApiOperation(TutoringOperation.classroomInfo)
   @Get('classroom/info/:questionId')
@@ -52,6 +54,20 @@ export class TutoringController {
     return this.tutoringService.startTutoring(
       AccessToken.userId(headers),
       tutoringId,
+    );
+  }
+
+  @ApiTags('Teacher')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(TutoringOperation.decline)
+  @Get('decline/:tutoringId')
+  decline(
+    @Param('tutoringId') chattingId: string,
+    @Headers() headers: Headers,
+  ) {
+    return this.tutoringService.decline(
+      chattingId,
+      AccessToken.userId(headers),
     );
   }
 

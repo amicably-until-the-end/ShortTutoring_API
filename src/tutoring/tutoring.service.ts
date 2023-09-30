@@ -1,6 +1,7 @@
 import { AgoraService } from '../agora/agora.service';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
+import { SocketGateway } from '../socket/socket.gateway';
 import { UserRepository } from '../user/user.repository';
 import { ClassroomInfo, TutoringInfo } from './entities/tutoring.entity';
 import { TutoringRepository } from './tutoring.repository';
@@ -12,6 +13,7 @@ export class TutoringService {
     private readonly tutoringRepository: TutoringRepository,
     private readonly questionRepository: QuestionRepository,
     private readonly agoraService: AgoraService,
+    private readonly socketGateway: SocketGateway,
     private readonly userRepository: UserRepository,
   ) {}
 
@@ -116,6 +118,28 @@ export class TutoringService {
       return new Success('과외 정보를 가져왔습니다.', tutoringInfo);
     } catch (e) {
       return new Fail('해당 과외 정보를 가져오는 데 실패했습니다.');
+    }
+  }
+
+  async decline(chattingId: string, userId: string) {
+    try {
+      const question = await this.questionRepository.getInfo(chattingId);
+      if (question.selectedTeacherId != userId) {
+        return new Fail('잘못된 접근입니다.');
+      }
+      await this.questionRepository.changeStatus(chattingId, 'declined');
+
+      await this.socketGateway.sendMessageToBothUser(
+        question.selectedTeacherId,
+        question.studentId,
+        chattingId,
+        'request-decline',
+        null,
+      );
+
+      return new Success('과외를 거절했습니다.');
+    } catch (e) {
+      return new Fail('과외 거절에 실패했습니다.');
     }
   }
 

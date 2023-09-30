@@ -1,4 +1,8 @@
 export const TutoringOperation = {
+  decline: {
+    summary: '과외 거절',
+    description: '특정 지정 과외를 거절합니다.',
+  },
   start: {
     summary: '선생님의 과외 시작 및 토큰 발급',
     description: '선생님의 과외 시작. 선생님의 강의실 토큰 발급',
