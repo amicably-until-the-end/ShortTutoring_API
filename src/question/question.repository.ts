@@ -55,9 +55,9 @@ export class QuestionRepository {
     }
   }
 
-  async getStudentPendingQuestions(userId: string) {
+  async getStudentNormalPendingQuestions(userId: string) {
     return await this.questionModel
-      .scan({ studentId: userId, status: 'pending' })
+      .scan({ studentId: userId, status: 'pending', isSelect: false })
       .exec();
   }
 

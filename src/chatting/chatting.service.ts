@@ -42,7 +42,9 @@ export class ChattingService {
 
       if (userInfo.role == 'student') {
         const questions =
-          await this.questionRepository.getStudentPendingQuestions(userId);
+          await this.questionRepository.getStudentNormalPendingQuestions(
+            userId,
+          );
         for (let i = 0; i < questions.count; i++) {
           if (insertedQuestions.has(questions[i].id)) continue;
           const question = questions[i];
