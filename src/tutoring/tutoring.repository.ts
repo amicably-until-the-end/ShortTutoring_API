@@ -43,7 +43,10 @@ export class TutoringRepository {
 
     return await this.tutoringModel.update(
       { id: tutoringId },
-      { reservedStart: startTime, reservedEnd: endTime },
+      {
+        reservedStart: startTime,
+        reservedEnd: endTime,
+      },
     );
   }
 

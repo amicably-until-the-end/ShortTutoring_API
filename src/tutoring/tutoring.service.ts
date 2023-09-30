@@ -45,6 +45,8 @@ export class TutoringService {
         question.selectedTeacherId,
       );
 
+      await this.questionRepository.setTutoringId(questionId, tutoring.id);
+
       await this.tutoringRepository.reserveTutoring(
         tutoring.id,
         startTime,
