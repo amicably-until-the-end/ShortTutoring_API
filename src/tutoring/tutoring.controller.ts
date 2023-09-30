@@ -47,11 +47,11 @@ export class TutoringController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(TutoringOperation.start)
   @ApiResponse(TutoringResponse.classroomInfo)
-  @Get('start/:questionId')
-  start(@Param('questionId') questionId: string, @Headers() headers: Headers) {
+  @Get('start/:tutoringId')
+  start(@Param('tutoringId') tutoringId: string, @Headers() headers: Headers) {
     return this.tutoringService.startTutoring(
       AccessToken.userId(headers),
-      questionId,
+      tutoringId,
     );
   }
 
