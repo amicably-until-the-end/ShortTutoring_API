@@ -43,11 +43,9 @@ export class QuestionRepository {
           schoolLevel: createQuestionDto.schoolLevel,
           schoolSubject: createQuestionDto.schoolSubject,
         },
-        selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
         offerTeachers: [],
-        tutoringId: '',
         isSelect: false,
       });
     } catch (error) {
@@ -96,7 +94,6 @@ export class QuestionRepository {
         status: 'pending',
         studentId: userId,
         offerTeachers: [],
-        tutoringId: '',
         isSelect: true,
       });
     } catch (error) {
