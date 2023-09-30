@@ -57,6 +57,24 @@ export class TutoringService {
         endTime,
       );
 
+      const reserveConfirmMessage = {
+        startTime: startTime.toISOString(),
+      };
+
+      const chatRoomId =
+        await this.chattingRepository.getIdByQuestionAndTeacher(
+          questionId,
+          question.selectedTeacherId,
+        );
+
+      await this.socketGateway.sendMessageToBothUser(
+        question.selectedTeacherId,
+        question.studentId,
+        chatRoomId,
+        'reserve-confirm',
+        JSON.stringify(reserveConfirmMessage),
+      );
+
       await this.questionRepository.changeStatus(questionId, 'reserved');
 
       return new Success('수업 시간이 확정되었습니다.');

@@ -136,7 +136,7 @@ export class QuestionRepository {
     );
   }
 
-  async setSeletedTeacherId(questionId: string, teacherId: string) {
+  async setSelectedTeacherId(questionId: string, teacherId: string) {
     return await this.questionModel.update(
       { id: questionId },
       { selectedTeacherId: teacherId },

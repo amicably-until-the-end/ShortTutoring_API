@@ -127,13 +127,13 @@ export class OfferService {
 
       await this.questionRepository.setTutoringId(questionId, tutoring.id);
 
-      await this.questionRepository.setSeletedTeacherId(
+      await this.questionRepository.setSelectedTeacherId(
         questionId,
         chatting.teacherId,
       );
 
       const confirmMessage = {
-        startTime: startTime,
+        startTime: startTime.toISOString(),
       };
 
       await this.socketGateway.sendMessageToBothUser(

@@ -93,7 +93,7 @@ export class QuestionService {
         questionId: questionId,
       };
       const requestMessage = {
-        startDateTime: createQuestionDto.requestTutoringStartTime,
+        startDateTime: createQuestionDto.requestTutoringStartTime.toISOString(),
       };
 
       await this.socketGateway.sendMessageToBothUser(
