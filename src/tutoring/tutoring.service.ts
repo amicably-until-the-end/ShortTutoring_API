@@ -36,7 +36,7 @@ export class TutoringService {
     try {
       const question = await this.questionRepository.getInfo(questionId);
 
-      if (question.tutoringId != null || question.tutoringId != '')
+      if (question.tutoringId != null)
         return new Fail('이미 과외가 확정되었습니다.');
 
       const tutoring = await this.tutoringRepository.create(
