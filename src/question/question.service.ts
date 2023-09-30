@@ -113,6 +113,7 @@ export class QuestionService {
 
       return new Success('질문이 생성되었습니다.', question);
     } catch (error) {
+      console.log(error);
       return new Fail(error.message);
     }
   }
