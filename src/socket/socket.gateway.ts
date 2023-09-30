@@ -200,18 +200,25 @@ export class SocketGateway {
     if (receiverSocketId != null) {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
     } else {
+      console.log('receiver is not online', receiverId);
       //TODO: FCM 메시지 보내기
     }
     const senderSocketId = await this.redisRepository.get(senderId);
     if (senderSocketId != null) {
       this.sendMessageToSocketClient(senderSocketId, chattingId, message);
     } else {
+      console.log('sender is not online', senderId);
     }
 
     // TODO: 레디스 브로드캐스트
     // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
     await this.redisRepository.publish(
       receiverSocketId,
+      JSON.stringify({ chattingId, message }),
+    );
+
+    await this.redisRepository.publish(
+      senderSocketId,
       JSON.stringify({ chattingId, message }),
     );
 
