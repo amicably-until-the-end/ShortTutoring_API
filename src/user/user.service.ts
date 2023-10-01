@@ -279,10 +279,14 @@ export class UserService {
       return new Success('현재 온라인 선생님이 없습니다.', []);
     const userInfos = await this.userRepository.usersInfo(users);
     const onlineTeachers = userInfos.filter((user) => user.role == 'teacher');
-    return onlineTeachers.map((teacher) => {
+    const result = onlineTeachers.map((teacher) => {
       const { id, name, profileImage, followers } = teacher;
       return { id, name, profileImage, followers: followers.length };
     });
+    return new Success(
+      '현재 온라인 선생님들을 성공적으로 가져왔습니다.',
+      result,
+    );
   }
 
   async otherFollowing(userId: string) {
