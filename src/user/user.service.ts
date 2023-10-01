@@ -1,5 +1,6 @@
 import { AuthRepository } from '../auth/auth.repository';
 import { webhook } from '../config.discord-webhook';
+import { RedisRepository } from '../redis/redis.repository';
 import { Fail, Success } from '../response';
 import { UploadRepository } from '../upload/upload.repository';
 import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
@@ -17,6 +18,7 @@ export class UserService {
     private readonly authRepository: AuthRepository,
     private readonly userRepository: UserRepository,
     private readonly uploadRepository: UploadRepository,
+    private readonly redisRepository: RedisRepository,
   ) {}
 
   /**
@@ -268,6 +270,19 @@ export class UserService {
     } catch (error) {
       return new Fail(error.message);
     }
+  }
+
+  async getOnlineTeachers() {
+    const users = await this.redisRepository.getAllKeys();
+    console.log(users);
+    if (users.length == 0)
+      return new Success('현재 온라인 선생님이 없습니다.', []);
+    const userInfos = await this.userRepository.usersInfo(users);
+    const onlineTeachers = userInfos.filter((user) => user.role == 'teacher');
+    return onlineTeachers.map((teacher) => {
+      const { id, name, profileImage, followers } = teacher;
+      return { id, name, profileImage, followers: followers.length };
+    });
   }
 
   async otherFollowing(userId: string) {

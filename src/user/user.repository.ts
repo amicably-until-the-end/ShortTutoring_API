@@ -82,6 +82,14 @@ export class UserRepository {
     }
   }
 
+  async usersInfo(userIds: string[]) {
+    const users = await this.userModel.batchGet(userIds.map((id) => ({ id })));
+    if (users === undefined) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+    return users;
+  }
+
   async delete(userId: string) {
     const user: User = await this.userModel.get({
       id: userId,

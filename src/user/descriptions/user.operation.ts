@@ -1,4 +1,8 @@
 export const UserOperation = {
+  onlineTeacher: {
+    summary: '온라인 선생님 조회',
+    description: '현재 접속해있는 선생님을 조회합니다.',
+  },
   signup: {
     student: {
       summary: '학생 회원가입',

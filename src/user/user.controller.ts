@@ -135,4 +135,11 @@ export class UserController {
   followers(@Headers() headers: Headers) {
     return this.userService.followers(AccessToken.userId(headers));
   }
+
+  @ApiTags('User')
+  @ApiOperation(UserOperation.onlineTeacher)
+  @Get('user/list/teacher/online')
+  getOnlineTeachers(@Headers() headers: Headers) {
+    return this.userService.getOnlineTeachers();
+  }
 }
