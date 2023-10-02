@@ -11,6 +11,7 @@ import {
   NestedChatRoomInfo,
 } from './items/chat.list';
 import { Injectable } from '@nestjs/common';
+import { TutoringRepository } from "../tutoring/tutoring.repository";
 
 @Injectable()
 export class ChattingService {
