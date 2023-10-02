@@ -4,6 +4,7 @@ import { UserParam } from './descriptions/user.param';
 import { UserResponse } from './descriptions/user.response';
 import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { SetFCMTokenUserDto } from './dto/setFCMToken-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserService } from './user.service';
 import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
@@ -146,7 +147,13 @@ export class UserController {
 
   @ApiTags('User')
   @Post('user/fcmToken')
-  setFCMToken(@Headers() headers: Headers, @Body('fcmToken') fcmToken: string) {
-    return this.userService.setFCMToken(AccessToken.userId(headers), fcmToken);
+  setFCMToken(
+    @Headers() headers: Headers,
+    @Body() setFCMTokenUserDto: SetFCMTokenUserDto,
+  ) {
+    return this.userService.setFCMToken(
+      AccessToken.userId(headers),
+      setFCMTokenUserDto.fcmToken,
+    );
   }
 }
