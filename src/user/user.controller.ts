@@ -146,6 +146,7 @@ export class UserController {
   }
 
   @ApiTags('User')
+  @ApiBearerAuth('Authorization')
   @Post('user/fcmToken')
   setFCMToken(
     @Headers() headers: Headers,
