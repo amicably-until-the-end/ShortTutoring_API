@@ -16,7 +16,6 @@ export class RedisRepository {
   constructor(
     @Inject(CACHE_MANAGER) private cache: Cache,
     @Inject('REDIS_PUB') private redisPub: RedisClientType,
-    @Inject('REDIS_SUB') private redisSub: RedisClientType,
   ) {}
 
   /*
@@ -30,11 +29,81 @@ export class RedisRepository {
     }
   }
 
+  async hSet(key: string, value: any) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      await this.redisPub.hSet(key, value);
+    }
+  }
+
+  async setSocketId(key: string, value: any) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      await this.redisPub.hSet(key, {
+        socketId: value,
+      });
+    }
+  }
+
+  async setFCMToken(key: string, value: any) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      await this.redisPub.hSet(key, {
+        fcmToken: value,
+      });
+    }
+  }
+
+  async setRole(key: string, value: any) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      await this.redisPub.hSet(key, {
+        role: value,
+      });
+    }
+  }
+
   async get(key: string): Promise<any> {
     if (process.env.NODE_ENV === 'local') {
       return await this.cache.get(key);
     } else {
       return await this.redisPub.get(key);
+    }
+  }
+
+  async hGetAll(key: string): Promise<any> {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      return await this.redisPub.hGetAll(key);
+    }
+  }
+
+  async getSocketId(key: string): Promise<any> {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      return await this.redisPub.hGet(key, 'socketId');
+    }
+  }
+
+  async getFCMToken(key: string): Promise<any> {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      return await this.redisPub.hGet(key, 'fcmToken');
+    }
+  }
+
+  async getRole(key: string): Promise<any> {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      return await this.redisPub.hGet(key, 'role');
     }
   }
 
@@ -51,6 +120,22 @@ export class RedisRepository {
       await this.cache.del(key);
     } else {
       await this.redisPub.del(key);
+    }
+  }
+
+  async delAll() {
+    if (process.env.NODE_ENV === 'local') {
+      await this.cache.reset();
+    } else {
+      await this.redisPub.flushAll();
+    }
+  }
+
+  async delSocketId(key: string) {
+    if (process.env.NODE_ENV === 'local') {
+      // 로컬 캐시엔 해시맵 없나?
+    } else {
+      await this.redisPub.hDel(key, 'socketId');
     }
   }
 
@@ -73,28 +158,6 @@ export class RedisRepository {
       // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
     } else {
       await this.redisPub.publish(channel, message);
-    }
-  }
-
-  /*
-    REDIS_SUB
-   */
-  async subscribe(channel: string) {
-    if (process.env.NODE_ENV === 'local') {
-      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
-    } else {
-      await this.redisSub.subscribe(channel, (message) => {
-        console.log('message : ', message);
-        console.log(this.server.sockets.adapter.rooms);
-      });
-    }
-  }
-
-  async unsubscribe(channel: string) {
-    if (process.env.NODE_ENV === 'local') {
-      // 로컬 Pub/Sub은 게이트웨이 단에서 구현함
-    } else {
-      await this.redisSub.unsubscribe(channel);
     }
   }
 }

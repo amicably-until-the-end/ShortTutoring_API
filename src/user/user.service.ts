@@ -299,4 +299,13 @@ export class UserService {
       return new Fail(error.message);
     }
   }
+
+  async setFCMToken(userId: any, fcmToken: string) {
+    try {
+      await this.redisRepository.setFCMToken(userId, fcmToken);
+      return new Success('성공적으로 FCM 토큰을 저장했습니다.');
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
 }

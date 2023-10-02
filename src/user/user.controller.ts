@@ -143,4 +143,10 @@ export class UserController {
   getOnlineTeachers(@Headers() headers: Headers) {
     return this.userService.getOnlineTeachers();
   }
+
+  @ApiTags('User')
+  @Post('user/fcmToken')
+  setFCMToken(@Headers() headers: Headers, @Body('fcmToken') fcmToken: string) {
+    return this.userService.setFCMToken(AccessToken.userId(headers), fcmToken);
+  }
 }
