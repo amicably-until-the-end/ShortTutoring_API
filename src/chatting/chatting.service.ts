@@ -1,5 +1,6 @@
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
+import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
 import { ChattingRepository } from './chatting.repository';
@@ -11,7 +12,6 @@ import {
   NestedChatRoomInfo,
 } from './items/chat.list';
 import { Injectable } from '@nestjs/common';
-import { TutoringRepository } from "../tutoring/tutoring.repository";
 
 @Injectable()
 export class ChattingService {
