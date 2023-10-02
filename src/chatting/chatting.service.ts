@@ -153,12 +153,14 @@ export class ChattingService {
       title: opponentInfo?.name,
     };
 
-    if (questionInfo.tutoringId != null) {
-      const tutoringInfo = await this.tutoringRepository.get(
-        questionInfo.tutoringId,
-      );
-      chatRoom.reservedStart = tutoringInfo.reservedStart;
-    }
+    try {
+      if (questionInfo.tutoringId != null) {
+        const tutoringInfo = await this.tutoringRepository.get(
+          questionInfo.tutoringId,
+        );
+        chatRoom.reservedStart = tutoringInfo.reservedStart;
+      }
+    } catch (error) {}
 
     return chatRoom;
   }

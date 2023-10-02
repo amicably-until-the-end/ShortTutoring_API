@@ -24,7 +24,6 @@ export class ChattingController {
   }
 
   @ApiOperation(ChattingOperation.list)
-  @ApiResponse(ChattingResponse.list.success)
   @Get('/:chattingId')
   getChatRoomInfo(
     @Param('chattingId') chattingId: string,
