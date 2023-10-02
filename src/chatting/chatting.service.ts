@@ -1,6 +1,5 @@
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
-import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
 import { ChattingRepository } from './chatting.repository';
