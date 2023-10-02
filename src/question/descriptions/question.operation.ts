@@ -15,4 +15,8 @@ export const QuestionOperation = {
     summary: '질문 목록 조회',
     description: '질문 목록을 조회합니다.',
   },
+  info: {
+    summary: '질문 정보 조회',
+    description: '질문 정보를 조회합니다.',
+  },
 };
