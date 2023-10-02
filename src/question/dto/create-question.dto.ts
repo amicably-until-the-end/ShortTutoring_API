@@ -1,4 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsDate } from 'class-validator';
 
 export class CreateQuestionDto {
   @ApiProperty({
@@ -57,6 +59,8 @@ export class CreateNormalQuestionDto extends CreateQuestionDto {
 }
 
 export class CreateSelectedQuestionDto extends CreateQuestionDto {
+  @Type(() => Date)
+  @IsDate()
   @ApiProperty({
     description: '학생이 원하는 과외 시작 시각입니다. (ISO Timestamp)',
     type: Date,
@@ -64,6 +68,8 @@ export class CreateSelectedQuestionDto extends CreateQuestionDto {
   })
   requestTutoringStartTime?: Date;
 
+  @Type(() => Date)
+  @IsDate()
   @ApiProperty({
     description: '학생이 원하는 과외 종료 시각입니다. (ISO Timestamp)',
     type: Date,

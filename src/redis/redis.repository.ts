@@ -38,7 +38,7 @@ export class RedisRepository {
     }
   }
 
-  async getAllKeys(): Promise<any> {
+  async getAllKeys() {
     if (process.env.NODE_ENV === 'local') {
       return await this.cache.store.keys();
     } else {

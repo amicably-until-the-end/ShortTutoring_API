@@ -26,7 +26,14 @@ export const QuestionSchema = new Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'reserved', 'canceled', 'expired', 'completed'],
+    enum: [
+      'pending',
+      'reserved',
+      'canceled',
+      'expired',
+      'completed',
+      'declined',
+    ],
   },
   studentId: {
     type: String,

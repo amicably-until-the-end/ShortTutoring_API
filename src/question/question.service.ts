@@ -92,8 +92,9 @@ export class QuestionService {
         description: createQuestionDto.description,
         questionId: questionId,
       };
+      console.log(createQuestionDto.requestTutoringStartTime);
       const requestMessage = {
-        startDateTime: createQuestionDto.requestTutoringStartTime,
+        startDateTime: createQuestionDto.requestTutoringStartTime.toISOString(),
       };
 
       await this.socketGateway.sendMessageToBothUser(
@@ -113,6 +114,7 @@ export class QuestionService {
 
       return new Success('질문이 생성되었습니다.', question);
     } catch (error) {
+      console.log(error);
       return new Fail(error.message);
     }
   }

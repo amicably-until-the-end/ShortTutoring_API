@@ -1,4 +1,4 @@
-import { AgoraService, WhiteBoardData } from '../agora/agora.service';
+import { AgoraService, WhiteBoardChannelInfo } from '../agora/agora.service';
 import { Tutoring, TutoringKey } from './entities/tutoring.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
@@ -15,29 +15,18 @@ export class TutoringRepository {
   async create(questionId: string, studentId: string, teacherId: string) {
     const tutoringId = uuid();
 
-    const { whiteBoardAppId, whiteBoardUUID, whiteBoardToken }: WhiteBoardData =
+    const { whiteBoardAppId, whiteBoardUUID }: WhiteBoardChannelInfo =
       await this.agoraService.makeWhiteBoardChannel();
-
-    const { teacherToken, studentToken } = await this.agoraService.makeRtcToken(
-      tutoringId,
-    );
-
-    if (whiteBoardToken == undefined) {
-      throw new Error('화이트보드 토큰을 생성할 수 없습니다');
-    }
 
     const tutoringInfo = {
       id: tutoringId,
-      questionId,
-      studentId,
-      teacherId,
+      questionId: questionId,
+      studentId: studentId,
+      teacherId: teacherId,
       status: 'reserved',
       matchedAt: new Date().toISOString(),
-      whiteBoardAppId,
-      whiteBoardUUID,
-      whiteBoardToken,
-      teacherRTCToken: teacherToken,
-      studentRTCToken: studentToken,
+      whiteBoardAppId: whiteBoardAppId,
+      whiteBoardUUID: whiteBoardUUID,
       RTCAppId: process.env.AGORA_RTC_APP_ID,
     };
     return await this.tutoringModel.create(tutoringInfo);
@@ -54,17 +43,20 @@ export class TutoringRepository {
 
     return await this.tutoringModel.update(
       { id: tutoringId },
-      { reservedStart: startTime, reservedEnd: endTime },
+      {
+        reservedStart: startTime,
+        reservedEnd: endTime,
+      },
     );
   }
 
   async startTutoring(tutoringId: string) {
     const tutoring = await this.tutoringModel.get({ id: tutoringId });
     if (tutoring === undefined) {
-      throw new Error('숏과외를 찾을 수 없습니다.');
+      return null;
     }
     if (tutoring.startedAt != undefined) {
-      throw new Error('이미 시작된 과외입니다.');
+      return tutoring;
     }
 
     return await this.tutoringModel.update(

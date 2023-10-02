@@ -1,9 +1,15 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { TutoringOperation } from './descriptions/tutoring.operation';
+import { TutoringResponse } from './descriptions/tutoring.response';
 import { AppointTutoringDto } from './dto/create-tutoring.dto';
 import { TutoringService } from './tutoring.service';
 import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
-import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Tutoring')
 @Controller('tutoring')
@@ -17,6 +23,7 @@ export class TutoringController {
     return this.tutoringService.finish(tutoringId);
   }
 
+  @ApiTags('Teacher')
   @ApiBearerAuth('Authorization')
   @ApiOperation(TutoringOperation.info)
   @Get('info/:questionId')
@@ -24,13 +31,43 @@ export class TutoringController {
     return this.tutoringService.info(questionId, AccessToken.userId(headers));
   }
 
+  @ApiTags('Tutoring')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(TutoringOperation.classroomInfo)
+  @Get('classroom/info/:questionId')
+  classroomInfo(
+    @Param('questionId') questionId: string,
+    @Headers() headers: Headers,
+  ) {
+    return this.tutoringService.classroomInfo(
+      questionId,
+      AccessToken.userId(headers),
+    );
+  }
+
   @ApiTags('Teacher')
   @ApiBearerAuth('Authorization')
-  @Get('start/:questionId')
-  start(@Param('questionId') questionId: string, @Headers() headers: Headers) {
+  @ApiOperation(TutoringOperation.start)
+  @ApiResponse(TutoringResponse.classroomInfo)
+  @Get('start/:tutoringId')
+  start(@Param('tutoringId') tutoringId: string, @Headers() headers: Headers) {
     return this.tutoringService.startTutoring(
       AccessToken.userId(headers),
-      questionId,
+      tutoringId,
+    );
+  }
+
+  @ApiTags('Teacher')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(TutoringOperation.decline)
+  @Get('decline/:tutoringId')
+  decline(
+    @Param('tutoringId') chattingId: string,
+    @Headers() headers: Headers,
+  ) {
+    return this.tutoringService.decline(
+      chattingId,
+      AccessToken.userId(headers),
     );
   }
 

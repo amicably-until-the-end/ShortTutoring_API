@@ -5,7 +5,7 @@ export interface ChattingKey {
 export interface Message {
   sender: string;
   format: string;
-  body: string;
+  body: string | null;
   createdAt: string;
 }
 

@@ -16,7 +16,7 @@ export interface Question extends QuestionKey {
   offerTeachers: string[];
   problem: Problem;
   selectedTeacherId?: string;
-  tutoringId: string;
+  tutoringId?: string;
   createdAt?: string;
   isSelect: boolean;
   hopeTutoringTime?: string[];

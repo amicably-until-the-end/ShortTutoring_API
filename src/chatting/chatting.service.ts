@@ -11,7 +11,6 @@ import {
   NestedChatRoomInfo,
 } from './items/chat.list';
 import { Injectable } from '@nestjs/common';
-import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class ChattingService {
@@ -42,12 +41,14 @@ export class ChattingService {
 
       if (userInfo.role == 'student') {
         const questions =
-          await this.questionRepository.getStudentPendingQuestions(userId);
+          await this.questionRepository.getStudentNormalPendingQuestions(
+            userId,
+          );
         for (let i = 0; i < questions.count; i++) {
           if (insertedQuestions.has(questions[i].id)) continue;
           const question = questions[i];
           const questionRoom: ChatRoom = {
-            id: uuid(),
+            id: question.id,
             roomImage: question.problem.mainImage,
             title: question.problem.description,
             questionInfo: question,

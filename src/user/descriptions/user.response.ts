@@ -133,6 +133,42 @@ export const UserResponse = {
       },
     },
   },
+
+  onlineTeacher: {
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        data: {
+          type: 'array',
+          items: {
+            properties: {
+              id: {
+                type: 'string',
+                description: '사용자 id',
+              },
+              name: {
+                type: 'string',
+                description: '사용자 이름',
+              },
+              profileImage: {
+                type: 'string',
+                description: '사용자 프로필 이미지',
+              },
+              followers: {
+                type: 'number',
+                description: '팔로워 수',
+              },
+            },
+          },
+        },
+        message: {
+          type: 'string',
+          example: '현재 온라인 선생님들을 성공적으로 가져왔습니다.',
+        },
+      },
+    },
+  },
   login: {
     status: 200,
     schema: {

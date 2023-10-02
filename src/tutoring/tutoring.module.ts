@@ -1,6 +1,8 @@
 import { AgoraModule } from '../agora/agora.module';
+import { ChattingRepository } from '../chatting/chatting.repository';
 import { dynamooseModule } from '../config.dynamoose';
 import { QuestionRepository } from '../question/question.repository';
+import { SocketModule } from '../socket/socket.module';
 import { UploadRepository } from '../upload/upload.repository';
 import { UserRepository } from '../user/user.repository';
 import { TutoringController } from './tutoring.controller';
@@ -9,7 +11,7 @@ import { TutoringService } from './tutoring.service';
 import { Module } from '@nestjs/common';
 
 @Module({
-  imports: [dynamooseModule, AgoraModule],
+  imports: [dynamooseModule, AgoraModule, SocketModule],
   controllers: [TutoringController],
   providers: [
     TutoringService,
@@ -17,6 +19,7 @@ import { Module } from '@nestjs/common';
     QuestionRepository,
     UserRepository,
     UploadRepository,
+    ChattingRepository,
   ],
 })
 export class TutoringModule {}

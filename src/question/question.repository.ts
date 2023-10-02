@@ -43,11 +43,9 @@ export class QuestionRepository {
           schoolLevel: createQuestionDto.schoolLevel,
           schoolSubject: createQuestionDto.schoolSubject,
         },
-        selectedTeacherId: '',
         status: 'pending',
         studentId: userId,
         offerTeachers: [],
-        tutoringId: '',
         isSelect: false,
       });
     } catch (error) {
@@ -55,10 +53,17 @@ export class QuestionRepository {
     }
   }
 
-  async getStudentPendingQuestions(userId: string) {
+  async getStudentNormalPendingQuestions(userId: string) {
     return await this.questionModel
-      .scan({ studentId: userId, status: 'pending' })
+      .scan({ studentId: userId, status: 'pending', isSelect: false })
       .exec();
+  }
+
+  async setTutoringId(questionId: string, tutoringId: string) {
+    return await this.questionModel.update(
+      { id: questionId },
+      { tutoringId: tutoringId },
+    );
   }
 
   async createSelectedQuestion(
@@ -89,7 +94,6 @@ export class QuestionRepository {
         status: 'pending',
         studentId: userId,
         offerTeachers: [],
-        tutoringId: '',
         isSelect: true,
       });
     } catch (error) {
@@ -132,7 +136,7 @@ export class QuestionRepository {
     );
   }
 
-  async setSeletedTeacherId(questionId: string, teacherId: string) {
+  async setSelectedTeacherId(questionId: string, teacherId: string) {
     return await this.questionModel.update(
       { id: questionId },
       { selectedTeacherId: teacherId },
