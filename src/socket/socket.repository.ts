@@ -1,8 +1,11 @@
 import { AuthRepository } from '../auth/auth.repository';
+import { ChattingRepository } from '../chatting/chatting.repository';
+import { Message } from '../chatting/entities/chatting.interface';
 import { RedisRepository } from '../redis/redis.repository';
 import { UserRepository } from '../user/user.repository';
 import { Injectable } from '@nestjs/common';
 import { WebSocketServer } from '@nestjs/websockets';
+import { getMessaging } from 'firebase-admin/messaging';
 import { Server } from 'socket.io';
 
 @Injectable()
@@ -14,6 +17,7 @@ export class SocketRepository {
     private readonly authRepository: AuthRepository,
     private readonly redisRepository: RedisRepository,
     private readonly userRepository: UserRepository,
+    private readonly chattingRepository: ChattingRepository,
   ) {}
 
   async getUserFromAuthorization(headers: any) {
@@ -28,5 +32,135 @@ export class SocketRepository {
     } catch (error) {
       return null;
     }
+  }
+
+  /**
+   * 다른 사용자에게 푸시 메시지를 보내는 메소드
+   * @param senderId
+   * @param receiverId
+   * @param chattingId
+   * @param format
+   * @param body
+   */
+  async sendPushMessageToUser(
+    senderId: string,
+    receiverId: string,
+    chattingId: string,
+    format: string,
+    body: string,
+  ) {
+    const receiverFCMToken = await this.redisRepository.getFCMToken(receiverId);
+    if (receiverFCMToken != null) {
+      await getMessaging().send({
+        data: {
+          chattingId,
+          sender: senderId,
+          format,
+          body,
+          createdAt: new Date().toISOString(),
+          type: 'chatting',
+        },
+        token: receiverFCMToken,
+      });
+    }
+  }
+
+  /**
+   * 다른 사용자에게 메시지를 전송하는 메소드
+   * @param senderId 메시지를 보내는 사용자의 ID
+   * @param receiverId 메시지를 받는 사용자의 ID
+   * @param chattingId 메시지를 보내는 채팅방의 ID
+   * @param format 메시지의 형식 (text, appoint-request , ...)
+   * @param body 메시지의 내용 (JSON 형식 ex: { "text" : "안녕하세요" } )
+   */
+  async sendMessageToUser(
+    senderId: string,
+    receiverId: string,
+    chattingId: string,
+    format: string,
+    body: string,
+  ) {
+    const message: Message = {
+      sender: senderId,
+      format,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+    const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
+    if (receiverSocketId != null) {
+      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
+    } else {
+      //FCM 메시지 보내기
+    }
+
+    // 레디스 브로드캐스트
+    await this.redisRepository.publish(
+      receiverSocketId,
+      JSON.stringify({ chattingId, message }),
+    );
+
+    // DynamoDB에 메시지 저장
+    await this.chattingRepository.sendMessage(
+      chattingId,
+      senderId,
+      format,
+      body,
+    );
+  }
+
+  async sendMessageToBothUser(
+    senderId: string,
+    receiverId: string,
+    chattingId: string,
+    format: string,
+    body: string,
+  ) {
+    const message: Message = {
+      sender: senderId,
+      format,
+      body,
+      createdAt: new Date().toISOString(),
+    };
+    const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
+
+    if (receiverSocketId != null) {
+      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
+    } else {
+      console.log('receiver is not online', receiverId);
+      //TODO: FCM 메시지 보내기
+    }
+    const senderSocketId = await this.redisRepository.getSocketId(senderId);
+    if (senderSocketId != null) {
+      this.sendMessageToSocketClient(senderSocketId, chattingId, message);
+    } else {
+      console.log('sender is not online', senderId);
+    }
+
+    // 레디스 브로드캐스트
+    await this.redisRepository.publish(
+      receiverSocketId,
+      JSON.stringify({ chattingId, message }),
+    );
+
+    await this.redisRepository.publish(
+      senderSocketId,
+      JSON.stringify({ chattingId, message }),
+    );
+
+    // DynamoDB에 메시지 저장
+    await this.chattingRepository.sendMessage(
+      chattingId,
+      senderId,
+      format,
+      body,
+    );
+  }
+
+  sendMessageToSocketClient(
+    receiverSocketId: string,
+    chattingId: string,
+    message: Message,
+  ) {
+    this.server.to(receiverSocketId).emit('message', { chattingId, message });
   }
 }

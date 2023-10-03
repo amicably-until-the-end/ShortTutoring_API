@@ -2,7 +2,7 @@ import { AgoraService } from '../agora/agora.service';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
-import { SocketGateway } from '../socket/socket.gateway';
+import { SocketRepository } from '../socket/socket.repository';
 import { UserRepository } from '../user/user.repository';
 import { ClassroomInfo, TutoringInfo } from './entities/tutoring.entity';
 import { TutoringRepository } from './tutoring.repository';
@@ -14,7 +14,7 @@ export class TutoringService {
     private readonly tutoringRepository: TutoringRepository,
     private readonly questionRepository: QuestionRepository,
     private readonly agoraService: AgoraService,
-    private readonly socketGateway: SocketGateway,
+    private readonly socketRepository: SocketRepository,
     private readonly userRepository: UserRepository,
     private readonly chattingRepository: ChattingRepository,
   ) {}
@@ -67,7 +67,7 @@ export class TutoringService {
           question.selectedTeacherId,
         );
 
-      await this.socketGateway.sendMessageToBothUser(
+      await this.socketRepository.sendMessageToBothUser(
         question.selectedTeacherId,
         question.studentId,
         chatRoomId,
@@ -153,7 +153,7 @@ export class TutoringService {
 
       await this.questionRepository.changeStatus(chattingId, 'declined');
 
-      await this.socketGateway.sendMessageToBothUser(
+      await this.socketRepository.sendMessageToBothUser(
         chatRoomInfo.teacherId,
         chatRoomInfo.studentId,
         chattingId,
