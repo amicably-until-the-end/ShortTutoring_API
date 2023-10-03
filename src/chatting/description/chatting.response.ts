@@ -9,6 +9,7 @@ export const ChattingListEntity = {
           roomImage:
             'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
           id: '067e02cd-57dd-4bb4-9654-d467bef97d1e',
+          reservedStart: '2021-09-11T03:59:08.121Z',
           messages: [
             {
               message: {

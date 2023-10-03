@@ -67,7 +67,7 @@ export class QuestionController {
 
   @ApiTags('Question')
   @ApiBearerAuth('Authorization')
-  @ApiOperation(QuestionOperation.list)
+  @ApiOperation(QuestionOperation.info)
   @Get('question/info/:questionId')
   getQuestionInfo(@Param('questionId') questionId: string) {
     return this.questionService.getQuestionInfo(questionId);
