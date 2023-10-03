@@ -128,6 +128,7 @@ export class SocketGateway {
           format === 'text'
             ? JSON.parse(body).text
             : '새로운 메시지가 도착했습니다.',
+        type: 'message',
       },
       token: receiverFCMToken,
     });
