@@ -287,10 +287,7 @@ export class UserRepository {
     }
 
     const now = new Date();
-    if (
-      now.getSeconds() - user.coin.lastReceivedFreeCoinAt.getSeconds() <
-      86400
-    ) {
+    if (now.valueOf() - user.coin.lastReceivedFreeCoinAt.valueOf() < 86400000) {
       throw new Error('이미 무료 코인을 받았습니다.');
     }
 
