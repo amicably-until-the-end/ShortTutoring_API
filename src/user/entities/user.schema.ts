@@ -11,6 +11,17 @@ export const UserSchema = new Schema({
   bio: {
     type: String,
   },
+  coin: {
+    type: Object,
+    schema: {
+      amount: {
+        type: Number,
+      },
+      lastReceivedFreeCoinAt: {
+        type: Date,
+      },
+    },
+  },
   profileImage: {
     type: String,
   },
