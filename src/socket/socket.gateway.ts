@@ -121,7 +121,7 @@ export class SocketGateway {
 
     // 푸시 알림 전송
     await getMessaging().send({
-      notification: {
+      data: {
         imageUrl: senderProfileImage,
         title: senderName,
         body: format === 'text' ? body : '새로운 메시지가 도착했습니다.',
