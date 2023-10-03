@@ -9,6 +9,7 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
+import { getMessaging } from 'firebase-admin/messaging';
 import * as process from 'process';
 import { RedisClientType } from 'redis';
 import { Server } from 'socket.io';
@@ -35,7 +36,7 @@ export class SocketGateway {
         client.handshake.headers,
       );
 
-      await this.redisRepository.set(user.id, client.id);
+      await this.redisRepository.setSocketId(user.id, client.id);
       if (process.env.NODE_ENV === 'dev') {
         await this.redisSub.subscribe(client.id, (message) => {
           client.emit('message', message);
@@ -63,29 +64,16 @@ export class SocketGateway {
         client.handshake.headers,
       );
 
-      await this.redisRepository.del(user.id);
-      await this.redisRepository.unsubscribe(client.id);
+      await this.redisRepository.delSocketId(user.id);
+      await this.redisSub.unsubscribe(client.id);
     } catch (error) {
       const message = `소켓 연결을 끊을 수 없습니다. ${error.message}`;
 
-      console.log(message);
       await socketErrorWebhook.send(message);
 
       return new Error('소켓 연결을 끊을 수 없습니다.');
     }
   }
-
-  //
-  // /**
-  //  * 원하는 역할의 온라인 사용자 목록을 가져오는 메소드
-  //  * @param client
-  //  * @param payload
-  //  */
-  // @SubscribeMessage('get-role-participants')
-  // async getRoleParticipants(client: any, payload: any) {
-  //   const { role } = payload;
-  //   return await this.redisRepository.get(role);
-  // }
 
   /**
    * 원하는 사용자의 정보를 가져오는 메소드
@@ -100,7 +88,6 @@ export class SocketGateway {
     } catch (error) {
       const message = `사용자 정보를 가져올 수 없습니다. ${error.message}`;
 
-      console.log(message);
       await socketErrorWebhook.send(message);
 
       return new Error('사용자 정보를 가져올 수 없습니다.');
@@ -116,36 +103,57 @@ export class SocketGateway {
   async handleMessage(client: any, payload: any) {
     const { receiverId, chattingId, format, body } = payload;
 
-    try {
-      // 메시지를 보낸 사용자의 정보를 가져옴
-      const sender = await this.socketRepository
-        .getUserFromAuthorization(client.handshake.headers)
-        .then((user) => user.id);
-
-      // user에게 메시지 전송
-      await this.sendMessageToUser(
-        sender,
-        receiverId,
-        chattingId,
-        format,
-        body,
-      );
-    } catch (error) {
-      const message = `메시지를 전송할 수 없습니다. ${error.message}`;
+    const sender = await this.socketRepository.getUserFromAuthorization(
+      client.handshake.headers,
+    );
+    if (sender === null) {
+      const message = `사용자를 찾을 수 없습니다.`;
 
       await socketErrorWebhook.send(message);
 
-      return new Error('메시지를 전송할 수 없습니다.');
+      return new Error('사용자를 찾을 수 없습니다.');
     }
+
+    // 푸시 알림 보내기
+    const senderName = sender.name;
+    const senderProfileImage = sender.profileImage;
+    const receiverFCMToken = await this.redisRepository.getFCMToken(receiverId);
+
+    // 푸시 알림 전송
+    await getMessaging().send({
+      data: {
+        imageUrl: senderProfileImage,
+        title: senderName,
+        body:
+          format === 'text'
+            ? JSON.parse(body).text
+            : '새로운 메시지가 도착했습니다.',
+        type: 'message',
+      },
+      token: receiverFCMToken,
+    });
+
+    // 소켓 메시지 전송
+    // 메시지를 보낸 사용자의 정보를 가져옴
+    const senderId = sender.id;
+
+    // user에게 메시지 전송
+    await this.sendMessageToUser(
+      senderId,
+      receiverId,
+      chattingId,
+      format,
+      body,
+    );
   }
 
   /**
    * 다른 사용자에게 메시지를 전송하는 메소드
-   * @param senderId : 메시지를 보내는 사용자의 ID
-   * @param receiverId : 메시지를 받는 사용자의 ID
-   * @param chattingId : 메시지를 보내는 채팅방의 ID
-   * @param format : 메시지의 형식 (text, appoint-request , ...)
-   * @param body : 메시지의 내용 (JSON 형식 ex: { "text" : "안녕하세요" } )
+   * @param senderId 메시지를 보내는 사용자의 ID
+   * @param receiverId 메시지를 받는 사용자의 ID
+   * @param chattingId 메시지를 보내는 채팅방의 ID
+   * @param format 메시지의 형식 (text, appoint-request , ...)
+   * @param body 메시지의 내용 (JSON 형식 ex: { "text" : "안녕하세요" } )
    */
   async sendMessageToUser(
     senderId: string,
@@ -160,7 +168,7 @@ export class SocketGateway {
       body,
       createdAt: new Date().toISOString(),
     };
-    const receiverSocketId = await this.redisRepository.get(receiverId);
+    const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
     if (receiverSocketId != null) {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
     } else {
@@ -195,7 +203,7 @@ export class SocketGateway {
       body,
       createdAt: new Date().toISOString(),
     };
-    const receiverSocketId = await this.redisRepository.get(receiverId);
+    const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
 
     if (receiverSocketId != null) {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
@@ -203,7 +211,7 @@ export class SocketGateway {
       console.log('receiver is not online', receiverId);
       //TODO: FCM 메시지 보내기
     }
-    const senderSocketId = await this.redisRepository.get(senderId);
+    const senderSocketId = await this.redisRepository.getSocketId(senderId);
     if (senderSocketId != null) {
       this.sendMessageToSocketClient(senderSocketId, chattingId, message);
     } else {

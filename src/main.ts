@@ -1,4 +1,5 @@
 import { AppModule } from './app.module';
+import { configFirebase } from './config.firebase';
 import { configSwagger } from './config.swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
@@ -11,8 +12,10 @@ async function bootstrap() {
   app.use(json({ limit: '50mb' }));
   app.use(urlencoded({ limit: '50mb', extended: false }));
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
+
   dotenv.config();
   configSwagger(app);
+  configFirebase();
 
   await app.listen(3000);
 }
