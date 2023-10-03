@@ -13,7 +13,6 @@ import { getMessaging } from 'firebase-admin/messaging';
 import * as process from 'process';
 import { RedisClientType } from 'redis';
 import { Server } from 'socket.io';
-import { User } from 'src/user/entities/user.interface';
 
 @WebSocketGateway()
 export class SocketGateway {
@@ -104,65 +103,44 @@ export class SocketGateway {
   async handleMessage(client: any, payload: any) {
     const { receiverId, chattingId, format, body } = payload;
 
-    let sender: User;
-    try {
-      sender = await this.socketRepository.getUserFromAuthorization(
-        client.handshake.headers,
-      );
-    } catch (error) {
-      const message = `사용자를 찾을 수 없습니다. ${error.message}`;
+    const sender = await this.socketRepository.getUserFromAuthorization(
+      client.handshake.headers,
+    );
+    if (sender === null) {
+      const message = `사용자를 찾을 수 없습니다.`;
 
       await socketErrorWebhook.send(message);
 
       return new Error('사용자를 찾을 수 없습니다.');
     }
 
-    // 소켓 메시지 전송
-    try {
-      // 메시지를 보낸 사용자의 정보를 가져옴
-      const senderId = sender.id;
-
-      // user에게 메시지 전송
-      await this.sendMessageToUser(
-        senderId,
-        receiverId,
-        chattingId,
-        format,
-        body,
-      );
-    } catch (error) {
-      const message = `메시지를 전송할 수 없습니다. ${error.message}`;
-
-      await socketErrorWebhook.send(message);
-
-      return new Error('메시지를 전송할 수 없습니다.');
-    }
-
     // 푸시 알림 보내기
-    try {
-      const senderName = sender.name;
-      const senderProfileImage = sender.profileImage;
+    const senderName = sender.name;
+    const senderProfileImage = sender.profileImage;
+    const receiverFCMToken = await this.redisRepository.getFCMToken(receiverId);
 
-      const receiverFCMToken = await this.redisRepository.getFCMToken(
-        receiverId,
-      );
+    // 푸시 알림 전송
+    await getMessaging().send({
+      notification: {
+        imageUrl: senderProfileImage,
+        title: senderName,
+        body: format === 'text' ? body : '새로운 메시지가 도착했습니다.',
+      },
+      token: receiverFCMToken,
+    });
 
-      // 푸시 알림 전송
-      await getMessaging().send({
-        notification: {
-          imageUrl: senderProfileImage,
-          title: senderName,
-          body: format === 'text' ? body : '새로운 메시지가 도착했습니다.',
-        },
-        token: receiverFCMToken,
-      });
-    } catch (error) {
-      const message = `푸시 알림을 보낼 수 없습니다. ${error.message}`;
+    // 소켓 메시지 전송
+    // 메시지를 보낸 사용자의 정보를 가져옴
+    const senderId = sender.id;
 
-      await socketErrorWebhook.send(message);
-
-      return new Error('푸시 알림을 보낼 수 없습니다.');
-    }
+    // user에게 메시지 전송
+    await this.sendMessageToUser(
+      senderId,
+      receiverId,
+      chattingId,
+      format,
+      body,
+    );
   }
 
   /**
