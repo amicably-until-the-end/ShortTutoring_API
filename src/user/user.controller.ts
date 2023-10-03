@@ -157,4 +157,11 @@ export class UserController {
       setFCMTokenUserDto.fcmToken,
     );
   }
+
+  @ApiTags('User')
+  @ApiBearerAuth('Authorization')
+  @Get('user/receiveFreeCoin')
+  receiveFreeCoin(@Headers() headers: Headers) {
+    return this.userService.receiveFreeCoin(AccessToken.userId(headers));
+  }
 }

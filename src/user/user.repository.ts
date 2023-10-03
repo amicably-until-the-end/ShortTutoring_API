@@ -279,4 +279,27 @@ export class UserRepository {
         });
       });
   }
+
+  async receiveFreeCoin(userId: string) {
+    const user: User = await this.get(userId);
+    if (user === undefined) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    const now = new Date();
+    if (
+      now.getSeconds() - user.coin.lastReceivedFreeCoinAt.getSeconds() <
+      86400
+    ) {
+      throw new Error('이미 무료 코인을 받았습니다.');
+    }
+
+    try {
+      user.coin.amount += 2;
+      user.coin.lastReceivedFreeCoinAt = now;
+      await this.userModel.update({ id: userId }, { coin: user.coin });
+    } catch (error) {
+      throw new Error('무료 코인을 받을 수 없습니다.');
+    }
+  }
 }
