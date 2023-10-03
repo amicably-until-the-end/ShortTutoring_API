@@ -16,7 +16,10 @@ export class UserRepository {
   async create(userId: string, createUserDto: CreateUserDto, role: string) {
     const user: User = {
       bio: createUserDto.bio,
-      createdAt: new Date().toISOString(),
+      coin: {
+        amount: 0,
+        lastReceivedFreeCoinAt: new Date(0),
+      },
       followers: [],
       following: [],
       id: userId,
