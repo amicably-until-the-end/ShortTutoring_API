@@ -124,7 +124,10 @@ export class SocketGateway {
       data: {
         imageUrl: senderProfileImage,
         title: senderName,
-        body: format === 'text' ? body : '새로운 메시지가 도착했습니다.',
+        body:
+          format === 'text'
+            ? JSON.parse(body).text
+            : '새로운 메시지가 도착했습니다.',
       },
       token: receiverFCMToken,
     });
