@@ -91,6 +91,7 @@ export class QuestionService {
         image: messageImage,
         description: createQuestionDto.description,
         questionId: questionId,
+        subTitle: `${createQuestionDto.schoolLevel} ${createQuestionDto.schoolSubject}`,
       };
       console.log(createQuestionDto.requestTutoringStartTime);
       const requestMessage = {

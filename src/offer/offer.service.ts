@@ -49,6 +49,7 @@ export class OfferService {
         image: messageImage,
         description: questionInfo.problem.description,
         questionId: questionId,
+        subTitle: `${questionInfo.problem.schoolLevel} ${questionInfo.problem.schoolSubject}`,
       };
       const requestMessage = {
         text: '안녕하세요 선생님! 언제 수업 가능하신가요?',
