@@ -308,4 +308,13 @@ export class UserService {
       return new Fail(error.message);
     }
   }
+
+  async receiveFreeCoin(userId: string) {
+    try {
+      await this.userRepository.receiveFreeCoin(userId);
+      return new Success('성공적으로 무료 코인을 지급받았습니다.');
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
 }

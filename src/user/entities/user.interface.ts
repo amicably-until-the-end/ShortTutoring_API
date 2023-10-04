@@ -4,10 +4,15 @@ export interface UserKey {
 
 export interface User extends UserKey {
   bio?: string;
+  coin: {
+    amount: number;
+    lastReceivedFreeCoinAt: Date;
+  };
   createdAt?: string;
   followers: string[];
   following: string[];
   name: string;
+  participatingChattingRooms: string[];
   profileImage?: string;
   role: string;
   school?: {
@@ -17,5 +22,4 @@ export interface User extends UserKey {
     department?: string;
     grade: number;
   };
-  participatingChattingRooms: string[];
 }
