@@ -66,7 +66,7 @@ export class SocketRepository {
   }
 
   /**
-   * 다른 사용자에게 메시지를 전송하는 메소드
+   * 다른 사용자에게 메시지를 전송하는 메소드 , 연결된 소켓이 있으면 소켓 전송, 레디스에 브로드캐스트, DynamoDB에 저장
    * @param senderId 메시지를 보내는 사용자의 ID
    * @param receiverId 메시지를 받는 사용자의 ID
    * @param chattingId 메시지를 보내는 채팅방의 ID
@@ -89,8 +89,6 @@ export class SocketRepository {
     const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
     if (receiverSocketId != null) {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
-    } else {
-      //FCM 메시지 보내기
     }
 
     // 레디스 브로드캐스트
@@ -125,15 +123,18 @@ export class SocketRepository {
 
     if (receiverSocketId != null) {
       this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
-    } else {
-      console.log('receiver is not online', receiverId);
-      //TODO: FCM 메시지 보내기
     }
+    await this.sendPushMessageToUser(
+      senderId,
+      receiverId,
+      chattingId,
+      format,
+      body,
+    );
+
     const senderSocketId = await this.redisRepository.getSocketId(senderId);
     if (senderSocketId != null) {
       this.sendMessageToSocketClient(senderSocketId, chattingId, message);
-    } else {
-      console.log('sender is not online', senderId);
     }
 
     // 레디스 브로드캐스트
