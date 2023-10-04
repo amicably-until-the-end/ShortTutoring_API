@@ -24,9 +24,8 @@ export class UserRepository {
       following: [],
       id: userId,
       name: createUserDto.name,
-      profileImage:
-        'https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile.png',
-      role,
+      profileImage: `https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile-img/ic_profile_${createUserDto.profileImg}.png`,
+      role: role,
       participatingChattingRooms: [],
     };
 
@@ -40,9 +39,7 @@ export class UserRepository {
       const createTeacherDto = createUserDto as CreateTeacherDto;
       user.school = {
         name: createTeacherDto.schoolName,
-        division: createTeacherDto.schoolDivision,
         department: createTeacherDto.schoolDepartment,
-        grade: createTeacherDto.schoolGrade,
       };
     }
 
@@ -246,7 +243,7 @@ export class UserRepository {
         profileImage: user.profileImage,
         role: user.role,
         school: user.school,
-        followersCount: user.followers.length,
+        followers: user.followers,
         followingCount: user.following.length,
       };
     }

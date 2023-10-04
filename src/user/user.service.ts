@@ -239,6 +239,9 @@ export class UserService {
     }
   }
 
+  /**
+   * 내가 팔로우한 선생님들을 가져옵니다.
+   */
   async following(studentId: string) {
     try {
       return new Success(
