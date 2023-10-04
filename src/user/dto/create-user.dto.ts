@@ -26,6 +26,12 @@ export class CreateUserDto {
   })
   bio: string;
 
+  @ApiProperty({
+    description: '사용자 프로필 이미지',
+    enum: ['dog', 'duck', 'fox', 'lion', 'penguin', 'polar_bear', 'tiger'],
+  })
+  profileImg: string;
+
   // @ApiProperty({
   //   description: 'The review list of the user.',
   //   default: ['review1', 'review2'],
@@ -68,20 +74,21 @@ export class CreateTeacherDto extends CreateUserDto {
   schoolName: string;
 
   @ApiProperty({
-    description: '선생님의 소속 단과대',
-    example: '사범대학',
-  })
-  schoolDivision: string;
-
-  @ApiProperty({
     description: '선생님의 학과',
     example: '수학교육과',
   })
   schoolDepartment: string;
 
+  /*  @ApiProperty({
+      description: '선생님의 소속 단과대',
+      example: '사범대학',
+    })
+    schoolDivision: string;
+  
+
   @ApiProperty({
     description: '선생님의 학년',
     example: 3,
   })
-  schoolGrade: number;
+  schoolGrade: number;*/
 }
