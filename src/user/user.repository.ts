@@ -240,7 +240,7 @@ export class UserRepository {
         profileImage: user.profileImage,
         role: user.role,
         school: user.school,
-        followersCount: user.followers.length,
+        followers: user.followers,
         followingCount: user.following.length,
       };
     }
