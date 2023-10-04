@@ -1,7 +1,7 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
-import { SocketGateway } from '../socket/socket.gateway';
+import { SocketRepository } from '../socket/socket.repository';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UserRepository } from '../user/user.repository';
 import { OfferRepository } from './offer.repository';
@@ -15,7 +15,7 @@ export class OfferService {
     private readonly chattingRepository: ChattingRepository,
     private readonly questionRepository: QuestionRepository,
     private readonly tutoringRepository: TutoringRepository,
-    private readonly socketGateway: SocketGateway,
+    private readonly socketRepository: SocketRepository,
   ) {}
 
   async append(userId: string, questionId: string) {
@@ -54,14 +54,14 @@ export class OfferService {
         text: '안녕하세요 선생님! 언제 수업 가능하신가요?',
       };
 
-      await this.socketGateway.sendMessageToBothUser(
+      await this.socketRepository.sendMessageToBothUser(
         studentId,
         userId,
         chatRoomId,
         'problem-image',
         JSON.stringify(problemMessage),
       );
-      await this.socketGateway.sendMessageToBothUser(
+      await this.socketRepository.sendMessageToBothUser(
         studentId,
         userId,
         chatRoomId,
@@ -136,7 +136,7 @@ export class OfferService {
         startTime: startTime.toISOString(),
       };
 
-      await this.socketGateway.sendMessageToBothUser(
+      await this.socketRepository.sendMessageToBothUser(
         userId,
         chatting.teacherId,
         chattingId,
@@ -155,7 +155,7 @@ export class OfferService {
               questionId,
               offerTeacherId,
             );
-          await this.socketGateway.sendMessageToBothUser(
+          await this.socketRepository.sendMessageToBothUser(
             userId,
             offerTeacherId,
             teacherChatId,

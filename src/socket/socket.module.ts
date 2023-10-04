@@ -17,6 +17,6 @@ import { Module } from '@nestjs/common';
     redisSubProvider,
     UserRepository,
   ],
-  exports: [SocketRepository, SocketGateway],
+  exports: [SocketRepository],
 })
 export class SocketModule {}

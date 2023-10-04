@@ -1,5 +1,3 @@
-import { ChattingRepository } from '../chatting/chatting.repository';
-import { Message } from '../chatting/entities/chatting.interface';
 import { socketErrorWebhook } from '../config.discord-webhook';
 import { RedisRepository } from '../redis/redis.repository';
 import { SocketRepository } from './socket.repository';
@@ -9,7 +7,6 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
-import { getMessaging } from 'firebase-admin/messaging';
 import * as process from 'process';
 import { RedisClientType } from 'redis';
 import { Server } from 'socket.io';
@@ -20,7 +17,6 @@ export class SocketGateway {
   server: Server;
 
   constructor(
-    private readonly chattingRepository: ChattingRepository,
     private readonly redisRepository: RedisRepository,
     private readonly socketRepository: SocketRepository,
     @Inject('REDIS_SUB') private redisSub: RedisClientType,
@@ -76,26 +72,8 @@ export class SocketGateway {
   }
 
   /**
-   * 원하는 사용자의 정보를 가져오는 메소드
-   * @param client
-   */
-  @SubscribeMessage('get-user-info')
-  async getUserInfo(client: any) {
-    try {
-      return await this.socketRepository.getUserFromAuthorization(
-        client.handshake.headers,
-      );
-    } catch (error) {
-      const message = `사용자 정보를 가져올 수 없습니다. ${error.message}`;
-
-      await socketErrorWebhook.send(message);
-
-      return new Error('사용자 정보를 가져올 수 없습니다.');
-    }
-  }
-
-  /**
    * 다른 사용자에게 메시지를 전송하는 메소드
+   * 푸시 알림 전송 및 소켓 메시지 전송
    * @param client
    * @param payload
    */
@@ -114,137 +92,23 @@ export class SocketGateway {
       return new Error('사용자를 찾을 수 없습니다.');
     }
 
-    // 푸시 알림 보내기
-    const senderName = sender.name;
-    const senderProfileImage = sender.profileImage;
-    const receiverFCMToken = await this.redisRepository.getFCMToken(receiverId);
-
     // 푸시 알림 전송
-    await getMessaging().send({
-      data: {
-        imageUrl: senderProfileImage,
-        title: senderName,
-        body:
-          format === 'text'
-            ? JSON.parse(body).text
-            : '새로운 메시지가 도착했습니다.',
-        type: 'message',
-      },
-      token: receiverFCMToken,
-    });
-
-    // 소켓 메시지 전송
-    // 메시지를 보낸 사용자의 정보를 가져옴
-    const senderId = sender.id;
-
-    // user에게 메시지 전송
-    await this.sendMessageToUser(
-      senderId,
+    await this.socketRepository.sendPushMessageToUser(
+      sender.id,
       receiverId,
       chattingId,
       format,
       body,
     );
-  }
 
-  /**
-   * 다른 사용자에게 메시지를 전송하는 메소드
-   * @param senderId 메시지를 보내는 사용자의 ID
-   * @param receiverId 메시지를 받는 사용자의 ID
-   * @param chattingId 메시지를 보내는 채팅방의 ID
-   * @param format 메시지의 형식 (text, appoint-request , ...)
-   * @param body 메시지의 내용 (JSON 형식 ex: { "text" : "안녕하세요" } )
-   */
-  async sendMessageToUser(
-    senderId: string,
-    receiverId: string,
-    chattingId: string,
-    format: string,
-    body: string,
-  ) {
-    const message: Message = {
-      sender: senderId,
-      format,
-      body,
-      createdAt: new Date().toISOString(),
-    };
-    const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
-    if (receiverSocketId != null) {
-      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
-    } else {
-      //FCM 메시지 보내기
-    }
-    // TODO: 레디스 브로드캐스트
-    // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
-    await this.redisRepository.publish(
-      receiverSocketId,
-      JSON.stringify({ chattingId, message }),
-    );
-
-    // DynamoDB에 메시지 저장
-    await this.chattingRepository.sendMessage(
+    // 소켓 메시지 전송
+    await this.socketRepository.sendMessageToUser(
+      sender.id,
+      receiverId,
       chattingId,
-      senderId,
       format,
       body,
     );
-  }
-
-  async sendMessageToBothUser(
-    senderId: string,
-    receiverId: string,
-    chattingId: string,
-    format: string,
-    body: string,
-  ) {
-    const message: Message = {
-      sender: senderId,
-      format,
-      body,
-      createdAt: new Date().toISOString(),
-    };
-    const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
-
-    if (receiverSocketId != null) {
-      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
-    } else {
-      console.log('receiver is not online', receiverId);
-      //TODO: FCM 메시지 보내기
-    }
-    const senderSocketId = await this.redisRepository.getSocketId(senderId);
-    if (senderSocketId != null) {
-      this.sendMessageToSocketClient(senderSocketId, chattingId, message);
-    } else {
-      console.log('sender is not online', senderId);
-    }
-
-    // TODO: 레디스 브로드캐스트
-    // EC2서버에서 레디스가 잘 뿌려주는지 확인 필요
-    await this.redisRepository.publish(
-      receiverSocketId,
-      JSON.stringify({ chattingId, message }),
-    );
-
-    await this.redisRepository.publish(
-      senderSocketId,
-      JSON.stringify({ chattingId, message }),
-    );
-
-    // DynamoDB에 메시지 저장
-    await this.chattingRepository.sendMessage(
-      chattingId,
-      senderId,
-      format,
-      body,
-    );
-  }
-
-  sendMessageToSocketClient(
-    receiverSocketId: string,
-    chattingId: string,
-    message: Message,
-  ) {
-    this.server.to(receiverSocketId).emit('message', { chattingId, message });
   }
 
   /**
