@@ -87,9 +87,6 @@ export class SocketRepository {
       createdAt: new Date().toISOString(),
     };
     const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
-    if (receiverSocketId != null) {
-      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
-    }
 
     // 레디스 브로드캐스트
     await this.redisRepository.publish(
@@ -121,9 +118,6 @@ export class SocketRepository {
     };
     const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
 
-    if (receiverSocketId != null) {
-      this.sendMessageToSocketClient(receiverSocketId, chattingId, message);
-    }
     await this.sendPushMessageToUser(
       senderId,
       receiverId,
@@ -133,9 +127,6 @@ export class SocketRepository {
     );
 
     const senderSocketId = await this.redisRepository.getSocketId(senderId);
-    if (senderSocketId != null) {
-      this.sendMessageToSocketClient(senderSocketId, chattingId, message);
-    }
 
     // 레디스 브로드캐스트
     await this.redisRepository.publish(
@@ -155,13 +146,5 @@ export class SocketRepository {
       format,
       body,
     );
-  }
-
-  sendMessageToSocketClient(
-    receiverSocketId: string,
-    chattingId: string,
-    message: Message,
-  ) {
-    this.server.to(receiverSocketId).emit('message', { chattingId, message });
   }
 }
