@@ -1,6 +1,7 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { TutoringOperation } from './descriptions/tutoring.operation';
 import { TutoringResponse } from './descriptions/tutoring.response';
+import { CreateReviewDto } from './dto/create-review.dto';
 import { AppointTutoringDto } from './dto/create-tutoring.dto';
 import { TutoringService } from './tutoring.service';
 import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
@@ -82,6 +83,21 @@ export class TutoringController {
       questionId,
       appointTutoringDto.startTime,
       appointTutoringDto.endTime,
+    );
+  }
+
+  @ApiTags('Student')
+  @ApiBearerAuth('Authorization')
+  @Post('student/review/create/:tutoringId')
+  createReview(
+    @Param('tutoringId') tutoringId: string,
+    @Body() createReviewDto: CreateReviewDto,
+    @Headers() headers: Headers,
+  ) {
+    return this.tutoringService.createReview(
+      AccessToken.userId(headers),
+      tutoringId,
+      createReviewDto,
     );
   }
 }
