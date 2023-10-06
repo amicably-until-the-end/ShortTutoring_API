@@ -2,10 +2,16 @@ import { AuthRepository } from '../auth/auth.repository';
 import { webhook } from '../config.discord-webhook';
 import { RedisRepository } from '../redis/redis.repository';
 import { Fail, Success } from '../response';
+import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UploadRepository } from '../upload/upload.repository';
 import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import {
+  StudentListing,
+  TeacherListing,
+  UserListing,
+} from './entities/user.entities';
 import { User } from './entities/user.interface';
 import { UserRepository } from './user.repository';
 import { Injectable } from '@nestjs/common';
@@ -19,6 +25,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly uploadRepository: UploadRepository,
     private readonly redisRepository: RedisRepository,
+    private readonly tutoringRepository: TutoringRepository,
   ) {}
 
   /**
@@ -252,23 +259,73 @@ export class UserService {
 
   async otherFollowers(userId: string) {
     try {
+      const user = await this.userRepository.get(userId);
+      const userList = await Promise.all(
+        user.followers.map(async (id) => await this.getOther(id)),
+      );
       return new Success(
-        '성공적으로 팔로워 학생들을 가져왔습니다.',
-        await this.userRepository.followers(userId),
+        '해당 사용자를 팔로우하는 사용자들의 정보를 성공적으로 가져왔습니다.',
+        userList,
       );
     } catch (error) {
-      return new Fail(error.message);
+      return new Fail(
+        '해당 사용자를 팔로우하는 사용자들의 정보를 가져오는데 실패했습니다.',
+      );
     }
   }
 
   async followers(teacherId: string) {
     try {
+      const teacher: User = await this.userRepository.get(teacherId);
+      const followers = [];
+      for (const followerId of teacher.followers) {
+        followers.push(await this.getOther(followerId));
+      }
       return new Success(
         '성공적으로 팔로워 학생들을 가져왔습니다.',
         await this.userRepository.followers(teacherId),
       );
     } catch (error) {
       return new Fail(error.message);
+    }
+  }
+
+  /**
+   * 특정 사용자의 정보를 가져옵니다.
+   * @param userId 조회할 사용자 ID
+   * @returns User 사용자 정보, 민감한 정보는 포함되지 않습니다.
+   */
+  async getOther(userId: string): Promise<UserListing> {
+    const user: User = await this.userRepository.get(userId);
+    if (user === undefined) {
+      return undefined;
+    } else {
+      if (user.role == 'teacher') {
+        const accTutoring =
+          await this.tutoringRepository.getTutoringCntOfTeacher(userId);
+        const teacher: TeacherListing = {
+          id: user.id,
+          name: user.name,
+          profileImage: user.profileImage,
+          role: user.role,
+          univ: user.school.name,
+          major: user.school.department,
+          followerIds: user.followers,
+          reserveCnt: accTutoring.length,
+        };
+        console.log(teacher);
+        return teacher;
+      } else if (user.role == 'student') {
+        const student: StudentListing = {
+          id: user.id,
+          name: user.name,
+          profileImage: user.profileImage,
+          role: user.role,
+          schoolLevel: user.school.level,
+          grade: user.school.grade,
+        };
+        return student;
+      }
     }
   }
 
@@ -291,12 +348,18 @@ export class UserService {
 
   async otherFollowing(userId: string) {
     try {
+      const user = await this.userRepository.get(userId);
+      const userList = await Promise.all(
+        user.following.map(async (id) => await this.getOther(id)),
+      );
       return new Success(
-        '성공적으로 팔로잉한 선생님들을 가져왔습니다.',
-        await this.userRepository.following(userId),
+        '해당 사용자가 팔로잉하는 사용자들의 정보를 성공적으로 가져왔습니다.',
+        userList,
       );
     } catch (error) {
-      return new Fail(error.message);
+      return new Fail(
+        '해당 사용자가 팔로잉하는 사용자들의 정보를 가져오는데 실패했습니다.',
+      );
     }
   }
 

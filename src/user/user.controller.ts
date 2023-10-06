@@ -77,6 +77,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.otherFollowers)
+  @ApiResponse(UserResponse.followInfo)
   @Get('user/followers/:userId')
   otherFollowers(@Headers() headers: Headers, @Param('userId') userId: string) {
     return this.userService.otherFollowers(userId);
@@ -86,6 +87,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.otherFollowing)
+  @ApiResponse(UserResponse.followInfo)
   @Get('user/following/:userId')
   otherFollowing(@Headers() headers: Headers, @Param('userId') userId: string) {
     return this.userService.otherFollowing(userId);

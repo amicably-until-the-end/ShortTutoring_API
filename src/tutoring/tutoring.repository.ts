@@ -92,4 +92,19 @@ export class TutoringRepository {
       throw new Error('과외 상태를 변경할 수 없습니다.');
     }
   }
+
+  async getTutoringCntOfTeacher(teacherId: string) {
+    try {
+      const result = await this.tutoringModel
+        .scan({
+          teacherId: {
+            eq: teacherId,
+          },
+        })
+        .exec();
+      return result.map((a) => a);
+    } catch (error) {
+      throw new Error('과외를 찾을 수 없습니다.');
+    }
+  }
 }
