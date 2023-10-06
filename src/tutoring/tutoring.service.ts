@@ -108,8 +108,11 @@ export class TutoringService {
         return new Fail('해당 과외 정보가 없습니다.');
       }
 
-      if (userInfo.role == 'student' && tutoring.status != 'going') {
+      if (userInfo.role == 'student' && tutoring.status == 'reserved') {
         return new Fail('수업 시작 전입니다.');
+      }
+      if (userInfo.role == 'student' && tutoring.status == 'finished') {
+        return new Fail('수업이 종료되었습니다.');
       }
       const whiteBoardToken = await this.agoraService.makeWhiteBoardToken(
         tutoring.whiteBoardUUID,
@@ -141,9 +144,6 @@ export class TutoringService {
         return new Fail('해당 과외 정보를 볼 수 없습니다.');
       }
       const tutoring = await this.tutoringRepository.get(question.tutoringId);
-      if (tutoring.status == 'finished') {
-        return new Fail('과외가 종료되었습니다.');
-      }
       const tutoringInfo: TutoringInfo = {
         id: tutoring.id,
         questionId: tutoring.questionId,
