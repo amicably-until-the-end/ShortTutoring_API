@@ -292,4 +292,76 @@ export const UserResponse = {
       },
     },
   },
+  followInfo: {
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          description: '디버깅 메시지',
+        },
+        data: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              id: {
+                type: 'string',
+                description: '사용자 id',
+              },
+              role: {
+                type: 'string',
+                description: '사용자 역할',
+                example: 'student',
+              },
+              name: {
+                type: 'string',
+                description: '사용자 이름',
+              },
+              profileImage: {
+                type: 'string',
+                description: '사용자 프로필 이미지 url',
+              },
+              grade: {
+                type: 'number',
+                optional: true,
+                description: '학생사용자의 경우 학년',
+                example: 1,
+              },
+              schoolLevel: {
+                type: 'string',
+                optional: true,
+                description: '학생사용자의 경우 학교급',
+                example: '중학교',
+              },
+              univ: {
+                type: 'string',
+                optional: true,
+                description: '선생님 사용자의 경우 대학교',
+                example: '서울대학교',
+              },
+              major: {
+                type: 'string',
+                optional: true,
+                description: '선생님 사용자의 경우 전공',
+                example: '컴퓨터공학과',
+              },
+              followerIds: {
+                type: 'array',
+                optional: true,
+                description: '팔로워 id 리스트',
+                example: ['test-user-id-1', 'test-user-id-2'],
+              },
+              reserveCnt: {
+                type: 'number',
+                optional: true,
+                description: '선생님 사용자의 경우 예약 수',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
 };
