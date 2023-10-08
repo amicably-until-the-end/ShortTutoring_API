@@ -214,4 +214,21 @@ export class QuestionRepository {
       },
     );
   }
+
+  async getMyQuestions(userId: string, status: string, type: string) {
+    const condition = {
+      studentId: { eq: userId },
+    };
+    if (status !== 'all') {
+      condition['status'] = { eq: status };
+    }
+    if (type !== 'all') {
+      const isSelect = type === 'selected';
+      condition['isSelect'] = { eq: isSelect };
+    }
+
+    const questions = await this.questionModel.scan(condition).exec();
+
+    return questions.map((question) => question);
+  }
 }

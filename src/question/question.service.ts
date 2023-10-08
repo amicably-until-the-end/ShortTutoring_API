@@ -147,4 +147,22 @@ export class QuestionService {
       return new Fail(error.message);
     }
   }
+
+  async getMyQuestions(userId: string, status: string, type: string) {
+    try {
+      const user = await this.userRepository.get(userId);
+      if (user.role !== 'student') {
+        return new Fail('학생 사용자가 아닙니다');
+      }
+
+      const questions = await this.questionRepository.getMyQuestions(
+        userId,
+        status,
+        type,
+      );
+      return new Success('질문 목록을 불러왔습니다.', questions);
+    } catch (error) {
+      return new Fail('사용자의 질문 목록을 불러오는데 실패했습니다.');
+    }
+  }
 }
