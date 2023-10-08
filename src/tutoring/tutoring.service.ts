@@ -198,6 +198,23 @@ export class TutoringService {
 
       await this.tutoringRepository.startTutoring(tutoringId);
 
+      const startMessage = {
+        text: '과외가 시작되었습니다.',
+      };
+      const chatRoomId =
+        await this.chattingRepository.getIdByQuestionAndTeacher(
+          tutoring.questionId,
+          teacherId,
+        );
+
+      await this.socketRepository.sendMessageToBothUser(
+        tutoring.teacherId,
+        tutoring.studentId,
+        chatRoomId,
+        'text',
+        JSON.stringify(startMessage),
+      );
+
       return await this.classroomInfo(tutoring.id, teacherId);
     } catch (error) {
       return new Fail('과외 시작에 실패했습니다.');
