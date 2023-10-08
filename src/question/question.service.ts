@@ -160,7 +160,6 @@ export class QuestionService {
         status,
         type,
       );
-      console.log(questions);
       return new Success('질문 목록을 불러왔습니다.', questions);
     } catch (error) {
       return new Fail('사용자의 질문 목록을 불러오는데 실패했습니다.');
