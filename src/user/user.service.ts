@@ -333,20 +333,31 @@ export class UserService {
   }
 
   async getOnlineTeachers() {
-    const users = await this.redisRepository.getAllKeys();
-    console.log(users);
-    if (users.length == 0)
-      return new Success('현재 온라인 선생님이 없습니다.', []);
-    const userInfos = await this.userRepository.usersInfo(users);
-    const onlineTeachers = userInfos.filter((user) => user.role == 'teacher');
-    const result = onlineTeachers.map((teacher) => {
-      const { id, name, profileImage, followers } = teacher;
-      return { id, name, profileImage, followers: followers.length };
-    });
-    return new Success(
-      '현재 온라인 선생님들을 성공적으로 가져왔습니다.',
-      result,
-    );
+    try {
+      const users = await this.redisRepository.getAllKeys();
+      const userState = await Promise.all(
+        users.map(async (user) => await this.redisRepository.get(user)),
+      );
+      console.log(userState);
+      const onlineTeachers = userState.filter(
+        (user) => user.role == 'teacher' && user.socketId != undefined,
+      );
+      console.log(onlineTeachers);
+      if (onlineTeachers.length == 0)
+        return new Success('현재 온라인 선생님이 없습니다.', []);
+      const teacherIds = onlineTeachers.map((teacher) => teacher.id);
+      const userInfos = await this.userRepository.usersInfo(teacherIds);
+      const result = userInfos.map((teacher) => {
+        const { id, name, profileImage, followers } = teacher;
+        return { id, name, profileImage, followers: followers.length };
+      });
+      return new Success(
+        '현재 온라인 선생님들을 성공적으로 가져왔습니다.',
+        result,
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
   }
 
   async otherFollowing(userId: string) {
