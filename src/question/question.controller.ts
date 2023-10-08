@@ -72,7 +72,7 @@ export class QuestionController {
   @ApiOperation(QuestionOperation.getMyQuestions)
   @ApiQuery(QuestionQuery.getMyQuestions.type)
   @ApiQuery(QuestionQuery.getMyQuestions.status)
-  @Get('student/question/my')
+  @Get('student/question/list/my')
   getMyQuestions(
     @Query('status') status: string,
     @Query('type') type: string,
