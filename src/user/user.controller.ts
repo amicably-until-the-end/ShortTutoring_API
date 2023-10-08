@@ -167,4 +167,16 @@ export class UserController {
   receiveFreeCoin(@Headers() headers: Headers) {
     return this.userService.receiveFreeCoin(AccessToken.userId(headers));
   }
+
+  @ApiTags('User')
+  @Get('user/history/tutoring/:userId')
+  tutoringHistory(@Param('userId') userId: string) {
+    return this.userService.tutoringHistory(userId);
+  }
+
+  @ApiTags('Teacher')
+  @Get('teacher/rating/:teacherId')
+  teacherRating(@Param('teacherId') teacherId: string) {
+    return this.userService.teacherRating(teacherId);
+  }
 }

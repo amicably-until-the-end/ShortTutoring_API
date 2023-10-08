@@ -10,4 +10,8 @@ export class AccessToken {
   static userId(headers: Headers) {
     return headers['userId'];
   }
+
+  static role(headers: Headers) {
+    return headers['role'];
+  }
 }

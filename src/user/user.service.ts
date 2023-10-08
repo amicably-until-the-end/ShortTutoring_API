@@ -408,4 +408,33 @@ export class UserService {
       return new Fail(error.message);
     }
   }
+
+  async tutoringHistory(userId: any) {
+    try {
+      const user = await this.userRepository.get(userId);
+      const role = user.role;
+
+      const tutoringHistory = await this.tutoringRepository.history(
+        userId,
+        role,
+      );
+      return new Success('과외 내역을 가져왔습니다.', tutoringHistory);
+    } catch (error) {
+      return new Fail('과외 내역을 가져오는데 실패했습니다.');
+    }
+  }
+
+  async teacherRating(userId: string) {
+    try {
+      const user = await this.userRepository.get(userId);
+      if (user.role != 'teacher') {
+        return new Fail('선생님의 평점만 볼 수 있습니다.');
+      }
+
+      const rating = await this.tutoringRepository.getTeacherRating(userId);
+      return new Success('선생님의 평점을 가져왔습니다.', { rating });
+    } catch (error) {
+      return new Fail('선생님의 평점을 가져오는데 실패했습니다.');
+    }
+  }
 }
