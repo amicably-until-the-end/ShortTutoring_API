@@ -1,15 +1,25 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { QuestionOperation } from './descriptions/question.operation';
+import { QuestionQuery } from './descriptions/question.query';
 import { QuestionResponse } from './descriptions/question.response';
 import {
   CreateNormalQuestionDto,
   CreateSelectedQuestionDto,
 } from './dto/create-question.dto';
 import { QuestionService } from './question.service';
-import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Post,
+  Query,
+} from '@nestjs/common';
 import {
   ApiBearerAuth,
   ApiOperation,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -55,6 +65,24 @@ export class QuestionController {
   @Get('student/question/delete/:questionId')
   delete(@Param('questionId') questionId: string, @Headers() headers: Headers) {
     return this.questionService.delete(AccessToken.userId(headers), questionId);
+  }
+
+  @ApiTags('Student')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(QuestionOperation.getMyQuestions)
+  @ApiQuery(QuestionQuery.getMyQuestions.type)
+  @ApiQuery(QuestionQuery.getMyQuestions.status)
+  @Get('student/question/my')
+  getMyQuestions(
+    @Query('status') status: string,
+    @Query('type') type: string,
+    @Headers() headers: Headers,
+  ) {
+    return this.questionService.getMyQuestions(
+      AccessToken.userId(headers),
+      status,
+      type,
+    );
   }
 
   @ApiTags('Teacher')
