@@ -64,7 +64,7 @@ export class CreateSelectedQuestionDto extends CreateQuestionDto {
   @ApiProperty({
     description: '학생이 원하는 과외 시작 시각입니다. (ISO Timestamp)',
     type: Date,
-    example: [new Date().toISOString()],
+    example: new Date().toISOString(),
   })
   requestTutoringStartTime?: Date;
 
@@ -73,7 +73,7 @@ export class CreateSelectedQuestionDto extends CreateQuestionDto {
   @ApiProperty({
     description: '학생이 원하는 과외 종료 시각입니다. (ISO Timestamp)',
     type: Date,
-    example: [new Date().toISOString()],
+    example: new Date().toISOString(),
   })
   requestTutoringEndTime?: Date;
 
