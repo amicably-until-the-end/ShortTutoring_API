@@ -332,7 +332,7 @@ export class UserService {
     }
   }
 
-  async getOnlineTeachers() {
+  async getOnlineTeachers(userId: string) {
     try {
       const users = await this.redisRepository.getAllKeys();
       const userState = await Promise.all(
@@ -349,10 +349,22 @@ export class UserService {
       const userIds = onlineUsers.map((teacher) => teacher.id);
       const userInfos = await this.userRepository.usersInfo(userIds);
       const teacherInfos = userInfos.filter((user) => user.role == 'teacher');
-      const result = teacherInfos.map((teacher) => {
-        const { id, name, profileImage, followers } = teacher;
-        return { id, name, profileImage, followers: followers.length };
-      });
+      const result: TeacherListing[] = await Promise.all(
+        teacherInfos.map(async (teacher) => {
+          return {
+            id: teacher.id,
+            name: teacher.name,
+            profileImage: teacher.profileImage,
+            role: teacher.role,
+            univ: teacher.school.name,
+            major: teacher.school.department,
+            followerIds: teacher.followers,
+            reserveCnt: (
+              await this.tutoringRepository.getTutoringCntOfTeacher(teacher.id)
+            ).length,
+          };
+        }),
+      );
       return new Success(
         '현재 온라인 선생님들을 성공적으로 가져왔습니다.',
         result,
