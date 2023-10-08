@@ -296,4 +296,55 @@ export class UserRepository {
       throw new Error('무료 코인을 받을 수 없습니다.');
     }
   }
+
+  /**
+   * 보유 코인을 가져옵니다.
+   * @param userId
+   */
+  async getCoin(userId: string) {
+    const user: User = await this.get(userId);
+    if (user === undefined) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    return user.coin.amount;
+  }
+
+  /**
+   * 코인을 1개 사용합니다.
+   * @param userId
+   */
+  async useCoin(userId: string) {
+    const user: User = await this.get(userId);
+    if (user === undefined) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+
+    if (user.coin.amount < 1) {
+      throw new Error('코인이 부족합니다.');
+    }
+    // TODO : 동시성 이슈 발생 가능
+    try {
+      user.coin.amount -= 1;
+      await this.userModel.update({ id: userId }, { coin: user.coin });
+    } catch (error) {
+      throw new Error('코인을 사용할 수 없습니다.');
+    }
+  }
+
+  /**
+   * 코인을 1개 얻습니다.
+   * @param userId
+   * @param amount
+   */
+  async earnCoin(userId: string) {
+    const user: User = await this.get(userId);
+    if (user === undefined) {
+      throw new Error('사용자를 찾을 수 없습니다.');
+    }
+    // TODO : 동시성 이슈 발생 가능
+    const coin = user.coin;
+    coin.amount += 1;
+    return await this.userModel.update({ id: userId }, { coin: coin });
+  }
 }

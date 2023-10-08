@@ -31,6 +31,11 @@ export class QuestionService {
     createQuestionDto: CreateNormalQuestionDto,
   ) {
     try {
+      const balance = await this.userRepository.getCoin(userId);
+      if (balance < 1) {
+        return new Fail('코인이 부족합니다.');
+      }
+
       const questionId = uuid();
       const problemImages = await this.questionRepository.problemImages(
         questionId,
@@ -43,6 +48,8 @@ export class QuestionService {
           createQuestionDto,
           problemImages,
         );
+      await this.userRepository.useCoin(userId);
+
       return new Success('질문이 생성되었습니다.', question);
     } catch (error) {
       return new Fail(error.message);
@@ -55,6 +62,11 @@ export class QuestionService {
     createQuestionDto: CreateSelectedQuestionDto,
   ) {
     try {
+      const balance = await this.userRepository.getCoin(userId);
+      if (balance < 1) {
+        return new Fail('코인이 부족합니다.');
+      }
+
       const questionId = uuid();
       const problemImages = await this.questionRepository.problemImages(
         questionId,
@@ -81,6 +93,7 @@ export class QuestionService {
         userId,
         questionId,
       );
+      await this.userRepository.useCoin(userId); // TODO : transaction 으로 변경 고려
 
       await this.userRepository.joinChattingRoom(userId, chatRoomId);
       await this.userRepository.joinChattingRoom(teacherId, chatRoomId);
@@ -131,7 +144,8 @@ export class QuestionService {
 
   async delete(userId: string, questionId: string) {
     try {
-      await this.questionRepository.delete(userId, questionId);
+      await this.questionRepository.cancelQuestion(userId, questionId);
+      await this.userRepository.earnCoin(userId);
       return new Success('질문이 삭제되었습니다.', { questionId });
     } catch (error) {
       return new Fail(error.message);

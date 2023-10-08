@@ -143,7 +143,7 @@ export class QuestionRepository {
     );
   }
 
-  async delete(userId: string, questionId: string) {
+  async cancelQuestion(userId: string, questionId: string) {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
       throw new Error('선생님은 질문을 삭제할 수 없습니다.');
@@ -157,9 +157,12 @@ export class QuestionRepository {
     }
 
     try {
-      return await this.questionModel.delete({
-        id: questionId,
-      });
+      return await this.questionModel.update(
+        {
+          id: questionId,
+        },
+        { status: 'canceled' },
+      );
     } catch (error) {
       throw new Error('질문을 삭제할 수 없습니다.');
     }

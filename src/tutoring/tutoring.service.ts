@@ -43,7 +43,7 @@ export class TutoringService {
         JSON.stringify(finishMessage),
       );
 
-      //TODO : 과외 종료시, 과외에 참여한 학생과 선생님의 포인트를 수정하는 로직 추가
+      await this.userRepository.earnCoin(tutoring.teacherId);
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
