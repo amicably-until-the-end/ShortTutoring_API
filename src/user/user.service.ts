@@ -335,6 +335,7 @@ export class UserService {
   async getOnlineTeachers() {
     try {
       const users = await this.redisRepository.getAllKeys();
+      console.log(users);
       const userState = await Promise.all(
         users.map(async (user) => await this.redisRepository.get(user)),
       );
