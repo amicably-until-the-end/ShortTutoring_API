@@ -342,7 +342,7 @@ export class UserService {
       const onlineTeachers = userState.filter(
         (user) => user.role == 'teacher' && user.socketId != undefined,
       );
-      console.log(onlineTeachers);
+      console.log('online teacher', onlineTeachers);
       if (onlineTeachers.length == 0)
         return new Success('현재 온라인 선생님이 없습니다.', []);
       const teacherIds = onlineTeachers.map((teacher) => teacher.id);
