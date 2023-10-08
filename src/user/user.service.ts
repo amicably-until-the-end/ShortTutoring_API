@@ -337,7 +337,13 @@ export class UserService {
       const users = await this.redisRepository.getAllKeys();
       console.log(users);
       const userState = await Promise.all(
-        users.map(async (user) => await this.redisRepository.get(user)),
+        users.map(async (user) => {
+          return {
+            id: user,
+            socketId: await this.redisRepository.get(user),
+            role: await this.redisRepository.getRole(user),
+          };
+        }),
       );
       console.log(userState);
       const onlineTeachers = userState.filter(

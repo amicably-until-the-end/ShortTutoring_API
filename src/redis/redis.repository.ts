@@ -71,9 +71,7 @@ export class RedisRepository {
     if (process.env.NODE_ENV === 'local') {
       return await this.cache.get(key);
     } else {
-      const a = await this.redisPub.get(key);
-      console.log(a);
-      return a;
+      return await this.redisPub.get(key);
     }
   }
 
