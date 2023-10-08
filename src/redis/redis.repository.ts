@@ -69,7 +69,7 @@ export class RedisRepository {
 
   async get(key: string): Promise<any> {
     if (process.env.NODE_ENV === 'local') {
-      return await this.cache.get(key);
+      //return await this.cache.get(key);
     } else {
       return await this.redisPub.get(key);
     }
