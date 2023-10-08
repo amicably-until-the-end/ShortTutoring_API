@@ -144,7 +144,8 @@ export class QuestionService {
 
   async delete(userId: string, questionId: string) {
     try {
-      await this.questionRepository.delete(userId, questionId);
+      await this.questionRepository.cancelQuestion(userId, questionId);
+      await this.userRepository.earnCoin(userId);
       return new Success('질문이 삭제되었습니다.', { questionId });
     } catch (error) {
       return new Fail(error.message);

@@ -9,7 +9,7 @@ export const QuestionQuery = {
     status: {
       name: 'status',
       description: '질문 상태를 기준으로 필터링하여 목록을 조회합니다.',
-      enum: ['all', 'pending', 'reserved'],
+      enum: ['all', 'pending', 'reserved', 'canceled'],
     },
     type: {
       name: 'type',
