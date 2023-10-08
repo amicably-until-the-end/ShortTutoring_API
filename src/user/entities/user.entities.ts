@@ -15,4 +15,6 @@ export interface TeacherListing extends UserListing {
   major: string;
   reserveCnt: number;
   followerIds: string[];
+  bio: string;
+  rating: number;
 }

@@ -358,6 +358,16 @@ export const UserResponse = {
                 optional: true,
                 description: '선생님 사용자의 경우 예약 수',
               },
+              rating: {
+                type: 'number',
+                optional: true,
+                description: '선생님 사용자의 경우 평점',
+              },
+              bio: {
+                type: 'string',
+                optional: true,
+                description: '선생님 사용자의 경우 자기소개',
+              },
             },
           },
         },
