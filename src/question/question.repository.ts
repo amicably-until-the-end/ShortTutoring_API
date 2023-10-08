@@ -235,6 +235,9 @@ export class QuestionRepository {
     }
 
     const questions = await this.questionModel.scan(condition).exec();
+    questions.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
     return questions.map((question) => question);
   }
