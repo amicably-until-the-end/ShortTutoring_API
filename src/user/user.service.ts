@@ -340,14 +340,14 @@ export class UserService {
         users.map(async (user) => {
           return {
             id: user,
-            socketId: await this.redisRepository.getSocketId(user),
+            online: (await this.redisRepository.getSocketId(user)) != null,
             role: await this.redisRepository.getRole(user),
           };
         }),
       );
       console.log(userState);
       const onlineTeachers = userState.filter(
-        (user) => user.role == 'teacher' && user.socketId != undefined,
+        (user) => user.role == 'teacher' && user.online,
       );
       console.log('online teacher', onlineTeachers);
       if (onlineTeachers.length == 0)
