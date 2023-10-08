@@ -216,7 +216,6 @@ export class QuestionRepository {
   }
 
   async getMyQuestions(userId: string, status: string, type: string) {
-    console.log(status, type);
     const condition = {
       studentId: { eq: userId },
     };
@@ -227,7 +226,6 @@ export class QuestionRepository {
       const isSelect = type === 'selected';
       condition['isSelect'] = { eq: isSelect };
     }
-    console.log(condition);
 
     const questions = await this.questionModel.scan(condition).exec();
 
