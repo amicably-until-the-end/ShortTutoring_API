@@ -35,4 +35,19 @@ export const TutoringResponse = {
       },
     },
   },
+  createReview: {
+    schema: {
+      type: 'object',
+      properties: {
+        message: {
+          type: 'string',
+          example: '리뷰가 작성되었습니다.',
+        },
+        success: {
+          type: 'boolean',
+          example: true,
+        },
+      },
+    },
+  },
 };

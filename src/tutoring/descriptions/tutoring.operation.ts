@@ -25,4 +25,8 @@ export const TutoringOperation = {
     description:
       '지정 질문에서 선생님이 해당 과외의 시작 종료 시간을 확정합니다',
   },
+  createReview: {
+    summary: '과외 리뷰 작성',
+    description: '특정 과외에 대한 리뷰를 작성합니다.',
+  },
 };

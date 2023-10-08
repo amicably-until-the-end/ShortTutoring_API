@@ -86,9 +86,10 @@ export class TutoringController {
     );
   }
 
-  @ApiTags('Student')
   @ApiBearerAuth('Authorization')
-  @Post('student/review/create/:tutoringId')
+  @ApiOperation(TutoringOperation.createReview)
+  @ApiResponse(TutoringResponse.createReview)
+  @Post('review/create/:tutoringId')
   createReview(
     @Param('tutoringId') tutoringId: string,
     @Body() createReviewDto: CreateReviewDto,
