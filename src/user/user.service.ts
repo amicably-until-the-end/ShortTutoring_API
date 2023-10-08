@@ -335,7 +335,6 @@ export class UserService {
   async getOnlineTeachers() {
     try {
       const users = await this.redisRepository.getAllKeys();
-      console.log(users);
       const userState = await Promise.all(
         users.map(async (user) => {
           return {
@@ -344,9 +343,7 @@ export class UserService {
           };
         }),
       );
-      console.log(userState);
       const onlineUsers = userState.filter((user) => user.online);
-      console.log('online users', onlineUsers);
       if (onlineUsers.length == 0)
         return new Success('현재 온라인 선생님이 없습니다.', []);
       const userIds = onlineUsers.map((teacher) => teacher.id);
