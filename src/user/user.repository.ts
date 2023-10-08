@@ -41,6 +41,7 @@ export class UserRepository {
         name: createTeacherDto.schoolName,
         department: createTeacherDto.schoolDepartment,
       };
+      user.rating = 0;
     }
 
     try {
@@ -54,7 +55,6 @@ export class UserRepository {
     const user: User = await this.userModel.get({
       id: userId,
     });
-
     if (user === undefined) {
       throw new Error('사용자를 찾을 수 없습니다.');
     }
@@ -245,6 +245,7 @@ export class UserRepository {
         school: user.school,
         followers: user.followers,
         followingCount: user.following.length,
+        rating: undefined,
       };
     }
   }
@@ -335,7 +336,6 @@ export class UserRepository {
   /**
    * 코인을 1개 얻습니다.
    * @param userId
-   * @param amount
    */
   async earnCoin(userId: string) {
     const user: User = await this.get(userId);

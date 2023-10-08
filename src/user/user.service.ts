@@ -154,6 +154,10 @@ export class UserService {
   async profile(userId: string) {
     try {
       const user: User = await this.userRepository.get(userId);
+      if (user.role === 'teacher') {
+        user.rating = await this.tutoringRepository.getTeacherRating(userId);
+      }
+
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
       return new Fail(error.message);
@@ -205,10 +209,12 @@ export class UserService {
    */
   async otherProfile(userId: string) {
     try {
-      return new Success(
-        '사용자 프로필을 성공적으로 가져왔습니다.',
-        await this.userRepository.getOther(userId),
-      );
+      const user = await this.userRepository.getOther(userId);
+      if (user.role === 'teacher') {
+        user.rating = await this.tutoringRepository.getTeacherRating(userId);
+      }
+
+      return new Success('사용자 프로필을 성공적으로 가져왔습니다.', user);
     } catch (error) {
       return new Fail(error.message);
     }
@@ -216,7 +222,7 @@ export class UserService {
 
   async withdraw(userId: string, token: string) {
     const stToken = token.split(' ')[1];
-    const decoded = await this.authRepository.decodeJwt(stToken);
+    const decoded = this.authRepository.decodeJwt(stToken);
 
     try {
       await this.userRepository.get(userId);
