@@ -30,7 +30,6 @@ import { DynamooseModule } from 'nestjs-dynamoose';
     ChattingModule,
     RedisModule,
     // SimulationModule,
-    // ReviewModule,
   ],
 })
 export class AppModule implements NestModule {

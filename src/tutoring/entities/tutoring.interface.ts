@@ -18,4 +18,6 @@ export interface Tutoring extends TutoringKey {
   RTCAppId?: string;
   reservedStart?: Date;
   reservedEnd?: Date;
+  reviewRating?: number;
+  reviewComment?: string;
 }

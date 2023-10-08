@@ -4,6 +4,7 @@ import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
 import { UserRepository } from '../user/user.repository';
+import { CreateReviewDto } from './dto/create-review.dto';
 import { ClassroomInfo, TutoringInfo } from './entities/tutoring.entity';
 import { TutoringRepository } from './tutoring.repository';
 import { Injectable } from '@nestjs/common';
@@ -218,6 +219,22 @@ export class TutoringService {
       return await this.classroomInfo(tutoring.id, teacherId);
     } catch (error) {
       return new Fail('과외 시작에 실패했습니다.');
+    }
+  }
+
+  async createReview(
+    userId: string,
+    tutoringId: string,
+    createReviewDto: CreateReviewDto,
+  ) {
+    try {
+      return this.tutoringRepository.createReview(
+        userId,
+        tutoringId,
+        createReviewDto,
+      );
+    } catch (error) {
+      return new Fail(error.message);
     }
   }
 }

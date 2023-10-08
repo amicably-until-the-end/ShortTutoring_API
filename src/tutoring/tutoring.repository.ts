@@ -1,4 +1,5 @@
 import { AgoraService, WhiteBoardChannelInfo } from '../agora/agora.service';
+import { CreateReviewDto } from './dto/create-review.dto';
 import { Tutoring, TutoringKey } from './entities/tutoring.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
@@ -90,6 +91,32 @@ export class TutoringRepository {
       }
     } catch (error) {
       throw new Error('과외 상태를 변경할 수 없습니다.');
+    }
+  }
+
+  async createReview(
+    userId: string,
+    tutoringId: string,
+    createReviewDto: CreateReviewDto,
+  ) {
+    const tutoring = await this.tutoringModel.get({ id: tutoringId });
+    if (tutoring === undefined) {
+      throw new Error('해당 과외를 찾을 수 없습니다.');
+    }
+    if (tutoring.studentId != userId) {
+      throw new Error('해당 과외를 평가할 수 없습니다.');
+    }
+
+    try {
+      return await this.tutoringModel.update(
+        { id: tutoringId },
+        {
+          reviewRating: createReviewDto.rating,
+          reviewComment: createReviewDto.comment,
+        },
+      );
+    } catch (error) {
+      throw new Error('과외 평가를 저장할 수 없습니다.');
     }
   }
 
