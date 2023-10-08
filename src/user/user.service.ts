@@ -340,7 +340,7 @@ export class UserService {
         users.map(async (user) => {
           return {
             id: user,
-            socketId: await this.redisRepository.get(user),
+            socketId: await this.redisRepository.getSocketId(user),
             role: await this.redisRepository.getRole(user),
           };
         }),
