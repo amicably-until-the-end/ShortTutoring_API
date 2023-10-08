@@ -141,10 +141,11 @@ export class UserController {
 
   @ApiTags('User')
   @ApiOperation(UserOperation.onlineTeacher)
+  @ApiBearerAuth('Authorization')
   @ApiResponse(UserResponse.onlineTeacher)
   @Get('user/list/teacher/online')
   getOnlineTeachers(@Headers() headers: Headers) {
-    return this.userService.getOnlineTeachers();
+    return this.userService.getOnlineTeachers(AccessToken.userId(headers));
   }
 
   @ApiTags('User')

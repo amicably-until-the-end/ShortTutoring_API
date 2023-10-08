@@ -332,21 +332,46 @@ export class UserService {
     }
   }
 
-  async getOnlineTeachers() {
-    const users = await this.redisRepository.getAllKeys();
-    console.log(users);
-    if (users.length == 0)
-      return new Success('현재 온라인 선생님이 없습니다.', []);
-    const userInfos = await this.userRepository.usersInfo(users);
-    const onlineTeachers = userInfos.filter((user) => user.role == 'teacher');
-    const result = onlineTeachers.map((teacher) => {
-      const { id, name, profileImage, followers } = teacher;
-      return { id, name, profileImage, followers: followers.length };
-    });
-    return new Success(
-      '현재 온라인 선생님들을 성공적으로 가져왔습니다.',
-      result,
-    );
+  async getOnlineTeachers(userId: string) {
+    try {
+      const users = await this.redisRepository.getAllKeys();
+      const userState = await Promise.all(
+        users.map(async (user) => {
+          return {
+            id: user,
+            online: (await this.redisRepository.getSocketId(user)) != null,
+          };
+        }),
+      );
+      const onlineUsers = userState.filter((user) => user.online);
+      if (onlineUsers.length == 0)
+        return new Success('현재 온라인 선생님이 없습니다.', []);
+      const userIds = onlineUsers.map((teacher) => teacher.id);
+      const userInfos = await this.userRepository.usersInfo(userIds);
+      const teacherInfos = userInfos.filter((user) => user.role == 'teacher');
+      const result: TeacherListing[] = await Promise.all(
+        teacherInfos.map(async (teacher) => {
+          return {
+            id: teacher.id,
+            name: teacher.name,
+            profileImage: teacher.profileImage,
+            role: teacher.role,
+            univ: teacher.school.name,
+            major: teacher.school.department,
+            followerIds: teacher.followers,
+            reserveCnt: (
+              await this.tutoringRepository.getTutoringCntOfTeacher(teacher.id)
+            ).length,
+          };
+        }),
+      );
+      return new Success(
+        '현재 온라인 선생님들을 성공적으로 가져왔습니다.',
+        result,
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
   }
 
   async otherFollowing(userId: string) {
