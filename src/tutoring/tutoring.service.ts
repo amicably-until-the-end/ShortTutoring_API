@@ -30,9 +30,24 @@ export class TutoringService {
         'finished',
       );
 
+      const finishMessage = {
+        startAt: tutoring.startedAt,
+        endAt: tutoring.endedAt,
+      };
+
+      await this.socketRepository.sendMessageToBothUser(
+        tutoring.teacherId,
+        tutoring.studentId,
+        tutoring.questionId,
+        'tutoring-finished',
+        JSON.stringify(finishMessage),
+      );
+
+      //TODO : 과외 종료시, 과외에 참여한 학생과 선생님의 포인트를 수정하는 로직 추가
+
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
-      return new Fail(error.message);
+      return new Fail('과외를 종료할 수 없습니다.');
     }
   }
 
@@ -93,8 +108,11 @@ export class TutoringService {
         return new Fail('해당 과외 정보가 없습니다.');
       }
 
-      if (userInfo.role == 'student' && tutoring.status != 'going') {
+      if (userInfo.role == 'student' && tutoring.status == 'reserved') {
         return new Fail('수업 시작 전입니다.');
+      }
+      if (userInfo.role == 'student' && tutoring.status == 'finished') {
+        return new Fail('수업이 종료되었습니다.');
       }
       const whiteBoardToken = await this.agoraService.makeWhiteBoardToken(
         tutoring.whiteBoardUUID,
@@ -174,7 +192,28 @@ export class TutoringService {
       if (tutoring.teacherId != teacherId) {
         return new Fail('해당 과외를 진행할 수 없습니다.');
       }
+      if (tutoring.status == 'finished') {
+        return new Fail('이미 종료된 과외입니다.');
+      }
+
       await this.tutoringRepository.startTutoring(tutoringId);
+
+      const startMessage = {
+        text: '과외가 시작되었습니다.',
+      };
+      const chatRoomId =
+        await this.chattingRepository.getIdByQuestionAndTeacher(
+          tutoring.questionId,
+          teacherId,
+        );
+
+      await this.socketRepository.sendMessageToBothUser(
+        tutoring.teacherId,
+        tutoring.studentId,
+        chatRoomId,
+        'text',
+        JSON.stringify(startMessage),
+      );
 
       return await this.classroomInfo(tutoring.id, teacherId);
     } catch (error) {
