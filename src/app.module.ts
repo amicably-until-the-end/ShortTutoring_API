@@ -2,6 +2,7 @@ import { AuthMiddleware } from './auth/auth.middleware';
 import { AuthModule } from './auth/auth.module';
 import { ChattingModule } from './chatting/chatting.module';
 import { DynamooseConfig } from './config.dynamoose';
+import { EventModule } from './event/event.module';
 import { OfferModule } from './offer/offer.module';
 import { QuestionModule } from './question/question.module';
 import { RedisModule } from './redis/redis.module';
@@ -29,7 +30,7 @@ import { DynamooseModule } from 'nestjs-dynamoose';
     SocketModule,
     ChattingModule,
     RedisModule,
-    // SimulationModule,
+    EventModule,
   ],
 })
 export class AppModule implements NestModule {
