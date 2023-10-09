@@ -169,6 +169,10 @@ export class OfferService {
             'text',
             JSON.stringify(rejectMessage),
           );
+          await this.chattingRepository.changeStatus(
+            teacherChatId,
+            ChattingStatus.declined,
+          );
         }
       }
 

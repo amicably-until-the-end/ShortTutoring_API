@@ -31,6 +31,7 @@ export const ChattingSchema = new Schema({
   },
   status: {
     type: String,
+    enum: ['proposed', 'reserved', 'declined'],
   },
   messages: {
     type: Array,
