@@ -37,10 +37,12 @@ export class EventService {
 
   async findAll() {
     try {
-      return new Success(
-        '이벤트 조회 성공',
-        await this.eventRepository.findAll(),
-      );
+      const events = await this.eventRepository.findAll();
+
+      return new Success('이벤트 조회 성공', {
+        count: events.length,
+        events,
+      });
     } catch (error) {
       return new Fail('이벤트 조회 실패');
     }
