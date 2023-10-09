@@ -126,6 +126,14 @@ export class SocketRepository {
       body,
     );
 
+    await this.sendPushMessageToUser(
+      senderId,
+      senderId,
+      chattingId,
+      format,
+      body,
+    );
+
     const senderSocketId = await this.redisRepository.getSocketId(senderId);
 
     if (receiverSocketId != null) {
