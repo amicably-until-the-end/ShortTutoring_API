@@ -18,7 +18,7 @@ export interface Chatting extends ChattingKey {
 }
 
 export enum ChattingStatus {
-  proposed = 'pending',
+  proposed = 'proposed',
   reserved = 'reserved',
   completed = 'completed',
   declined = 'declined',
