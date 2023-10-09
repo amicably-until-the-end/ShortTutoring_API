@@ -14,4 +14,12 @@ export interface Chatting extends ChattingKey {
   teacherId: string;
   questionId: string;
   messages: Message[];
+  status: ChattingStatus;
+}
+
+export enum ChattingStatus {
+  proposed = 'pending',
+  reserved = 'reserved',
+  completed = 'completed',
+  declined = 'declined',
 }

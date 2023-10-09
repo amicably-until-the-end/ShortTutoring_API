@@ -1,4 +1,8 @@
-import { Chatting, ChattingKey } from './entities/chatting.interface';
+import {
+  Chatting,
+  ChattingKey,
+  ChattingStatus,
+} from './entities/chatting.interface';
 import { Injectable } from '@nestjs/common';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 import { v4 as uuid } from 'uuid';
@@ -112,6 +116,7 @@ export class ChattingRepository {
       studentId,
       questionId,
       messages: [],
+      status: ChattingStatus.proposed,
     };
     await this.chattingModel.create(chatting);
     return chattingRoomId;

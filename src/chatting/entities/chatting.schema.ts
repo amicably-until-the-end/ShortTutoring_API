@@ -29,6 +29,9 @@ export const ChattingSchema = new Schema({
   questionId: {
     type: String,
   },
+  status: {
+    type: String,
+  },
   messages: {
     type: Array,
     schema: [ChattingMessageSchema],
