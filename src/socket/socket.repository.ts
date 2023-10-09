@@ -128,16 +128,19 @@ export class SocketRepository {
 
     const senderSocketId = await this.redisRepository.getSocketId(senderId);
 
-    // 레디스 브로드캐스트
-    await this.redisRepository.publish(
-      receiverSocketId,
-      JSON.stringify({ chattingId, message }),
-    );
+    if (receiverSocketId != null) {
+      await this.redisRepository.publish(
+        receiverSocketId,
+        JSON.stringify({ chattingId, message }),
+      );
+    }
 
-    await this.redisRepository.publish(
-      senderSocketId,
-      JSON.stringify({ chattingId, message }),
-    );
+    if (senderSocketId != null) {
+      await this.redisRepository.publish(
+        senderSocketId,
+        JSON.stringify({ chattingId, message }),
+      );
+    }
 
     // DynamoDB에 메시지 저장
     await this.chattingRepository.sendMessage(
