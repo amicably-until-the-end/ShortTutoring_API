@@ -73,13 +73,13 @@ export class QuestionRepository {
     createQuestionDto: CreateSelectedQuestionDto,
     problemImages: string[],
   ): Promise<Question> {
+    const user: User = await this.userRepository.get(userId);
+
+    if (user.role === 'teacher') {
+      throw new Error('선생님은 질문을 생성할 수 없습니다.');
+    }
+
     try {
-      const user: User = await this.userRepository.get(userId);
-
-      if (user.role === 'teacher') {
-        throw new Error('선생님은 질문을 생성할 수 없습니다.');
-      }
-
       return await this.questionModel.create({
         createdAt: new Date().toISOString(),
         id: questionId,
@@ -113,6 +113,10 @@ export class QuestionRepository {
         })
         .exec();
     }
+
+    questions.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
     return await Promise.all(
       questions.map(async (question) => {
@@ -231,6 +235,9 @@ export class QuestionRepository {
     }
 
     const questions = await this.questionModel.scan(condition).exec();
+    questions.sort((a, b) => {
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
     return questions.map((question) => question);
   }

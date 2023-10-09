@@ -63,4 +63,7 @@ export const UserSchema = new Schema({
     type: Array,
     schema: [String],
   },
+  rating: {
+    type: Number,
+  },
 });

@@ -154,6 +154,10 @@ export class UserService {
   async profile(userId: string) {
     try {
       const user: User = await this.userRepository.get(userId);
+      if (user.role === 'teacher') {
+        user.rating = await this.tutoringRepository.getTeacherRating(userId);
+      }
+
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
       return new Fail(error.message);
@@ -205,10 +209,12 @@ export class UserService {
    */
   async otherProfile(userId: string) {
     try {
-      return new Success(
-        '사용자 프로필을 성공적으로 가져왔습니다.',
-        await this.userRepository.getOther(userId),
-      );
+      const user = await this.userRepository.getOther(userId);
+      if (user.role === 'teacher') {
+        user.rating = await this.tutoringRepository.getTeacherRating(userId);
+      }
+
+      return new Success('사용자 프로필을 성공적으로 가져왔습니다.', user);
     } catch (error) {
       return new Fail(error.message);
     }
@@ -216,7 +222,7 @@ export class UserService {
 
   async withdraw(userId: string, token: string) {
     const stToken = token.split(' ')[1];
-    const decoded = await this.authRepository.decodeJwt(stToken);
+    const decoded = this.authRepository.decodeJwt(stToken);
 
     try {
       await this.userRepository.get(userId);
@@ -406,6 +412,35 @@ export class UserService {
       return new Success('성공적으로 무료 코인을 지급받았습니다.');
     } catch (error) {
       return new Fail(error.message);
+    }
+  }
+
+  async tutoringHistory(userId: any) {
+    try {
+      const user = await this.userRepository.get(userId);
+      const role = user.role;
+
+      const tutoringHistory = await this.tutoringRepository.history(
+        userId,
+        role,
+      );
+      return new Success('과외 내역을 가져왔습니다.', tutoringHistory);
+    } catch (error) {
+      return new Fail('과외 내역을 가져오는데 실패했습니다.');
+    }
+  }
+
+  async teacherRating(userId: string) {
+    try {
+      const user = await this.userRepository.get(userId);
+      if (user.role != 'teacher') {
+        return new Fail('선생님의 평점만 볼 수 있습니다.');
+      }
+
+      const rating = await this.tutoringRepository.getTeacherRating(userId);
+      return new Success('선생님의 평점을 가져왔습니다.', { rating });
+    } catch (error) {
+      return new Fail('선생님의 평점을 가져오는데 실패했습니다.');
     }
   }
 }

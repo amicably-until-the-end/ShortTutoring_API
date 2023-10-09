@@ -134,4 +134,43 @@ export class TutoringRepository {
       throw new Error('과외를 찾을 수 없습니다.');
     }
   }
+
+  async getTeacherRating(teacherId: string) {
+    try {
+      const tutoringList = await this.tutoringModel
+        .scan({
+          teacherId: {
+            eq: teacherId,
+          },
+        })
+        .exec();
+
+      let reviewRatingSum = 0;
+      let reviewRatingCnt = 0;
+      for (const tutoring of tutoringList) {
+        if (tutoring.reviewRating != undefined) {
+          reviewRatingSum += tutoring.reviewRating;
+          reviewRatingCnt += 1;
+        }
+      }
+
+      return reviewRatingCnt ? reviewRatingSum / reviewRatingCnt : 0;
+    } catch (error) {
+      throw new Error('선생님의 평점을 가져올 수 없습니다.');
+    }
+  }
+
+  async history(userId: string, role: string) {
+    try {
+      const history: Tutoring[] = await this.tutoringModel
+        .scan({
+          [role + 'Id']: { eq: userId },
+        })
+        .exec();
+
+      return history;
+    } catch (error) {
+      return new Error('과외 내역을 가져올 수 없습니다.');
+    }
+  }
 }

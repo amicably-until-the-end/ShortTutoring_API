@@ -22,4 +22,5 @@ export interface User extends UserKey {
     department?: string;
     grade?: number;
   };
+  rating?: number;
 }
