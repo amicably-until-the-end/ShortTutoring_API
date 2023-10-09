@@ -122,38 +122,9 @@ export class ChattingRepository {
     return chattingRoomId;
   }
 
-  /*
-    async sendMessage(senderId: string, receiverId: string, message: string) {
-      try {
-        const chattingRoom = await this.chattingModel.scan().exec();
-        const chattingRoomId = chattingRoom.find((chatting) => {
-          return (
-            chatting.participants.includes(senderId) &&
-            chatting.participants.includes(receiverId)
-          );
-        }).id;
-
-        const chatting = await this.chattingModel.get({ id: chattingRoomId });
-        chatting.logs.push({
-          sender: senderId,
-          message,
-          createdAt: new Date().toISOString()
-        });
-        await this.chattingModel.update(
-          { id: chattingRoomId },
-          { logs: chatting.logs }
-        );
-
-        return {
-          chattingRoomId,
-          message
-        };
-      } catch (error) {
-        throw new Fail("메시지를 전송할 수 없습니다." + error.message);
-      }
-    }
-
-   */
+  async changeStatus(chattingRoomId: string, status: ChattingStatus) {
+    await this.chattingModel.update({ id: chattingRoomId }, { status: status });
+  }
 
   async findAll() {
     return await this.chattingModel.scan().exec();

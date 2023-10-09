@@ -1,4 +1,5 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
+import { ChattingStatus } from '../chatting/entities/chatting.interface';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
@@ -123,6 +124,11 @@ export class OfferService {
       const question = await this.questionRepository.getInfo(questionId);
 
       const offerTeacherIds = question.offerTeachers;
+
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.reserved,
+      );
 
       await this.questionRepository.changeStatus(questionId, 'reserved');
 
