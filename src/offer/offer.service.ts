@@ -125,11 +125,6 @@ export class OfferService {
 
       const offerTeacherIds = question.offerTeachers;
 
-      await this.chattingRepository.changeStatus(
-        chattingId,
-        ChattingStatus.reserved,
-      );
-
       await this.questionRepository.changeStatus(questionId, 'reserved');
 
       await this.questionRepository.setTutoringId(questionId, tutoring.id);
