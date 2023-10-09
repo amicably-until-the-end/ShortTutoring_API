@@ -1,5 +1,5 @@
 import { webhook } from '../config.discord-webhook';
-import { HttpException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { MessageBuilder } from 'discord-webhook-node';
 import * as process from 'process';
@@ -42,7 +42,7 @@ export class UploadRepository {
 
       return imagePath;
     } catch (error) {
-      return HttpException;
+      throw Error('이미지 업로드에 실패했습니다.');
     }
   }
 }

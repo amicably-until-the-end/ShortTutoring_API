@@ -28,6 +28,7 @@ export const configSwagger = (app: INestApplication<any>) => {
       'Authorization',
     )
     .addTag('Dev', '개발용')
+    .addTag('Event', '이벤트 배너용')
     .addTag('User', '모든 사용자')
     .addTag('Student', '학생')
     .addTag('Teacher', '선생님')
