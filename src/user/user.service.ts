@@ -321,6 +321,8 @@ export class UserService {
           major: user.school.department,
           followerIds: user.followers,
           reserveCnt: accTutoring.length,
+          bio: user.bio,
+          rating: 5,
         };
         console.log(teacher);
         return teacher;
@@ -355,6 +357,7 @@ export class UserService {
       const userIds = onlineUsers.map((teacher) => teacher.id);
       const userInfos = await this.userRepository.usersInfo(userIds);
       const teacherInfos = userInfos.filter((user) => user.role == 'teacher');
+      //TODO: rating 수정
       const result: TeacherListing[] = await Promise.all(
         teacherInfos.map(async (teacher) => {
           return {
@@ -368,6 +371,8 @@ export class UserService {
             reserveCnt: (
               await this.tutoringRepository.getTutoringCntOfTeacher(teacher.id)
             ).length,
+            bio: teacher.bio,
+            rating: 5,
           };
         }),
       );
