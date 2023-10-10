@@ -51,7 +51,7 @@ export class TutoringService {
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
       console.log(error);
-      return new Fail(`과외를 종료할 수 없습니다.${error}`);
+      return new Fail(`과외를 종료할 수 없습니다.`);
     }
   }
 
