@@ -24,13 +24,14 @@ export class TutoringService {
   async finish(tutoringId: string) {
     try {
       const tutoring = await this.tutoringRepository.finishTutoring(tutoringId);
-      const { whiteBoardUUID } = tutoring;
-      await this.agoraService.disableWhiteBoardChannel(whiteBoardUUID);
 
       await this.questionRepository.changeStatus(
         tutoring.questionId,
         'finished',
       );
+
+      const { whiteBoardUUID } = tutoring;
+      await this.agoraService.disableWhiteBoardChannel(whiteBoardUUID);
 
       const finishMessage = {
         startAt: tutoring.startedAt,
@@ -49,6 +50,7 @@ export class TutoringService {
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
+      console.log(error);
       return new Fail(`과외를 종료할 수 없습니다.${error}`);
     }
   }
