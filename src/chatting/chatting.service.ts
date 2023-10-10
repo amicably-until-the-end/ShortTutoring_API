@@ -5,12 +5,7 @@ import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
 import { ChattingRepository } from './chatting.repository';
 import { UpdateChattingDto } from './dto/update-chatting.dto';
-import {
-  ChatList,
-  ChatRoom,
-  ChattingStatus,
-  NestedChatRoomInfo,
-} from './items/chat.list';
+import { ChatRoom, NestedChatRoomInfo } from './items/chat.list';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
@@ -22,100 +17,11 @@ export class ChattingService {
     private readonly tutoringRepository: TutoringRepository,
   ) {}
 
-  async getChatList(userId: string) {
-    try {
-      const userInfo = await this.userRepository.get(userId);
-
-      const insertedQuestions = new Set<string>();
-
-      const chatRooms: ChatRoom[] = await Promise.all(
-        //Join Chatting & Question
-        userInfo.participatingChattingRooms.map(async (roomId) => {
-          const roomInfo = await this.chattingRepository.getChatRoomInfo(
-            roomId,
-          );
-          const questionInfo = await this.questionRepository.getInfo(
-            roomInfo.questionId,
-          );
-          return this.makeChatItem({ roomInfo, questionInfo }, userInfo);
-        }),
-      );
-
-      if (userInfo.role == 'student') {
-        const questions =
-          await this.questionRepository.getStudentNormalPendingQuestions(
-            userId,
-          );
-        for (let i = 0; i < questions.count; i++) {
-          if (insertedQuestions.has(questions[i].id)) continue;
-          const question = questions[i];
-          const questionRoom: ChatRoom = {
-            id: question.id,
-            roomImage: question.problem.mainImage,
-            title: question.problem.description,
-            questionInfo: question,
-            status: ChattingStatus.pending,
-            isSelect: false,
-            questionId: question.id,
-          };
-          chatRooms.push(questionRoom);
-        }
-      }
-
-      return new Success('채팅방 목록을 불러왔습니다.', chatRooms);
-    } catch (error) {
-      return new Fail(error.message);
-    }
-  }
-
-  groupChatRoomByState(chatRooms: ChatRoom[]): ChatList {
-    const result: ChatList = {
-      normalProposed: [],
-      normalReserved: [],
-      selectedProposed: [],
-      selectedReserved: [],
-    };
-
-    chatRooms.forEach((chatRoom) => {
-      if (chatRoom.isSelect) {
-        if (chatRoom.status == ChattingStatus.pending) {
-          result.selectedProposed.push(chatRoom);
-        }
-        if (chatRoom.status == ChattingStatus.reserved) {
-          result.selectedReserved.push(chatRoom);
-        }
-      } else {
-        if (chatRoom.status == ChattingStatus.pending) {
-          result.normalProposed.push(chatRoom);
-        }
-        if (chatRoom.status == ChattingStatus.reserved) {
-          result.normalReserved.push(chatRoom);
-        }
-      }
-    });
-    return result;
-  }
-
   async makeChatItem(nestChatRoom: NestedChatRoomInfo, userInfo: User) {
     //DB의 질문 정보와 채팅 정보를 API를 호출 한 사람에 맞게 가공한다.
 
     const { roomInfo, questionInfo } = nestChatRoom;
 
-    let status: ChattingStatus;
-    if (questionInfo.status == 'pending') {
-      status = ChattingStatus.pending;
-    } else if (
-      questionInfo.status == 'reserved' &&
-      userInfo.role == 'teacher'
-    ) {
-      status =
-        roomInfo.teacherId == questionInfo.selectedTeacherId
-          ? ChattingStatus.reserved
-          : ChattingStatus.pending;
-    } else {
-      status = ChattingStatus.reserved;
-    }
-    let roomImage: string;
     let opponentInfo: User | undefined;
 
     try {
@@ -130,21 +36,7 @@ export class ChattingService {
 
     const chatRoom: ChatRoom = {
       id: roomInfo.id,
-      messages: roomInfo.messages.map((message) => {
-        const { body, ...rest } = message;
-        const isMyMsg = message.sender == userInfo.id;
-        try {
-          return { body: JSON.parse(body), ...rest, isMyMsg: isMyMsg };
-        } catch (e) {
-          return {
-            body: { text: body },
-            ...rest,
-            isMyMsg: isMyMsg,
-            format: 'text',
-          };
-        }
-      }),
-      status: status,
+      status: roomInfo.status,
       roomImage: opponentInfo.profileImage,
       questionId: questionInfo.id,
       isSelect: questionInfo.isSelect,
