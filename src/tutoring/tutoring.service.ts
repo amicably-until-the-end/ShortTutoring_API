@@ -72,14 +72,17 @@ export class TutoringService {
         question.studentId,
         question.selectedTeacherId,
       );
+      console.log('t', tutoring);
 
       await this.questionRepository.setTutoringId(questionId, tutoring.id);
 
-      await this.tutoringRepository.reserveTutoring(
+      const rt = await this.tutoringRepository.reserveTutoring(
         tutoring.id,
         startTime,
         endTime,
       );
+
+      console.log('rt', rt);
 
       const reserveConfirmMessage = {
         startTime: startTime.toISOString(),
@@ -90,6 +93,7 @@ export class TutoringService {
           questionId,
           question.selectedTeacherId,
         );
+      console.log('chatRoomId', chatRoomId);
       await this.chattingRepository.changeStatus(
         chatRoomId,
         ChattingStatus.reserved,
