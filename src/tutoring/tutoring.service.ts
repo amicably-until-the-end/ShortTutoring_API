@@ -129,7 +129,9 @@ export class TutoringService {
         rtcAppId: tutoring.RTCAppId,
         boardUUID: tutoring.whiteBoardUUID,
         boardToken: whiteBoardToken,
-        rtcToken: rtcToken,
+        rtcToken: rtcToken.token,
+        rtcChannel: rtcToken.channel,
+        rtcUID: rtcToken.uid,
       };
       return new Success('강의실 정보를 가져왔습니다.', accessInfo);
     } catch (error) {

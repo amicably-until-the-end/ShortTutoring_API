@@ -4,6 +4,8 @@ export interface ClassroomInfo {
   boardToken: string;
   rtcAppId: string;
   rtcToken: string;
+  rtcChannel: string;
+  rtcUID: number;
 }
 
 export interface TutoringInfo {
