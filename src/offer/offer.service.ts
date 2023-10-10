@@ -146,6 +146,11 @@ export class OfferService {
         JSON.stringify(confirmMessage),
       );
 
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.reserved,
+      );
+
       const rejectMessage = {
         text: '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
       };
