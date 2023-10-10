@@ -85,6 +85,10 @@ export class TutoringService {
           questionId,
           question.selectedTeacherId,
         );
+      await this.chattingRepository.changeStatus(
+        chatRoomId,
+        ChattingStatus.reserved,
+      );
 
       await this.questionRepository.changeStatus(questionId, 'reserved');
 
