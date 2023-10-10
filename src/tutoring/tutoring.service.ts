@@ -84,6 +84,8 @@ export class TutoringService {
           question.selectedTeacherId,
         );
 
+      await this.questionRepository.changeStatus(questionId, 'reserved');
+
       await this.socketRepository.sendMessageToBothUser(
         question.selectedTeacherId,
         question.studentId,
@@ -91,8 +93,6 @@ export class TutoringService {
         'reserve-confirm',
         JSON.stringify(reserveConfirmMessage),
       );
-
-      await this.questionRepository.changeStatus(questionId, 'reserved');
 
       return new Success('수업 시간이 확정되었습니다.');
     } catch (error) {
@@ -175,16 +175,17 @@ export class TutoringService {
 
       await this.questionRepository.changeStatus(chattingId, 'declined');
 
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.declined,
+      );
+
       await this.socketRepository.sendMessageToBothUser(
         chatRoomInfo.teacherId,
         chatRoomInfo.studentId,
         chattingId,
         'request-decline',
         JSON.stringify({}),
-      );
-      await this.chattingRepository.changeStatus(
-        chattingId,
-        ChattingStatus.declined,
       );
 
       return new Success('과외를 거절했습니다.');

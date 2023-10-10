@@ -138,17 +138,17 @@ export class OfferService {
         startTime: startTime.toISOString(),
       };
 
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.reserved,
+      );
+
       await this.socketRepository.sendMessageToBothUser(
         userId,
         chatting.teacherId,
         chattingId,
         'reserve-confirm',
         JSON.stringify(confirmMessage),
-      );
-
-      await this.chattingRepository.changeStatus(
-        chattingId,
-        ChattingStatus.reserved,
       );
 
       const rejectMessage = {
@@ -162,16 +162,16 @@ export class OfferService {
               questionId,
               offerTeacherId,
             );
+          await this.chattingRepository.changeStatus(
+            teacherChatId,
+            ChattingStatus.declined,
+          );
           await this.socketRepository.sendMessageToBothUser(
             userId,
             offerTeacherId,
             teacherChatId,
             'text',
             JSON.stringify(rejectMessage),
-          );
-          await this.chattingRepository.changeStatus(
-            teacherChatId,
-            ChattingStatus.declined,
           );
         }
       }
