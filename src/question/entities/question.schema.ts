@@ -31,7 +31,7 @@ export const QuestionSchema = new Schema({
       'reserved',
       'canceled',
       'expired',
-      'completed',
+      'finished',
       'declined',
     ],
   },
