@@ -8,7 +8,7 @@ import { firstValueFrom } from 'rxjs';
 export class AgoraService {
   constructor(private readonly httpService: HttpService) {}
 
-  async makeRtcToken(channelName: string) {
+  async makeRtcToken(channelName: string, uid: number): Promise<string> {
     const appID = process.env.AGORA_RTC_APP_ID;
     const appCertificate = process.env.AGORA_RTC_APP_CERTIFICATE;
     const expirationTimeInSeconds = 3600;
@@ -18,7 +18,7 @@ export class AgoraService {
       appID,
       appCertificate,
       channelName,
-      2,
+      uid,
       RtcRole.PUBLISHER,
       privilegeExpiredTs,
     );

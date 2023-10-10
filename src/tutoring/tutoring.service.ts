@@ -120,6 +120,7 @@ export class TutoringService {
       );
       const rtcToken = await this.agoraService.makeRtcToken(
         tutoring.questionId,
+        userInfo.role == 'teacher' ? 1 : 2,
       );
 
       const accessInfo: ClassroomInfo = {
