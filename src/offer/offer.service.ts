@@ -1,4 +1,5 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
+import { ChattingStatus } from '../chatting/entities/chatting.interface';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
@@ -145,6 +146,11 @@ export class OfferService {
         JSON.stringify(confirmMessage),
       );
 
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.reserved,
+      );
+
       const rejectMessage = {
         text: '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
       };
@@ -162,6 +168,10 @@ export class OfferService {
             teacherChatId,
             'text',
             JSON.stringify(rejectMessage),
+          );
+          await this.chattingRepository.changeStatus(
+            teacherChatId,
+            ChattingStatus.declined,
           );
         }
       }

@@ -29,6 +29,10 @@ export const ChattingSchema = new Schema({
   questionId: {
     type: String,
   },
+  status: {
+    type: String,
+    enum: ['proposed', 'reserved', 'declined'],
+  },
   messages: {
     type: Array,
     schema: [ChattingMessageSchema],

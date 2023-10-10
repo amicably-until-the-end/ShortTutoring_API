@@ -1,5 +1,5 @@
 import { Question } from '../../question/entities/question.interface';
-import { Chatting } from '../entities/chatting.interface';
+import { Chatting, ChattingStatus } from '../entities/chatting.interface';
 import { Item } from 'nestjs-dynamoose';
 
 export interface ChatList {
@@ -14,14 +14,8 @@ export interface NestedChatRoomInfo {
   questionInfo: Item<Question>;
 }
 
-export enum ChattingStatus {
-  pending = 'pending',
-  reserved = 'reserved',
-}
-
 export interface ChatRoom {
   status: ChattingStatus;
-  messages?: Message[];
   id?: string;
   title: string;
   roomImage: string;

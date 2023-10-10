@@ -1,5 +1,6 @@
 import { AgoraService } from '../agora/agora.service';
 import { ChattingRepository } from '../chatting/chatting.repository';
+import { ChattingStatus } from '../chatting/entities/chatting.interface';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
@@ -165,7 +166,6 @@ export class TutoringService {
       const chatRoomInfo = await this.chattingRepository.getChatRoomInfo(
         chattingId,
       );
-      console.log(chatRoomInfo, chattingId);
       if (userId != chatRoomInfo.teacherId) {
         return new Fail('해당 과외를 거절할 수 없습니다.');
       }
@@ -178,6 +178,10 @@ export class TutoringService {
         chattingId,
         'request-decline',
         JSON.stringify({}),
+      );
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.declined,
       );
 
       return new Success('과외를 거절했습니다.');
