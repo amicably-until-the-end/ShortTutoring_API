@@ -123,6 +123,11 @@ export class OfferService {
 
       const question = await this.questionRepository.getInfo(questionId);
 
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.reserved,
+      );
+
       const offerTeacherIds = question.offerTeachers;
 
       await this.questionRepository.changeStatus(questionId, 'reserved');
@@ -137,11 +142,6 @@ export class OfferService {
       const confirmMessage = {
         startTime: startTime.toISOString(),
       };
-
-      await this.chattingRepository.changeStatus(
-        chattingId,
-        ChattingStatus.reserved,
-      );
 
       await this.socketRepository.sendMessageToBothUser(
         userId,

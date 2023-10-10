@@ -38,10 +38,15 @@ export class TutoringService {
         endAt: tutoring.endedAt,
       };
 
+      const chatId = await this.chattingRepository.getIdByQuestionAndTeacher(
+        tutoring.questionId,
+        tutoring.teacherId,
+      );
+
       await this.socketRepository.sendMessageToBothUser(
         tutoring.teacherId,
         tutoring.studentId,
-        tutoring.questionId,
+        chatId,
         'tutoring-finished',
         JSON.stringify(finishMessage),
       );
