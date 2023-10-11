@@ -106,7 +106,6 @@ export class QuestionService {
         questionId: questionId,
         subTitle: `${createQuestionDto.schoolLevel} ${createQuestionDto.schoolSubject}`,
       };
-      console.log(createQuestionDto.requestTutoringStartTime);
       const requestMessage = {
         startDateTime: createQuestionDto.requestTutoringStartTime.toISOString(),
       };
@@ -126,9 +125,11 @@ export class QuestionService {
         JSON.stringify(requestMessage),
       );
 
-      return new Success('질문이 생성되었습니다.', question);
+      return new Success('질문이 생성되었습니다.', {
+        ...question,
+        chattingId: chatRoomId,
+      });
     } catch (error) {
-      console.log(error);
       return new Fail(error.message);
     }
   }
