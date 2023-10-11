@@ -227,13 +227,15 @@ export class TutoringService {
           teacherId,
         );
 
-      await this.socketRepository.sendMessageToBothUser(
-        tutoring.teacherId,
-        tutoring.studentId,
-        chatRoomId,
-        'text',
-        JSON.stringify(startMessage),
-      );
+      if (tutoring.status == 'reserved') {
+        await this.socketRepository.sendMessageToBothUser(
+          tutoring.teacherId,
+          tutoring.studentId,
+          chatRoomId,
+          'text',
+          JSON.stringify(startMessage),
+        );
+      }
 
       return await this.classroomInfo(tutoring.id, teacherId);
     } catch (error) {
