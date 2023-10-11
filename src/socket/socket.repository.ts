@@ -149,13 +149,5 @@ export class SocketRepository {
         JSON.stringify({ chattingId, message }),
       );
     }
-
-    // DynamoDB에 메시지 저장
-    await this.chattingRepository.sendMessage(
-      chattingId,
-      senderId,
-      format,
-      body,
-    );
   }
 }

@@ -123,6 +123,11 @@ export class OfferService {
 
       const question = await this.questionRepository.getInfo(questionId);
 
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.reserved,
+      );
+
       const offerTeacherIds = question.offerTeachers;
 
       await this.questionRepository.changeStatus(questionId, 'reserved');
@@ -146,11 +151,6 @@ export class OfferService {
         JSON.stringify(confirmMessage),
       );
 
-      await this.chattingRepository.changeStatus(
-        chattingId,
-        ChattingStatus.reserved,
-      );
-
       const rejectMessage = {
         text: '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
       };
@@ -162,16 +162,16 @@ export class OfferService {
               questionId,
               offerTeacherId,
             );
+          await this.chattingRepository.changeStatus(
+            teacherChatId,
+            ChattingStatus.declined,
+          );
           await this.socketRepository.sendMessageToBothUser(
             userId,
             offerTeacherId,
             teacherChatId,
             'text',
             JSON.stringify(rejectMessage),
-          );
-          await this.chattingRepository.changeStatus(
-            teacherChatId,
-            ChattingStatus.declined,
           );
         }
       }

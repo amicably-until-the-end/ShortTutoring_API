@@ -24,23 +24,29 @@ export class TutoringService {
   async finish(tutoringId: string) {
     try {
       const tutoring = await this.tutoringRepository.finishTutoring(tutoringId);
-      const { whiteBoardUUID } = tutoring;
-      await this.agoraService.disableWhiteBoardChannel(whiteBoardUUID);
 
       await this.questionRepository.changeStatus(
         tutoring.questionId,
         'finished',
       );
 
+      const { whiteBoardUUID } = tutoring;
+      await this.agoraService.disableWhiteBoardChannel(whiteBoardUUID);
+
       const finishMessage = {
         startAt: tutoring.startedAt,
         endAt: tutoring.endedAt,
       };
 
+      const chatId = await this.chattingRepository.getIdByQuestionAndTeacher(
+        tutoring.questionId,
+        tutoring.teacherId,
+      );
+
       await this.socketRepository.sendMessageToBothUser(
         tutoring.teacherId,
         tutoring.studentId,
-        tutoring.questionId,
+        chatId,
         'tutoring-finished',
         JSON.stringify(finishMessage),
       );
@@ -49,7 +55,8 @@ export class TutoringService {
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
-      return new Fail('과외를 종료할 수 없습니다.');
+      console.log(error);
+      return new Fail(`과외를 종료할 수 없습니다.`);
     }
   }
 
@@ -83,6 +90,12 @@ export class TutoringService {
           questionId,
           question.selectedTeacherId,
         );
+      await this.chattingRepository.changeStatus(
+        chatRoomId,
+        ChattingStatus.reserved,
+      );
+
+      await this.questionRepository.changeStatus(questionId, 'reserved');
 
       await this.socketRepository.sendMessageToBothUser(
         question.selectedTeacherId,
@@ -91,8 +104,6 @@ export class TutoringService {
         'reserve-confirm',
         JSON.stringify(reserveConfirmMessage),
       );
-
-      await this.questionRepository.changeStatus(questionId, 'reserved');
 
       return new Success('수업 시간이 확정되었습니다.');
     } catch (error) {
@@ -175,16 +186,17 @@ export class TutoringService {
 
       await this.questionRepository.changeStatus(chattingId, 'declined');
 
+      await this.chattingRepository.changeStatus(
+        chattingId,
+        ChattingStatus.declined,
+      );
+
       await this.socketRepository.sendMessageToBothUser(
         chatRoomInfo.teacherId,
         chatRoomInfo.studentId,
         chattingId,
         'request-decline',
         JSON.stringify({}),
-      );
-      await this.chattingRepository.changeStatus(
-        chattingId,
-        ChattingStatus.declined,
       );
 
       return new Success('과외를 거절했습니다.');
