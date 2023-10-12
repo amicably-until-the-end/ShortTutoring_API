@@ -285,8 +285,12 @@ export class UserRepository {
     }
 
     const now = new Date();
-    if (now.valueOf() - user.coin.lastReceivedFreeCoinAt.valueOf() < 86400000) {
-      throw new Error('이미 무료 코인을 받았습니다.');
+    if (
+      now.getFullYear() == user.coin.lastReceivedFreeCoinAt.getFullYear() &&
+      now.getMonth() == user.coin.lastReceivedFreeCoinAt.getMonth() &&
+      now.getDate() == user.coin.lastReceivedFreeCoinAt.getDate()
+    ) {
+      throw new Error('오늘은 이미 무료 코인을 받았습니다.');
     }
 
     try {
