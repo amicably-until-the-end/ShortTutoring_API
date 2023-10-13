@@ -1,4 +1,4 @@
-import { socketErrorWebhook } from '../config.discord-webhook';
+import { socketErrorWebhook, webhook } from '../config.discord-webhook';
 import { RedisRepository } from '../redis/redis.repository';
 import { SocketRepository } from './socket.repository';
 import { Inject } from '@nestjs/common';
@@ -33,14 +33,18 @@ export class SocketGateway {
       );
 
       await this.redisRepository.setSocketId(user.id, client.id);
-      if (process.env.NODE_ENV === 'dev') {
-        await this.redisSub.subscribe(client.id, (message) => {
-          client.emit('message', message);
-        });
+      if (process.env.NODE_ENV === 'local') {
+        return null;
       }
 
-      // 접속 확인용 로그
-      console.log(user.name, client.id);
+      await this.redisSub.subscribe(client.id, (message) => {
+        client.emit('message', message);
+      });
+      await webhook.send(
+        `${user.id}(${user.role})이 ` +
+          process.env.NODE_ENV +
+          ' 서버에 연결되었습니다.',
+      );
     } catch (error) {
       const message = `소켓 연결에 실패했습니다. ${error.message}`;
 

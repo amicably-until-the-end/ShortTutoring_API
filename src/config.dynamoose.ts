@@ -23,29 +23,93 @@ export class DynamooseConfig implements DynamooseOptionsFactory {
   }
 }
 
-export const dynamooseModule = DynamooseModule.forFeature([
-  {
-    name: 'Auth',
-    schema: AuthSchema,
-  },
-  {
-    name: 'Chatting',
-    schema: ChattingSchema,
-  },
-  {
-    name: 'Event',
-    schema: EventSchema,
-  },
-  {
-    name: 'Question',
-    schema: QuestionSchema,
-  },
-  {
-    name: 'Tutoring',
-    schema: TutoringSchema,
-  },
-  {
-    name: 'User',
-    schema: UserSchema,
-  },
-]);
+export const dynamooseModule =
+  process.env.NODE_ENV === 'prod'
+    ? DynamooseModule.forFeature([
+        {
+          name: 'Auth',
+          schema: AuthSchema,
+          options: {
+            tableName: 'DEV_Auth',
+          },
+        },
+        {
+          name: 'Chatting',
+          schema: ChattingSchema,
+          options: {
+            tableName: 'DEV_Chatting',
+          },
+        },
+        {
+          name: 'Event',
+          schema: EventSchema,
+          options: {
+            tableName: 'DEV_Event',
+          },
+        },
+        {
+          name: 'Question',
+          schema: QuestionSchema,
+          options: {
+            tableName: 'DEV_Question',
+          },
+        },
+        {
+          name: 'Tutoring',
+          schema: TutoringSchema,
+          options: {
+            tableName: 'DEV_Tutoring',
+          },
+        },
+        {
+          name: 'User',
+          schema: UserSchema,
+          options: {
+            tableName: 'DEV_User',
+          },
+        },
+      ])
+    : DynamooseModule.forFeature([
+        {
+          name: 'Auth',
+          schema: AuthSchema,
+          options: {
+            tableName: 'PROD_Auth',
+          },
+        },
+        {
+          name: 'Chatting',
+          schema: ChattingSchema,
+          options: {
+            tableName: 'PROD_Chatting',
+          },
+        },
+        {
+          name: 'Event',
+          schema: EventSchema,
+          options: {
+            tableName: 'PROD_Event',
+          },
+        },
+        {
+          name: 'Question',
+          schema: QuestionSchema,
+          options: {
+            tableName: 'PROD_Question',
+          },
+        },
+        {
+          name: 'Tutoring',
+          schema: TutoringSchema,
+          options: {
+            tableName: 'PROD_Tutoring',
+          },
+        },
+        {
+          name: 'User',
+          schema: UserSchema,
+          options: {
+            tableName: 'PROD_User',
+          },
+        },
+      ]);
