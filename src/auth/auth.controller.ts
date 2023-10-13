@@ -31,6 +31,7 @@ export class AuthController {
     );
   }
 
+  @ApiExcludeEndpoint()
   @ApiOperation(AuthOperation.decodeJwt)
   @ApiResponse(AuthResponse.decodeJwt)
   @Get('token/decode')
@@ -38,6 +39,7 @@ export class AuthController {
     return this.authService.decodeJwt(jwt);
   }
 
+  @ApiExcludeEndpoint()
   @Post('access-token')
   getAccessToken(@Body() getAccessTokenDto: GetAccessTokenDto) {
     return this.authService.getAccessToken(getAccessTokenDto);
