@@ -178,7 +178,6 @@ export class UserController {
 
   @ApiTags('User')
   @ApiBearerAuth('Authorization')
-  @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.tutoringList)
   @Get('user/tutoring/list')
   tutoringList(@Headers() headers: Headers) {
