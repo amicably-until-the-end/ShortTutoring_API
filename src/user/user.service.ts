@@ -422,7 +422,7 @@ export class UserService {
     }
   }
 
-  async tutoringHistory(userId: any) {
+  async tutoringList(userId: any) {
     try {
       const user = await this.userRepository.get(userId);
       const role = user.role;
@@ -437,7 +437,7 @@ export class UserService {
     }
   }
 
-  async reviewHistory(userId: any) {
+  async reviewList(userId: any) {
     const user = await this.userRepository.get(userId);
     if (user.role === 'student') {
       return new Fail('선생님의 리뷰 내역만 볼 수 있습니다.');
