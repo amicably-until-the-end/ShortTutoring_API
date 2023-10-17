@@ -177,11 +177,12 @@ export class UserController {
   }
 
   @ApiTags('User')
+  @ApiBearerAuth('Authorization')
   @ApiParam(UserParam.userId)
   @ApiOperation(UserOperation.tutoringList)
-  @Get('user/tutoring/list/:userId')
-  tutoringList(@Param('userId') userId: string) {
-    return this.userService.tutoringList(userId);
+  @Get('user/tutoring/list')
+  tutoringList(@Headers() headers: Headers) {
+    return this.userService.tutoringList(AccessToken.userId(headers));
   }
 
   @ApiTags('Teacher')
