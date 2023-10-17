@@ -70,6 +70,10 @@ export const UserOperation = {
     summary: '과외 내역 조회',
     description: '`USER`\n\n과외 내역을 조회합니다.',
   },
+  bestTeacher: {
+    summary: '최고의 선생님 조회',
+    description: '`USER`\n\n최고의 선생님을 조회합니다.',
+  },
 };
 
 export const TeacherOperation = {

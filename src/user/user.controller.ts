@@ -141,6 +141,7 @@ export class UserController {
 
   @ApiTags('User')
   @ApiBearerAuth('Authorization')
+  @ApiOperation(UserOperation.bestTeacher)
   @Get('user/list/teacher/best')
   getBestTeachers(@Headers() headers: Headers) {
     return this.userService.getBestTeachers(AccessToken.userId(headers));
