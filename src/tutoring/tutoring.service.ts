@@ -1,9 +1,10 @@
-import { AgoraService } from '../agora/agora.service';
+import { AgoraService, WhiteBoardChannelInfo } from '../agora/agora.service';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { ChattingStatus } from '../chatting/entities/chatting.interface';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
+import { UploadRepository } from '../upload/upload.repository';
 import { UserRepository } from '../user/user.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { ClassroomInfo, TutoringInfo } from './entities/tutoring.entity';
@@ -19,16 +20,17 @@ export class TutoringService {
     private readonly socketRepository: SocketRepository,
     private readonly userRepository: UserRepository,
     private readonly chattingRepository: ChattingRepository,
+    private readonly uploadRepository: UploadRepository,
   ) {}
 
   async finish(tutoringId: string) {
     try {
       const tutoring = await this.tutoringRepository.finishTutoring(tutoringId);
 
-      await this.questionRepository.changeStatus(
+      /*await this.questionRepository.changeStatus(
         tutoring.questionId,
         'finished',
-      );
+      );*/
 
       const { whiteBoardUUID } = tutoring;
       await this.agoraService.disableWhiteBoardChannel(whiteBoardUUID);
@@ -52,6 +54,27 @@ export class TutoringService {
       );
 
       await this.userRepository.earnCoin(tutoring.teacherId);
+
+      this.agoraService
+        .stopRecord(
+          tutoring.recordingResourceId,
+          tutoring.recordingSid,
+          tutoringId,
+        )
+        .then(async (result) => {
+          try {
+            const files = await this.uploadRepository.findRecordFile(
+              result.uid,
+            );
+            await this.tutoringRepository.setRecordingFilePath(
+              result.tutoringId,
+              files,
+            );
+          } catch (error) {
+            console.log(error);
+          }
+        })
+        .catch((error) => console.log(error));
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
@@ -111,21 +134,21 @@ export class TutoringService {
     }
   }
 
-  async classroomInfo(tutoringId: string, userId: string) {
+  async classroomChannel(tutoringId: string, userId: string) {
     try {
       const userInfo = await this.userRepository.get(userId);
 
       const tutoring = await this.tutoringRepository.get(tutoringId);
 
       if (tutoring == null) {
-        return new Fail('해당 과외 정보가 없습니다.');
+        throw new Error('존재하지 않는 과외입니다.');
       }
 
       if (userInfo.role == 'student' && tutoring.status == 'reserved') {
-        return new Fail('수업 시작 전입니다.');
+        throw new Error('아직 수업이 시작되지 않았습니다.');
       }
       if (userInfo.role == 'student' && tutoring.status == 'finished') {
-        return new Fail('수업이 종료되었습니다.');
+        throw new Error('이미 종료된 수업입니다.');
       }
       const whiteBoardToken = await this.agoraService.makeWhiteBoardToken(
         tutoring.whiteBoardUUID,
@@ -144,9 +167,20 @@ export class TutoringService {
         rtcChannel: rtcToken.channel,
         rtcUID: rtcToken.uid,
       };
-      return new Success('강의실 정보를 가져왔습니다.', accessInfo);
+      return accessInfo;
     } catch (error) {
-      return new Fail('강의실 정보를 가져오는데 실패했습니다.');
+      return null;
+    }
+  }
+
+  async classrroomInfo(tutoringId: string, userId: string) {
+    try {
+      return new Success(
+        '수업 정보를 가져왔습니다.',
+        await this.classroomChannel(tutoringId, userId),
+      );
+    } catch (e) {
+      return new Fail('수업 정보를 가져오는데 실패했습니다.');
     }
   }
 
@@ -221,6 +255,7 @@ export class TutoringService {
       const startMessage = {
         text: '과외가 시작되었습니다.',
       };
+
       const chatRoomId =
         await this.chattingRepository.getIdByQuestionAndTeacher(
           tutoring.questionId,
@@ -237,7 +272,26 @@ export class TutoringService {
         );
       }
 
-      return await this.classroomInfo(tutoring.id, teacherId);
+      const roomInfo = await this.classroomChannel(tutoring.id, teacherId);
+
+      const whiteBoardInfo: WhiteBoardChannelInfo = {
+        whiteBoardAppId: roomInfo.boardAppId,
+        whiteBoardUUID: roomInfo.boardUUID,
+      };
+
+      this.agoraService
+        .startRecord(whiteBoardInfo, roomInfo.rtcChannel, tutoringId)
+        .then((result) => {
+          console.log(result, 'result', tutoringId, 'tutoringId');
+          this.tutoringRepository.setRecordingInfo(
+            result.tutoringId,
+            result.resourceId,
+            result.sid,
+          );
+        })
+        .catch((e) => console.log(e));
+
+      return new Success('과외가 시작되었습니다.', roomInfo);
     } catch (error) {
       return new Fail('과외 시작에 실패했습니다.');
     }

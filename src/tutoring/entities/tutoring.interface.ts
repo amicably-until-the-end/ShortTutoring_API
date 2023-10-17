@@ -20,4 +20,7 @@ export interface Tutoring extends TutoringKey {
   reservedEnd?: Date;
   reviewRating?: number;
   reviewComment?: string;
+  recordingResourceId?: string;
+  recordingSid?: string;
+  recordingFilePath?: string[];
 }

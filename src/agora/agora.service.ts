@@ -101,13 +101,17 @@ export class AgoraService {
     }
   }
 
-  async startRecord(boardChannel: WhiteBoardChannelInfo, voiceChannel: string) {
+  async startRecord(
+    boardChannel: WhiteBoardChannelInfo,
+    voiceChannel: string,
+    tutoringId: string,
+  ): Promise<{ resourceId: string; sid: string; tutoringId: string }> {
     try {
       const boardAppId = boardChannel.whiteBoardAppId;
       const boardChannelId = boardChannel.whiteBoardUUID;
       const boardRoomToken = await this.makeWhiteBoardToken(boardChannelId);
       const voiceAppId = process.env.AGORA_RTC_APP_ID;
-      const voiceChannelId = voiceChannel;
+      const voiceChannelId = tutoringId; //agora 에서 voice Channel은 questionId와 동일
       const voiceUid = 3;
       const voiceRoomToken = await this.makeRtcToken(voiceChannelId, voiceUid);
       const queryParams = new URLSearchParams();
@@ -123,7 +127,7 @@ export class AgoraService {
           `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/acquire`,
           {
             cname: process.env.AGORA_RECORDING_ACCESS_CHANNEL,
-            uid: await this.djb2Hash(voiceChannelId),
+            uid: await this.djb2Hash(tutoringId),
             clientRequest: {
               region: 'AP',
               resourceExpiredHour: 24,
@@ -139,15 +143,12 @@ export class AgoraService {
         ),
       );
       const { cname, uid, resourceId } = data;
-      console.log(
-        `${process.env.AGORA_RECORDING_SOURCE}?${queryParams.toString()}`,
-      );
       const startResult = await firstValueFrom(
         this.httpService.post(
           `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/resourceid/${resourceId}/mode/web/start`,
           {
             cname: cname,
-            uid: await this.djb2Hash(voiceChannelId),
+            uid: await this.djb2Hash(tutoringId),
             clientRequest: {
               token: process.env.AGORA_RECORDING_TOKEN,
               recordingConfig: {
@@ -163,7 +164,7 @@ export class AgoraService {
                 bucket: process.env.AGORA_RECORDING_S3_BUCKET_NAME,
                 accessKey: process.env.AGORA_RECORDING_S3_ACCESS_KEY,
                 secretKey: process.env.AGORA_RECORDING_S3_SECRET_KEY,
-                fileNamePrefix: [boardChannel.whiteBoardUUID],
+                fileNamePrefix: [`${await this.djb2Hash(tutoringId)}`],
               },
               extensionServiceConfig: {
                 errorHandlePolicy: 'error_abort',
@@ -194,10 +195,10 @@ export class AgoraService {
           },
         ),
       );
-      console.log(startResult);
       return {
         sid: startResult.data.sid,
         resourceId: startResult.data.resourceId,
+        tutoringId: tutoringId,
       };
     } catch (error) {
       console.log(error);
@@ -217,15 +218,25 @@ export class AgoraService {
     });
   }
 
-  async stopRecord(resourceId: string, sid: string, voiceChannel: string) {
+  /**
+   *
+   * @param resourceId - agora record acquire 할 때 받은 resourceId : tutoring table에 저장
+   * @param sid - agora record acquire 할 때 받은 sid : tutoring table에 저장
+   * @param tutoringId - tutoringId : recording의 uid로 활용
+   */
+
+  async stopRecord(
+    resourceId: string,
+    sid: string,
+    tutoringId: string,
+  ): Promise<{ uid: string; tutoringId: string }> {
     try {
-      console.log('stop record');
-      const { data } = await firstValueFrom(
+      const response = await firstValueFrom(
         this.httpService.post(
           `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/resourceid/${resourceId}/sid/${sid}/mode/web/stop`,
           {
             cname: process.env.AGORA_RECORDING_ACCESS_CHANNEL,
-            uid: await this.djb2Hash(voiceChannel),
+            uid: `${await this.djb2Hash(tutoringId)}`,
             clientRequest: {},
           },
           {
@@ -236,9 +247,16 @@ export class AgoraService {
           },
         ),
       );
-      await this.logDeeply(data);
+      return {
+        uid: `${await this.djb2Hash(tutoringId)}`,
+        tutoringId: tutoringId,
+      };
     } catch (error) {
       console.log(error);
+      return {
+        uid: `${await this.djb2Hash(tutoringId)}`,
+        tutoringId: tutoringId,
+      };
     }
   }
 
@@ -251,17 +269,6 @@ export class AgoraService {
     }
 
     return String(hash >>> 0); // Ensure it's a positive 32-bit integer
-  }
-
-  async logDeeply(obj, depth = 0) {
-    for (const key in obj) {
-      if (typeof obj[key] === 'object') {
-        console.log('  '.repeat(depth) + key + ':');
-        await this.logDeeply(obj[key], depth + 1);
-      } else {
-        console.log('  '.repeat(depth) + key + ': ' + obj[key]);
-      }
-    }
   }
 }
 

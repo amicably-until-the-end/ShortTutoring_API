@@ -45,4 +45,30 @@ export class UploadRepository {
       throw Error('이미지 업로드에 실패했습니다.');
     }
   }
+
+  async findRecordFile(uid: string) {
+    AWS.config.update({
+      region: process.env.AWS_REGION,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      },
+    });
+    try {
+      const url = `${process.env.AGORA_RECORDING_BUCKET_URL}`;
+      const response = await new AWS.S3()
+        .listObjectsV2({
+          Bucket: process.env.AGORA_RECORDING_S3_BUCKET_NAME,
+          Prefix: uid,
+        })
+        .promise();
+      const fileNames = response.Contents.map((file) => file.Key);
+      return fileNames
+        .filter((fileName) => fileName.endsWith('.m3u8'))
+        .map((fileName) => `${url}/${fileName}`);
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
 }

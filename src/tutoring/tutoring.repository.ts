@@ -51,6 +51,20 @@ export class TutoringRepository {
     );
   }
 
+  async setRecordingInfo(tutoringId: string, resourceId: string, sid: string) {
+    return await this.tutoringModel.update(
+      { id: tutoringId },
+      { recordingResourceId: resourceId, recordingSid: sid },
+    );
+  }
+
+  async setRecordingFilePath(tutoringId: string, filePath: string[]) {
+    return await this.tutoringModel.update(
+      { id: tutoringId },
+      { recordingFilePath: filePath },
+    );
+  }
+
   async startTutoring(tutoringId: string) {
     const tutoring = await this.tutoringModel.get({ id: tutoringId });
     if (tutoring === undefined) {
