@@ -175,8 +175,12 @@ export class UserController {
   }
 
   @ApiTags('Teacher')
-  @Get('teacher/rating/:teacherId')
-  teacherRating(@Param('teacherId') teacherId: string) {
-    return this.userService.teacherRating(teacherId);
+  @ApiBearerAuth('Authorization')
+  @Get('teacher/review/list/:teacherId')
+  reviewHistory(
+    @Headers() headers: Headers,
+    @Param('teacherId') teacherId: string,
+  ) {
+    return this.userService.reviewHistory(teacherId);
   }
 }

@@ -1,5 +1,6 @@
 import { AuthRepository } from '../auth/auth.repository';
 import { webhook } from '../config.discord-webhook';
+import { QuestionRepository } from '../question/question.repository';
 import { RedisRepository } from '../redis/redis.repository';
 import { Fail, Success } from '../response';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
@@ -25,6 +26,7 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly uploadRepository: UploadRepository,
     private readonly redisRepository: RedisRepository,
+    private readonly questionRepository: QuestionRepository,
     private readonly tutoringRepository: TutoringRepository,
   ) {}
 
@@ -435,17 +437,25 @@ export class UserService {
     }
   }
 
-  async teacherRating(userId: string) {
+  async reviewHistory(userId: any) {
+    const user = await this.userRepository.get(userId);
+    if (user.role === 'student') {
+      return new Fail('선생님의 리뷰 내역만 볼 수 있습니다.');
+    }
+
     try {
-      const user = await this.userRepository.get(userId);
-      if (user.role != 'teacher') {
-        return new Fail('선생님의 평점만 볼 수 있습니다.');
+      const reviewHistory = await this.tutoringRepository.reviewHistory(userId);
+
+      for (const review of reviewHistory) {
+        review.student = await this.userRepository.getOther(review.studentId);
       }
 
-      const rating = await this.tutoringRepository.getTeacherRating(userId);
-      return new Success('선생님의 평점을 가져왔습니다.', { rating });
+      return new Success('리뷰 내역을 가져왔습니다.', {
+        count: reviewHistory.length,
+        history: reviewHistory,
+      });
     } catch (error) {
-      return new Fail('선생님의 평점을 가져오는데 실패했습니다.');
+      return new Fail('리뷰 내역을 가져오는데 실패했습니다.');
     }
   }
 }

@@ -173,4 +173,34 @@ export class TutoringRepository {
       return new Error('과외 내역을 가져올 수 없습니다.');
     }
   }
+
+  async reviewHistory(userId: any) {
+    try {
+      const tutoringHistory: Tutoring[] = await this.tutoringModel
+        .scan({
+          teacherId: { eq: userId },
+        })
+        .exec();
+      const history = tutoringHistory
+        .filter((tutoring) => tutoring.reviewRating != undefined)
+        .sort((a, b) => {
+          return new Date(b.endedAt).getTime() - new Date(a.endedAt).getTime();
+        });
+
+      return history.map((tutoring) => {
+        return {
+          questionId: tutoring.questionId,
+          studentId: tutoring.studentId,
+          tutoringId: tutoring.id,
+          student: undefined,
+          reviewRating: tutoring.reviewRating,
+          reviewComment: tutoring.reviewComment,
+          startedAt: tutoring.startedAt,
+          endedAt: tutoring.endedAt,
+        };
+      });
+    } catch (error) {
+      throw new Error('과외 내역을 가져올 수 없습니다.');
+    }
+  }
 }
