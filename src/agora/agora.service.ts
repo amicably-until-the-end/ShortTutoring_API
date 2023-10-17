@@ -120,10 +120,10 @@ export class AgoraService {
 
       const { data } = await firstValueFrom(
         this.httpService.post(
-          `https://api.netless.link/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/acquire`,
+          `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/acquire`,
           {
             cname: process.env.AGORA_RECORDING_ACCESS_CHANNEL,
-            uid: 3,
+            uid: await this.djb2Hash(voiceChannelId),
             clientRequest: {
               region: 'AP',
               resourceExpiredHour: 24,
@@ -133,33 +133,37 @@ export class AgoraService {
           {
             headers: {
               'Content-Type': 'application/json',
+              Authorization: `Basic ${process.env.AGORA_RECORDING_AUTHORIZATION}`,
             },
           },
         ),
       );
-      console.log(data);
-      const acquiredResource = data;
+      const { cname, uid, resourceId } = data;
+      console.log(
+        `${process.env.AGORA_RECORDING_SOURCE}?${queryParams.toString()}`,
+      );
       const startResult = await firstValueFrom(
         this.httpService.post(
-          `https://api.netless.link/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording${acquiredResource.resourceID}/mode/mix/start`,
+          `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/resourceid/${resourceId}/mode/web/start`,
           {
-            cname: '{{AccessChannel}}',
-            uid: '{{RecordingUID}}',
+            cname: cname,
+            uid: await this.djb2Hash(voiceChannelId),
             clientRequest: {
-              token:
-                '007eJxTYNBoXvf+dJDb/vsdVtU8rp3PzRW0D3nmuG6/FPJ3jeSvQ/kKDMYGlqZGiSmWJuZGpiZplqmJKUapiamplqmmqSmmhimGjWoMqQ2BjAzXZsQzMTJAIIjPyJDGwAAAFYUeow==',
+              token: process.env.AGORA_RECORDING_TOKEN,
               recordingConfig: {
                 maxIdleTime: 120,
                 streamTypes: 0,
                 audioProfile: 1,
                 channelType: 1,
+                maxRecordingHour: 2,
               },
               storageConfig: {
-                vendor: process.env.AGORA_RECORDING_S3_VENDOR,
-                region: process.env.AGORA_RECORDING_S3_REGION,
-                bucket: process.env.AGORA_RECORDING_S3_BUCKET,
+                vendor: Number(process.env.AGORA_RECORDING_S3_VENDOR),
+                region: Number(process.env.AGORA_RECORDING_S3_REGION),
+                bucket: process.env.AGORA_RECORDING_S3_BUCKET_NAME,
                 accessKey: process.env.AGORA_RECORDING_S3_ACCESS_KEY,
                 secretKey: process.env.AGORA_RECORDING_S3_SECRET_KEY,
+                fileNamePrefix: [boardChannel.whiteBoardUUID],
               },
               extensionServiceConfig: {
                 errorHandlePolicy: 'error_abort',
@@ -169,7 +173,7 @@ export class AgoraService {
                     errorHandlePolicy: 'error_abort',
                     serviceParam: {
                       url: `${
-                        process.env.AROGA_RECORDING_SOURCE
+                        process.env.AGORA_RECORDING_SOURCE
                       }?${queryParams.toString()}`,
                       audioProfile: 0,
                       videoWidth: 720,
@@ -184,14 +188,79 @@ export class AgoraService {
           },
           {
             headers: {
+              Authorization: `Basic ${process.env.AGORA_RECORDING_AUTHORIZATION}`,
               'Content-Type': 'application/json',
             },
           },
         ),
       );
       console.log(startResult);
+      return {
+        sid: startResult.data.sid,
+        resourceId: startResult.data.resourceId,
+      };
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  async delayedStopRecord(
+    resourceId: string,
+    sid: string,
+    voiceChannel: string,
+  ) {
+    return new Promise((resolve, reject) => {
+      setTimeout(async () => {
+        await this.stopRecord(resourceId, sid, voiceChannel);
+        resolve('');
+      }, 10000);
+    });
+  }
+
+  async stopRecord(resourceId: string, sid: string, voiceChannel: string) {
+    try {
+      console.log('stop record');
+      const { data } = await firstValueFrom(
+        this.httpService.post(
+          `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/resourceid/${resourceId}/sid/${sid}/mode/web/stop`,
+          {
+            cname: process.env.AGORA_RECORDING_ACCESS_CHANNEL,
+            uid: await this.djb2Hash(voiceChannel),
+            clientRequest: {},
+          },
+          {
+            headers: {
+              Authorization: `Basic ${process.env.AGORA_RECORDING_AUTHORIZATION}`,
+              'Content-Type': 'application/json',
+            },
+          },
+        ),
+      );
+      await this.logDeeply(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async djb2Hash(str: string): Promise<string> {
+    let hash = 1255; // Initial hash value
+
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = (hash * 33) ^ char; // DJB2 hash formula
+    }
+
+    return String(hash >>> 0); // Ensure it's a positive 32-bit integer
+  }
+
+  async logDeeply(obj, depth = 0) {
+    for (const key in obj) {
+      if (typeof obj[key] === 'object') {
+        console.log('  '.repeat(depth) + key + ':');
+        await this.logDeeply(obj[key], depth + 1);
+      } else {
+        console.log('  '.repeat(depth) + key + ': ' + obj[key]);
+      }
     }
   }
 }
