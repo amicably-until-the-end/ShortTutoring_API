@@ -1,5 +1,5 @@
 import { AccessToken } from '../auth/entities/auth.entity';
-import { UserOperation } from './descriptions/user.operation';
+import { TeacherOperation, UserOperation } from './descriptions/user.operation';
 import { UserParam } from './descriptions/user.param';
 import { UserResponse } from './descriptions/user.response';
 import { CreateStudentDto, CreateTeacherDto } from './dto/create-user.dto';
@@ -140,8 +140,16 @@ export class UserController {
   }
 
   @ApiTags('User')
-  @ApiOperation(UserOperation.onlineTeacher)
   @ApiBearerAuth('Authorization')
+  @ApiOperation(UserOperation.bestTeacher)
+  @Get('user/list/teacher/best')
+  getBestTeachers(@Headers() headers: Headers) {
+    return this.userService.getBestTeachers(AccessToken.userId(headers));
+  }
+
+  @ApiTags('User')
+  @ApiBearerAuth('Authorization')
+  @ApiOperation(UserOperation.onlineTeacher)
   @ApiResponse(UserResponse.onlineTeacher)
   @Get('user/list/teacher/online')
   getOnlineTeachers(@Headers() headers: Headers) {
@@ -169,14 +177,22 @@ export class UserController {
   }
 
   @ApiTags('User')
-  @Get('user/history/tutoring/:userId')
-  tutoringHistory(@Param('userId') userId: string) {
-    return this.userService.tutoringHistory(userId);
+  @ApiParam(UserParam.userId)
+  @ApiOperation(UserOperation.tutoringList)
+  @Get('user/tutoring/list/:userId')
+  tutoringList(@Param('userId') userId: string) {
+    return this.userService.tutoringList(userId);
   }
 
   @ApiTags('Teacher')
-  @Get('teacher/rating/:teacherId')
-  teacherRating(@Param('teacherId') teacherId: string) {
-    return this.userService.teacherRating(teacherId);
+  @ApiBearerAuth('Authorization')
+  @ApiParam(UserParam.teacherId)
+  @ApiOperation(TeacherOperation.reviewList)
+  @Get('teacher/review/list/:teacherId')
+  reviewList(
+    @Headers() headers: Headers,
+    @Param('teacherId') teacherId: string,
+  ) {
+    return this.userService.reviewList(teacherId);
   }
 }
