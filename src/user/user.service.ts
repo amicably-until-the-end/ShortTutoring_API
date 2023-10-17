@@ -342,6 +342,27 @@ export class UserService {
     }
   }
 
+  async getBestTeachers(userId: string) {
+    try {
+      await this.userRepository.get(userId);
+      const bestTeachers = await this.userRepository.getTeachers();
+      for (const teacher of bestTeachers) {
+        teacher.rating = await this.tutoringRepository.getTeacherRating(
+          teacher.id,
+        );
+      }
+
+      bestTeachers.sort((a, b) => b.rating - a.rating);
+
+      return new Success(
+        '성공적으로 최고의 선생님들을 가져왔습니다.',
+        bestTeachers,
+      );
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
   async getOnlineTeachers(userId: string) {
     try {
       const users = await this.redisRepository.getAllKeys();
