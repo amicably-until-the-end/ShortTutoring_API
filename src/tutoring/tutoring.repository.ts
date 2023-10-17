@@ -174,17 +174,19 @@ export class TutoringRepository {
     }
   }
 
-  async history(userId: string, role: string) {
+  async history(userId: string, role: string): Promise<Tutoring[]> {
     try {
+      console.log(userId, role);
       const history: Tutoring[] = await this.tutoringModel
         .scan({
           [role + 'Id']: { eq: userId },
+          status: { eq: 'finished' },
         })
         .exec();
 
       return history;
     } catch (error) {
-      return new Error('과외 내역을 가져올 수 없습니다.');
+      throw new Error('과외 내역을 가져올 수 없습니다.');
     }
   }
 

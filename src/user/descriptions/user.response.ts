@@ -77,6 +77,67 @@ export const JwtEntity = {
 };
 
 export const UserResponse = {
+  tutoringList: {
+    status: 200,
+    schema: {
+      type: 'object',
+      properties: {
+        success: {
+          type: 'boolean',
+          example: true,
+        },
+        data: {
+          type: 'array',
+          items: {
+            properties: {
+              tutoringId: {
+                type: 'string',
+              },
+              questionId: {
+                type: 'string',
+              },
+              description: {
+                type: 'string',
+                description: '학생이 작성한 문제 설명',
+              },
+              schoolLevel: {
+                type: 'string',
+                example: {
+                  oneOf: ['중학교', '고등학교'],
+                },
+              },
+              schoolSubject: {
+                type: 'string',
+                description: '학생이 선택한 과목',
+                example: '미적분',
+              },
+              tutoringDate: {
+                type: 'string',
+                description: '튜터링 일시',
+              },
+              opponentName: {
+                type: 'string',
+                description:
+                  '튜터링 상대 이름, 학생이면 선생님, 선생님이면 학생',
+              },
+              opponentProfileImage: {
+                type: 'string',
+                description: '튜터링 상대 프로필 이미지',
+              },
+              recordFileUrl: {
+                type: 'array',
+                description: '튜터링 녹화 영상 m3u8 파일 url',
+              },
+              questionImage: {
+                type: 'string',
+                description: '학생이 올린 문제 이미지 url',
+              },
+            },
+          },
+        },
+      },
+    },
+  },
   signup: {
     student: {
       status: 201,
