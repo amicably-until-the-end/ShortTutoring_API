@@ -351,4 +351,18 @@ export class UserRepository {
     coin.amount += 1;
     return await this.userModel.update({ id: userId }, { coin: coin });
   }
+
+  async getTeachers() {
+    try {
+      return await this.userModel
+        .scan({
+          role: {
+            eq: 'teacher',
+          },
+        })
+        .exec();
+    } catch (error) {
+      throw new Error('선생님 목록을 가져올 수 없습니다.');
+    }
+  }
 }

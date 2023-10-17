@@ -11,4 +11,10 @@ export const UserParam = {
     type: String,
     example: 'kakao',
   },
+  teacherId: {
+    name: 'teacherId',
+    description: '선생님 id',
+    type: String,
+    example: 'test-teacher-id',
+  },
 };

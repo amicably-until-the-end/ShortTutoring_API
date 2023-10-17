@@ -66,4 +66,19 @@ export const UserOperation = {
     summary: '다른 사용자의 팔로워 목록 조회',
     description: '`USER`\n\n다른 사용자의 팔로워 목록을 조회합니다.',
   },
+  tutoringList: {
+    summary: '과외 내역 조회',
+    description: '`USER`\n\n과외 내역을 조회합니다.',
+  },
+  bestTeacher: {
+    summary: '최고의 선생님 조회',
+    description: '`USER`\n\n최고의 선생님을 조회합니다.',
+  },
+};
+
+export const TeacherOperation = {
+  reviewList: {
+    summary: '선생님 리뷰 목록 조회',
+    description: '`USER`\n\n선생님의 리뷰 목록을 조회합니다.',
+  },
 };
