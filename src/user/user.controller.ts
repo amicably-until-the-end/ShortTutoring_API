@@ -180,6 +180,7 @@ export class UserController {
   @ApiBearerAuth('Authorization')
   @ApiOperation(UserOperation.tutoringList)
   @Get('user/tutoring/list')
+  @ApiResponse(UserResponse.tutoringList)
   tutoringList(@Headers() headers: Headers) {
     return this.userService.tutoringList(AccessToken.userId(headers));
   }

@@ -51,6 +51,20 @@ export class TutoringRepository {
     );
   }
 
+  async setRecordingInfo(tutoringId: string, resourceId: string, sid: string) {
+    return await this.tutoringModel.update(
+      { id: tutoringId },
+      { recordingResourceId: resourceId, recordingSid: sid },
+    );
+  }
+
+  async setRecordingFilePath(tutoringId: string, filePath: string[]) {
+    return await this.tutoringModel.update(
+      { id: tutoringId },
+      { recordingFilePath: filePath },
+    );
+  }
+
   async startTutoring(tutoringId: string) {
     const tutoring = await this.tutoringModel.get({ id: tutoringId });
     if (tutoring === undefined) {
@@ -160,17 +174,18 @@ export class TutoringRepository {
     }
   }
 
-  async history(userId: string, role: string) {
+  async history(userId: string, role: string): Promise<Tutoring[]> {
     try {
       const history: Tutoring[] = await this.tutoringModel
         .scan({
           [role + 'Id']: { eq: userId },
+          status: { eq: 'finished' },
         })
         .exec();
 
       return history;
     } catch (error) {
-      return new Error('과외 내역을 가져올 수 없습니다.');
+      throw new Error('과외 내역을 가져올 수 없습니다.');
     }
   }
 

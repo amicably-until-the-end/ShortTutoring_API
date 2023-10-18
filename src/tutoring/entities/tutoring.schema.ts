@@ -56,4 +56,14 @@ export const TutoringSchema = new Schema({
   reviewComment: {
     type: String,
   },
+  recordingResourceId: {
+    type: String,
+  },
+  recordingSid: {
+    type: String,
+  },
+  recordingFilePath: {
+    type: Array,
+    schema: [String],
+  },
 });

@@ -11,6 +11,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import {
   StudentListing,
   TeacherListing,
+  TutoringHistory,
   UserListing,
 } from './entities/user.entities';
 import { User } from './entities/user.interface';
@@ -26,8 +27,8 @@ export class UserService {
     private readonly userRepository: UserRepository,
     private readonly uploadRepository: UploadRepository,
     private readonly redisRepository: RedisRepository,
-    private readonly questionRepository: QuestionRepository,
     private readonly tutoringRepository: TutoringRepository,
+    private readonly questionRepository: QuestionRepository,
   ) {}
 
   /**
@@ -452,8 +453,33 @@ export class UserService {
         userId,
         role,
       );
-      return new Success('과외 내역을 가져왔습니다.', tutoringHistory);
+      const result = await Promise.all(
+        tutoringHistory.map(async (tutoring) => {
+          const question = await this.questionRepository.getInfo(
+            tutoring.questionId,
+          );
+          const opponent = await this.userRepository.get(
+            role == 'teacher' ? tutoring.studentId : tutoring.teacherId,
+          );
+          const history: TutoringHistory = {
+            tutoringId: tutoring.id,
+            description: question.problem.description,
+            schoolLevel: question.problem.schoolLevel,
+            schoolSubject: question.problem.schoolSubject,
+            tutoringDate: tutoring.startedAt,
+            questionId: tutoring.questionId,
+            opponentName: opponent.name,
+            opponentProfileImage: opponent.profileImage,
+            questionImage: question.problem.mainImage,
+            recordFileUrl: tutoring.recordingFilePath,
+          };
+          return history;
+        }),
+      );
+
+      return new Success('과외 내역을 가져왔습니다.', result);
     } catch (error) {
+      console.log(error);
       return new Fail('과외 내역을 가져오는데 실패했습니다.');
     }
   }
