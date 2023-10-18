@@ -176,7 +176,6 @@ export class TutoringRepository {
 
   async history(userId: string, role: string): Promise<Tutoring[]> {
     try {
-      console.log(userId, role);
       const history: Tutoring[] = await this.tutoringModel
         .scan({
           [role + 'Id']: { eq: userId },
