@@ -63,7 +63,9 @@ export class UserService {
       const embed = new MessageBuilder()
         .setTitle('회원가입')
         .setColor(Number('#00ff00'))
-        .setImage(user.profileImage)
+        .setImage(
+          `https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile-img/ic_profile_${user.profileImage}.png`,
+        )
         .setDescription(`${user.name}님이 회원가입했습니다.`);
       await webhook.send(embed);
 
@@ -105,7 +107,9 @@ export class UserService {
       const embed = new MessageBuilder()
         .setTitle('회원가입')
         .setColor(Number('#00ff00'))
-        .setImage(user.profileImage)
+        .setImage(
+          `https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile-img/ic_profile_${user.profileImage}.png`,
+        )
         .setDescription(`${user.name}님이 회원가입했습니다.`);
       await webhook.send(embed);
 
