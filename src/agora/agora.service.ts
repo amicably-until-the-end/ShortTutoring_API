@@ -111,7 +111,7 @@ export class AgoraService {
       const boardChannelId = boardChannel.whiteBoardUUID;
       const boardRoomToken = await this.makeWhiteBoardToken(boardChannelId);
       const voiceAppId = process.env.AGORA_RTC_APP_ID;
-      const voiceChannelId = tutoringId; //agora 에서 voice Channel은 questionId와 동일
+      const voiceChannelId = voiceChannel; //agora 에서 voice Channel은 questionId와 동일
       const voiceUid = 3;
       const voiceRoomToken = await this.makeRtcToken(voiceChannelId, voiceUid);
       const queryParams = new URLSearchParams();
