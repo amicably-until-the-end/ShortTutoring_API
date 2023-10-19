@@ -143,6 +143,10 @@ export class AgoraService {
         ),
       );
       const { cname, uid, resourceId } = data;
+      console.log(
+        'url',
+        `${process.env.AGORA_RECORDING_SOURCE}?${queryParams.toString()}`,
+      );
       const startResult = await firstValueFrom(
         this.httpService.post(
           `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/resourceid/${resourceId}/mode/web/start`,
