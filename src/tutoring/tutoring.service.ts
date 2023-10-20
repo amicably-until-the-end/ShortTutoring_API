@@ -175,12 +175,26 @@ export class TutoringService {
 
   async classrroomInfo(tutoringId: string, userId: string) {
     try {
+      const userInfo = await this.userRepository.get(userId);
+
+      const tutoring = await this.tutoringRepository.get(tutoringId);
+
+      if (tutoring == null) {
+        return new Fail('존재하지 않는 과외입니다.', 100);
+      }
+
+      if (userInfo.role == 'student' && tutoring.status == 'reserved') {
+        return new Fail('아직 수업이 시작되지 않았습니다.', 200);
+      }
+      if (userInfo.role == 'student' && tutoring.status == 'finished') {
+        return new Fail('이미 종료된 수업입니다.', 300);
+      }
       return new Success(
         '수업 정보를 가져왔습니다.',
-        await this.classroomChannel(tutoringId, userId),
+        this.classroomChannel(tutoringId, userId),
       );
     } catch (e) {
-      return new Fail('수업 정보를 가져오는데 실패했습니다.');
+      return new Fail('수업 정보를 가져오는데 실패했습니다.' + e.message);
     }
   }
 

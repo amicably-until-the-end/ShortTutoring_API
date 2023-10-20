@@ -17,7 +17,8 @@ export class Success extends Response {
 }
 
 export class Fail extends Response {
-  constructor(message: string) {
-    super(message, false);
+  constructor(message: string, errorCode?: number) {
+    if (errorCode) super(message, false, { errorCode });
+    else super(message, false);
   }
 }
