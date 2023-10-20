@@ -175,7 +175,33 @@ export class QuestionService {
         status,
         type,
       );
-      return new Success('질문 목록을 불러왔습니다.', questions);
+
+      const result = await Promise.all(
+        questions.map(async (question) => {
+          let chattingId = null;
+          if (question.selectedTeacherId != undefined) {
+            try {
+              chattingId =
+                await this.chattingRepository.getIdByQuestionAndTeacher(
+                  question.id,
+                  question.selectedTeacherId,
+                );
+            } catch (e) {
+              console.log(e);
+            }
+          }
+          if (chattingId != null) {
+            return {
+              ...question,
+              chattingId: chattingId,
+            };
+          } else {
+            return question;
+          }
+        }),
+      );
+
+      return new Success('질문 목록을 불러왔습니다.', result);
     } catch (error) {
       return new Fail('사용자의 질문 목록을 불러오는데 실패했습니다.');
     }
