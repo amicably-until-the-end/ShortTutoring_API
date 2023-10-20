@@ -87,7 +87,6 @@ export class ChattingRepository {
   }
 
   async getIdByQuestionAndTeacher(questionId: string, teacherId: string) {
-    console.log(questionId, teacherId);
     const result = await this.chattingModel
       .scan({ questionId, teacherId })
       .exec();

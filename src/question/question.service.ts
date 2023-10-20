@@ -186,9 +186,7 @@ export class QuestionService {
                   question.id,
                   question.selectedTeacherId,
                 );
-            } catch (e) {
-              console.log(e);
-            }
+            } catch (e) {}
           }
           if (chattingId != null) {
             return {
