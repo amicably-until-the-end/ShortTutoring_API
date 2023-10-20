@@ -111,7 +111,7 @@ export class AgoraService {
       const boardChannelId = boardChannel.whiteBoardUUID;
       const boardRoomToken = await this.makeWhiteBoardToken(boardChannelId);
       const voiceAppId = process.env.AGORA_RTC_APP_ID;
-      const voiceChannelId = tutoringId; //agora 에서 voice Channel은 questionId와 동일
+      const voiceChannelId = voiceChannel; //agora 에서 voice Channel은 questionId와 동일
       const voiceUid = 3;
       const voiceRoomToken = await this.makeRtcToken(voiceChannelId, voiceUid);
       const queryParams = new URLSearchParams();
@@ -143,6 +143,10 @@ export class AgoraService {
         ),
       );
       const { cname, uid, resourceId } = data;
+      console.log(
+        'url',
+        `${process.env.AGORA_RECORDING_SOURCE}?${queryParams.toString()}`,
+      );
       const startResult = await firstValueFrom(
         this.httpService.post(
           `https://api.agora.io/v1/apps/${process.env.AGORA_RECORDING_APP_ID}/cloud_recording/resourceid/${resourceId}/mode/web/start`,
