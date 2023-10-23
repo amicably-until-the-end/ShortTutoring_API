@@ -191,10 +191,10 @@ export class TutoringService {
       }
       return new Success(
         '수업 정보를 가져왔습니다.',
-        this.classroomChannel(tutoringId, userId),
+        await this.classroomChannel(tutoringId, userId),
       );
     } catch (e) {
-      return new Fail('수업 정보를 가져오는데 실패했습니다.' + e.message);
+      return new Fail('수업 정보를 가져오는데 실패했습니다.');
     }
   }
 
