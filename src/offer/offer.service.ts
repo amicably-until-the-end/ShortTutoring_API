@@ -105,81 +105,79 @@ export class OfferService {
     startTime: Date,
     endTime: Date,
   ) {
-    try {
-      const chatting = await this.chattingRepository.getChatRoomInfo(
-        chattingId,
-      );
-      const tutoring = await this.tutoringRepository.create(
-        questionId,
-        userId,
-        chatting.teacherId,
-      );
+    // try {
+    const chatting = await this.chattingRepository.getChatRoomInfo(chattingId);
+    const tutoring = await this.tutoringRepository.create(
+      questionId,
+      userId,
+      chatting.teacherId,
+    );
 
-      await this.tutoringRepository.reserveTutoring(
-        tutoring.id,
-        startTime,
-        endTime,
-      );
+    await this.tutoringRepository.reserveTutoring(
+      tutoring.id,
+      startTime,
+      endTime,
+    );
 
-      const question = await this.questionRepository.getInfo(questionId);
+    const question = await this.questionRepository.getInfo(questionId);
 
-      await this.chattingRepository.changeStatus(
-        chattingId,
-        ChattingStatus.reserved,
-      );
+    await this.chattingRepository.changeStatus(
+      chattingId,
+      ChattingStatus.reserved,
+    );
 
-      const offerTeacherIds = question.offerTeachers;
+    const offerTeacherIds = question.offerTeachers;
 
-      await this.questionRepository.changeStatus(questionId, 'reserved');
+    await this.questionRepository.changeStatus(questionId, 'reserved');
 
-      await this.questionRepository.setTutoringId(questionId, tutoring.id);
+    await this.questionRepository.setTutoringId(questionId, tutoring.id);
 
-      await this.questionRepository.setSelectedTeacherId(
-        questionId,
-        chatting.teacherId,
-      );
+    await this.questionRepository.setSelectedTeacherId(
+      questionId,
+      chatting.teacherId,
+    );
 
-      const confirmMessage = {
-        startTime: startTime.toISOString(),
-      };
+    const confirmMessage = {
+      startTime: startTime.toISOString(),
+    };
 
-      await this.socketRepository.sendMessageToBothUser(
-        userId,
-        chatting.teacherId,
-        chattingId,
-        'reserve-confirm',
-        JSON.stringify(confirmMessage),
-      );
+    await this.socketRepository.sendMessageToBothUser(
+      userId,
+      chatting.teacherId,
+      chattingId,
+      'reserve-confirm',
+      JSON.stringify(confirmMessage),
+    );
 
-      const rejectMessage = {
-        text: '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
-      };
+    const rejectMessage = {
+      text: '죄송합니다.\n다른 선생님과 수업을 진행하기로 했습니다.',
+    };
 
-      for (const offerTeacherId of offerTeacherIds) {
-        if (offerTeacherId != chatting.teacherId) {
-          const teacherChatId =
-            await this.chattingRepository.getIdByQuestionAndTeacher(
-              questionId,
-              offerTeacherId,
-            );
-          await this.chattingRepository.changeStatus(
-            teacherChatId,
-            ChattingStatus.declined,
-          );
-          await this.socketRepository.sendMessageToBothUser(
-            userId,
+    for (const offerTeacherId of offerTeacherIds) {
+      if (offerTeacherId != chatting.teacherId) {
+        const teacherChatId =
+          await this.chattingRepository.getIdByQuestionAndTeacher(
+            questionId,
             offerTeacherId,
-            teacherChatId,
-            'text',
-            JSON.stringify(rejectMessage),
           );
-        }
+        await this.chattingRepository.changeStatus(
+          teacherChatId,
+          ChattingStatus.declined,
+        );
+        await this.socketRepository.sendMessageToBothUser(
+          userId,
+          offerTeacherId,
+          teacherChatId,
+          'text',
+          JSON.stringify(rejectMessage),
+        );
       }
-
-      return new Success('선생님 선택이 완료되었습니다.');
-    } catch (error) {
-      return new Fail(error.message);
     }
+
+    return new Success('선생님 선택이 완료되었습니다.');
+    // } catch (error) {
+    //   return new Fail(error.message);
+    // }
   }
 
   /*
