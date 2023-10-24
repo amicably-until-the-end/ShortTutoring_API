@@ -6,11 +6,11 @@ files:
 hooks:
   BeforeInstall:
     - location: /initialize.sh
-      runas: root
+      runas: ubuntu
 
   ApplicationStart:
     - location: /start.sh
-      runas: root
+      runas: ubuntu
   ValidateService:
     - location: /healthCheck.sh
       runas: ubuntu
