@@ -1,0 +1,1 @@
+if [ -d "/home/ubuntu/api" ]; then rm -Rf "/home/ubuntu/api"; fi
