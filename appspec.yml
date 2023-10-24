@@ -9,4 +9,4 @@ hooks:
       runas: root
   ValidateService:
     - location: /cd/healthCheck.sh
-      runas: ubuntu
+      runas: root
