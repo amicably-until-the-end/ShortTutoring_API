@@ -6,9 +6,11 @@ phases:
       nodejs: 18
     commands:
       - npm install
-      - nest build
       - pwd
     run-as: root
+  build:
+    commands:
+      - nest build
 artifacts:
   files:
     - "**/*"
