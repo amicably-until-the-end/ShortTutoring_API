@@ -27,10 +27,10 @@ export class TutoringService {
     try {
       const tutoring = await this.tutoringRepository.finishTutoring(tutoringId);
 
-      /*await this.questionRepository.changeStatus(
+      await this.questionRepository.changeStatus(
         tutoring.questionId,
         'finished',
-      );*/
+      );
 
       const { whiteBoardUUID } = tutoring;
       await this.agoraService.disableWhiteBoardChannel(whiteBoardUUID);
