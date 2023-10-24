@@ -9,7 +9,6 @@ phases:
       - nest build
       - pwd
     run-as: root
-
 artifacts:
   files:
     - "**/*"
