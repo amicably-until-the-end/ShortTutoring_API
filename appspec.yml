@@ -4,9 +4,12 @@ files:
   - source: /
     destination: /home/ubuntu/api
 hooks:
+  BeforeInstall:
+    - location: /cd/beforeInstall.sh
+      runas: root
   ApplicationStart:
-    - location: /start.sh
+    - location: /cd/start.sh
       runas: root
   ValidateService:
-    - location: /healthCheck.sh
+    - location: /cd/healthCheck.sh
       runas: ubuntu

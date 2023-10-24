@@ -11,6 +11,8 @@ phases:
   build:
     commands:
       - npx @nestjs/cli build
+      - rm -rf node_modules
+    run-as: root
 artifacts:
   files:
     - "**/*"
