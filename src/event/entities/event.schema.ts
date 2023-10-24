@@ -15,4 +15,8 @@ export const EventSchema = new Schema({
     type: Date,
     default: new Date(),
   },
+  authority: {
+    type: Set,
+    schema: [String],
+  },
 });

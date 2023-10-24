@@ -1,7 +1,8 @@
+import { AccessToken } from '../auth/entities/auth.entity';
 import { CreateEventDto } from './dto/create-event.dto';
 import { EventService } from './event.service';
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Headers, Post } from '@nestjs/common';
+import { ApiBearerAuth, ApiExcludeEndpoint, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('Event')
 @Controller('event')
@@ -15,7 +16,8 @@ export class EventController {
   }
 
   @Get('list')
-  findAll() {
-    return this.eventService.findAll();
+  @ApiBearerAuth('Authorization')
+  findAll(@Headers() headers: Headers) {
+    return this.eventService.findAll(AccessToken.role(headers));
   }
 }

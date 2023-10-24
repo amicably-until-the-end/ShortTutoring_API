@@ -28,16 +28,21 @@ export class EventService {
 
       return new Success(
         '이벤트 등록 성공',
-        await this.eventRepository.create(eventId, image, createEventDto.url),
+        await this.eventRepository.create(
+          eventId,
+          image,
+          createEventDto.url,
+          createEventDto.authority,
+        ),
       );
     } catch (error) {
       return new Fail('이벤트 등록 실패');
     }
   }
 
-  async findAll() {
+  async findAll(role: string) {
     try {
-      const events = await this.eventRepository.findAll();
+      const events = await this.eventRepository.findByRole(role);
 
       return new Success('이벤트 조회 성공', {
         count: events.length,
