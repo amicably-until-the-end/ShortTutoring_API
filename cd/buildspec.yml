@@ -6,6 +6,7 @@ phases:
       nodejs: 18.18
     commands:
       - npm install
+      - nest build
       - pwd
     run-as: root
 
