@@ -10,7 +10,7 @@ phases:
     run-as: root
   build:
     commands:
-      - nest build
+      - npx @nestjs/cli build
 artifacts:
   files:
     - "**/*"
