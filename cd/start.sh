@@ -4,6 +4,6 @@ cd /home/ubuntu/api
 sudo kill -9 `ps -ef | grep 'node' | awk '{print $2}'`
 sudo chmod -R 777 /home/ubuntu/api
 npm install
-echo "npm install" >> /home/ubuntu/start.log
+ls "-al /home/api" >> /home/ubuntu/start.log
 nohup "cross-env NODE_ENV=dev node /home/ubuntu/api/dist/main" 1>~/log/logs 2>&1  &
 echo "done start.sh"
