@@ -33,9 +33,6 @@ export class SocketGateway {
       );
 
       await this.redisRepository.setSocketId(user.id, client.id);
-      if (process.env.NODE_ENV === 'local') {
-        return null;
-      }
 
       await this.redisSub.subscribe(client.id, (message) => {
         client.emit('message', message);
