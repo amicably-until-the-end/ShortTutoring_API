@@ -1,6 +1,7 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
+import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UserRepository } from '../user/user.repository';
 import {
   CreateNormalQuestionDto,
@@ -18,6 +19,7 @@ export class QuestionService {
     private readonly chattingRepository: ChattingRepository,
     private readonly userRepository: UserRepository,
     private readonly socketRepository: SocketRepository,
+    private readonly tutoringRepository: TutoringRepository,
   ) {}
 
   /**
@@ -178,6 +180,7 @@ export class QuestionService {
 
       const result = await Promise.all(
         questions.map(async (question) => {
+          const info: any = question;
           let chattingId = null;
           if (question.selectedTeacherId != undefined) {
             try {
@@ -189,13 +192,17 @@ export class QuestionService {
             } catch (e) {}
           }
           if (chattingId != null) {
-            return {
-              ...question,
-              chattingId: chattingId,
-            };
-          } else {
-            return question;
+            info.chattingId = chattingId;
           }
+          if (question.status === 'reserved') {
+            const tutoring = await this.tutoringRepository.get(
+              question.tutoringId,
+            );
+            if (tutoring?.reservedStart) {
+              info.reservedStart = tutoring.reservedStart;
+            }
+          }
+          return question;
         }),
       );
 
