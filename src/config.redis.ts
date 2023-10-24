@@ -7,8 +7,15 @@ dotenv.config();
 export const redisPubProvider = {
   provide: 'REDIS_PUB',
   useFactory: async () => {
-    if (process.env.NODE_ENV === 'local') {
-      return null;
+    if (process.env.NODE_ENV != 'local') {
+      const client = createClient({
+        socket: {
+          host: process.env.REDIS_HOST_LOCAL,
+          port: Number(process.env.REDIS_PORT_LOCAL),
+        },
+      });
+      await client.connect();
+      return client;
     }
     const client = createClient({
       socket: {
@@ -24,8 +31,15 @@ export const redisPubProvider = {
 export const redisSubProvider = {
   provide: 'REDIS_SUB',
   useFactory: async () => {
-    if (process.env.NODE_ENV === 'local') {
-      return null;
+    if (process.env.NODE_ENV !== 'prod') {
+      const client = createClient({
+        socket: {
+          host: process.env.REDIS_HOST_LOCAL,
+          port: Number(process.env.REDIS_PORT_LOCAL),
+        },
+      });
+      await client.connect();
+      return client;
     }
     const client = createClient({
       socket: {
