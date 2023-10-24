@@ -7,6 +7,3 @@ hooks:
   ApplicationStart:
     - location: /cd/start.sh
       runas: ubuntu
-  ValidateService:
-    - location: /cd/healthCheck.sh
-      runas: ubuntu
