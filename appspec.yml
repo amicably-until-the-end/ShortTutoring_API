@@ -4,7 +4,7 @@ files:
   - source: /
     destination: /home/ubuntu/api
 hooks:
-  BeforeInstall:
+  AfterInstall:
     - location: /cd/afterInstall.sh
       runas: root
   ApplicationStart:
