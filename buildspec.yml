@@ -7,12 +7,12 @@ phases:
     commands:
       - npm install
       - pwd
-    run-as: root
+    run-as: ubuntu
   build:
     commands:
       - npx @nestjs/cli build
       - rm -rf node_modules
-    run-as: root
+    run-as: ubuntu
 artifacts:
   files:
     - "**/*"
