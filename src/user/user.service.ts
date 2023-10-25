@@ -372,12 +372,18 @@ export class UserService {
     try {
       const users = await this.redisRepository.getAllKeys();
       const userState = await Promise.all(
-        users.map(async (user) => {
-          return {
-            id: user,
-            online: (await this.redisRepository.getSocketId(user)) != null,
-          };
-        }),
+        users
+          .map(async (user) => {
+            try {
+              return {
+                id: user,
+                online: (await this.redisRepository.getSocketId(user)) != null,
+              };
+            } catch (error) {
+              return null;
+            }
+          })
+          .filter((user) => user != null),
       );
       const onlineUsers = userState.filter((user) => user.online);
       if (onlineUsers.length == 0)
