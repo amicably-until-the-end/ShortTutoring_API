@@ -4,6 +4,10 @@ files:
   - source: /
     destination: /home/ubuntu/api
 hooks:
+  BeforeInstall:
+    - location: /cd/initialize.sh
+      runas: ubuntu
+
   ApplicationStart:
     - location: /cd/start.sh
       runas: ubuntu
