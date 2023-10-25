@@ -3,13 +3,16 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      nodejs: 18.18
+      nodejs: 18
     commands:
       - npm install
-      - nest build
       - pwd
     run-as: root
-
+  build:
+    commands:
+      - npx @nestjs/cli build
+      - rm -rf node_modules
+    run-as: root
 artifacts:
   files:
     - "**/*"

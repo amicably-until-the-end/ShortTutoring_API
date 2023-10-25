@@ -7,7 +7,7 @@ dotenv.config();
 export const redisPubProvider = {
   provide: 'REDIS_PUB',
   useFactory: async () => {
-    if (process.env.NODE_ENV != 'local') {
+    if (process.env.NODE_ENV != 'prod') {
       const client = createClient({
         socket: {
           host: process.env.REDIS_HOST_LOCAL,

@@ -373,13 +373,19 @@ export class UserService {
       const users = await this.redisRepository.getAllKeys();
       const userState = await Promise.all(
         users.map(async (user) => {
-          return {
-            id: user,
-            online: (await this.redisRepository.getSocketId(user)) != null,
-          };
+          try {
+            return {
+              id: user,
+              online: (await this.redisRepository.getSocketId(user)) != null,
+            };
+          } catch (error) {
+            return null;
+          }
         }),
       );
-      const onlineUsers = userState.filter((user) => user.online);
+      const onlineUsers = userState.filter(
+        (user) => user != null && user.online,
+      );
       if (onlineUsers.length == 0)
         return new Success('현재 온라인 선생님이 없습니다.', []);
       const userIds = onlineUsers.map((teacher) => teacher.id);
