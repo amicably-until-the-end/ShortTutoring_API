@@ -1,7 +1,7 @@
 import { AccessToken } from '../auth/entities/auth.entity';
 import { OfferOperations } from './descriptions/offer.operation';
 import { OfferParam } from './descriptions/offer.param';
-import { AcceptOfferDto } from './dto/accept-offer.dto';
+import { AcceptOfferDto, ScheduleOfferDto } from './dto/accept-offer.dto';
 import { OfferService } from './offer.service';
 import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
 import {
@@ -24,43 +24,23 @@ export class OfferController {
     return this.offerService.append(AccessToken.userId(headers), questionId);
   }
 
-  /*
   @ApiTags('Teacher')
-  @Post('teacher/offer/remove/:questionId')
+  @Post('teacher/offer/schedule/:questionId')
   @ApiParam(OfferParam.questionId)
-  @ApiOperation(OfferOperations.remove)
-  remove(@Headers() headers: Headers, @Param('questionId') questionId: string) {
-    return this.offerService.remove(AccessToken.userId(headers), questionId);
-  }*/
-
-  /*
-
-  @ApiTags('Teacher')
-  @Get('teacher/offer/status/:questionId')
-  @ApiParam(OfferParam.questionId)
-  @ApiOperation(OfferOperations.getStatus)
-  @ApiResponse(OfferResponse.getStatus.success)
-  getStatus(
+  @ApiOperation(OfferOperations.accept)
+  schedule(
     @Headers() headers: Headers,
     @Param('questionId') questionId: string,
+    @Body() scheduleOfferDto: ScheduleOfferDto,
   ) {
-    return this.offerService.getStatus(AccessToken.userId(headers), questionId);
-  }*/
-
-  /*
-  @ApiTags('Student')
-  @Get('student/offer/teachers/:questionId')
-  @ApiParam(OfferParam.questionId)
-  @ApiOperation(OfferOperations.getTeachers)
-  getTeachers(
-    @Headers() headers: Headers,
-    @Param('questionId') questionId: string,
-  ) {
-    return this.offerService.getTeachers(
+    return this.offerService.schedule(
       AccessToken.userId(headers),
+      scheduleOfferDto.chattingId,
       questionId,
+      scheduleOfferDto.startTime,
+      scheduleOfferDto.endTime,
     );
-  }*/
+  }
 
   @ApiTags('Student')
   @Post('student/offer/accept/:questionId')
