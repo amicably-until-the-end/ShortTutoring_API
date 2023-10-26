@@ -1,4 +1,8 @@
 export const OfferOperations = {
+  schedule: {
+    summary: '일반 질문의 과외 시간 제안',
+    description: '선생님이 일반 질문에 과외를 시작할 시간을 제안합니다.',
+  },
   append: {
     summary: '숏과외 제안',
     description:

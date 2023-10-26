@@ -23,3 +23,26 @@ export class AcceptOfferDto {
   })
   endTime: Date;
 }
+
+export class ScheduleOfferDto {
+  @ApiProperty({
+    description: '과외를 진행할 학생이 있는 채팅방의 ID\n\n',
+  })
+  chattingId: string;
+
+  @Type(() => Date)
+  @IsDate()
+  @ApiProperty({
+    description: '제안할 수업 시작 날짜,시간',
+    example: '2023-11-30T18:00:00+09:00',
+  })
+  startTime: Date;
+
+  @Type(() => Date)
+  @IsDate()
+  @ApiProperty({
+    description: '수업 종료 날짜,시간',
+    example: '2023-11-30T19:00:00+09:00',
+  })
+  endTime: Date;
+}

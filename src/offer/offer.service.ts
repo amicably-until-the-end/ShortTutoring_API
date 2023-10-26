@@ -98,6 +98,37 @@ export class OfferService {
     }
   }*/
 
+  async schedule(
+    userId: string,
+    chattingId: string,
+    questionId: string,
+    startTime: Date,
+    endTime: Date,
+  ) {
+    try {
+      const chatting = await this.chattingRepository.getChatRoomInfo(
+        chattingId,
+      );
+
+      const scheduleMessage = {
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
+      };
+
+      await this.socketRepository.sendMessageToBothUser(
+        userId,
+        chatting.teacherId,
+        chattingId,
+        'schedule-time',
+        JSON.stringify(scheduleMessage),
+      );
+
+      return new Success('시간을 제안했습니다.', chatting);
+    } catch (error) {
+      return new Fail(error.message);
+    }
+  }
+
   async accept(
     userId: string,
     chattingId: string,
