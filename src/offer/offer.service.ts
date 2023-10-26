@@ -111,7 +111,8 @@ export class OfferService {
       );
 
       const scheduleMessage = {
-        arrangeTime: startTime.toISOString(),
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
       };
 
       await this.socketRepository.sendMessageToBothUser(
