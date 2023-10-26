@@ -5,5 +5,7 @@ export interface EventKey {
 export interface Event extends EventKey {
   image: string;
   url: string;
+  title: string;
+  authority: Set<string>;
   createdAt: Date;
 }
