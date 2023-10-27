@@ -1,3 +1,4 @@
+import { CreateEventDto } from './dto/create-event.dto';
 import { Event, EventKey } from './entities/event.interface';
 import { InjectModel, Model } from 'nestjs-dynamoose';
 
@@ -6,20 +7,26 @@ export class EventRepository {
     @InjectModel('Event') private readonly eventModel: Model<Event, EventKey>,
   ) {}
 
-  async create(eventId: string, image: string, url: string) {
+  async create(id: string, createEventDto: CreateEventDto, image: string) {
     return await this.eventModel.create({
-      id: eventId,
+      id,
       image,
-      url,
+      url: createEventDto.url,
+      title: createEventDto.title,
+      authority: createEventDto.authority,
       createdAt: new Date(),
     });
   }
 
-  async findAll() {
+  async findByRole(role: string) {
     const events = await this.eventModel.scan().exec();
-    events.sort((a, b) => {
-      return a.createdAt.getTime() - b.createdAt.getTime();
-    });
-    return events;
+
+    return events
+      .filter((event) => {
+        return event.authority.has(role);
+      })
+      .sort((a, b) => {
+        return a.createdAt.getTime() - b.createdAt.getTime();
+      });
   }
 }

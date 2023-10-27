@@ -11,6 +11,13 @@ export const EventSchema = new Schema({
   url: {
     type: String,
   },
+  title: {
+    type: String,
+  },
+  authority: {
+    type: Set,
+    schema: [String],
+  },
   createdAt: {
     type: Date,
     default: new Date(),

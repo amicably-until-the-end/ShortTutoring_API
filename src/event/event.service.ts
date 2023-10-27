@@ -28,23 +28,23 @@ export class EventService {
 
       return new Success(
         '이벤트 등록 성공',
-        await this.eventRepository.create(eventId, image, createEventDto.url),
+        await this.eventRepository.create(eventId, createEventDto, image),
       );
     } catch (error) {
       return new Fail('이벤트 등록 실패');
     }
   }
 
-  async findAll() {
-    try {
-      const events = await this.eventRepository.findAll();
+  async findAll(role: string) {
+    // try {
+    const events = await this.eventRepository.findByRole(role);
 
-      return new Success('이벤트 조회 성공', {
-        count: events.length,
-        events,
-      });
-    } catch (error) {
-      return new Fail('이벤트 조회 실패');
-    }
+    return new Success('이벤트 조회 성공', {
+      count: events.length,
+      events,
+    });
+    // } catch (error) {
+    //   return new Fail('이벤트 조회 실패');
+    // }
   }
 }
