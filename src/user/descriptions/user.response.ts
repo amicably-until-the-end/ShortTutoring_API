@@ -120,6 +120,10 @@ export const UserResponse = {
                 description:
                   '튜터링 상대 이름, 학생이면 선생님, 선생님이면 학생',
               },
+              opponentId: {
+                type: 'string',
+                description: '튜터링 상대 id, 학생이면 선생님, 선생님이면 학생',
+              },
               opponentProfileImage: {
                 type: 'string',
                 description: '튜터링 상대 프로필 이미지',
