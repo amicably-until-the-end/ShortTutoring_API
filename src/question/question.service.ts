@@ -168,14 +168,32 @@ export class QuestionService {
   async getMyQuestions(userId: string, status: string, type: string) {
     try {
       const user = await this.userRepository.get(userId);
-      if (user.role !== 'student') {
-        return new Fail('학생 사용자가 아닙니다');
-      }
 
-      const questions = await this.questionRepository.getMyQuestions(
-        userId,
-        status,
-        type,
+      console.log(user.participatingChattingRooms);
+
+      const chatRooms = (
+        await Promise.all(
+          user.participatingChattingRooms.map(async (chatRoomId) => {
+            try {
+              return await this.chattingRepository.getChatRoomInfo(chatRoomId);
+            } catch (e) {
+              console.log(e);
+              return null;
+            }
+          }),
+        )
+      ).filter((chatRoom) => chatRoom != undefined);
+
+      const questions: Question[] = (
+        await Promise.all(
+          chatRooms.map(async (chatRoom) => {
+            return await this.questionRepository.getInfo(chatRoom.questionId);
+          }),
+        )
+      ).filter(
+        (question) =>
+          (status != 'all' ? question.status === status : true) &&
+          (type != 'all' ? question.isSelect === (type == 'selected') : true),
       );
 
       const result = await Promise.all(
@@ -190,6 +208,12 @@ export class QuestionService {
                   question.selectedTeacherId,
                 );
             } catch (e) {}
+          } else if (user.role == 'teacher') {
+            chattingId =
+              await this.chattingRepository.getIdByQuestionAndTeacher(
+                question.id,
+                userId,
+              );
           }
           if (chattingId != null) {
             info.chattingId = chattingId;

@@ -67,12 +67,12 @@ export class QuestionController {
     return this.questionService.delete(AccessToken.userId(headers), questionId);
   }
 
-  @ApiTags('Student')
+  @ApiTags('Question')
   @ApiBearerAuth('Authorization')
   @ApiOperation(QuestionOperation.getMyQuestions)
   @ApiQuery(QuestionQuery.getMyQuestions.type)
   @ApiQuery(QuestionQuery.getMyQuestions.status)
-  @Get('student/question/list/my')
+  @Get('question/list/my')
   getMyQuestions(
     @Query('status') status: string,
     @Query('type') type: string,

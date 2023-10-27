@@ -96,8 +96,9 @@ export class ChattingRepository {
     throw new Error('채팅방을 찾을 수 없습니다.');
   }
 
-  async getChatRoomsInfo(roomIds: ChattingKey[]) {
-    return await this.chattingModel.batchGet(roomIds);
+  async getChatRoomsInfo(roomIds: string[]) {
+    const ids = roomIds.map((id) => ({ id }));
+    return (await this.chattingModel.batchGet(ids)).map((chatting) => chatting);
   }
 
   /*
