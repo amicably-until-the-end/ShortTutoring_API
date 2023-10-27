@@ -30,4 +30,5 @@ export class TutoringHistory {
   opponentProfileImage: string;
   recordFileUrl: string[];
   questionImage: string;
+  opponentId: string;
 }

@@ -480,6 +480,7 @@ export class UserService {
             questionId: tutoring.questionId,
             opponentName: opponent.name,
             opponentProfileImage: opponent.profileImage,
+            opponentId: opponent.id,
             questionImage: question.problem.mainImage,
             recordFileUrl: tutoring.recordingFilePath,
           };
