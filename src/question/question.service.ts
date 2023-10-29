@@ -169,8 +169,6 @@ export class QuestionService {
     try {
       const user = await this.userRepository.get(userId);
 
-      console.log(user.participatingChattingRooms);
-
       const chatRooms = (
         await Promise.all(
           user.participatingChattingRooms.map(async (chatRoomId) => {
@@ -195,6 +193,16 @@ export class QuestionService {
           (status != 'all' ? question.status === status : true) &&
           (type != 'all' ? question.isSelect === (type == 'selected') : true),
       );
+
+      if (user.role == 'student') {
+        const pendingNormalQuestions =
+          await this.questionRepository.getMyQuestions(
+            userId,
+            'pending',
+            'normal',
+          );
+        questions.push(...pendingNormalQuestions);
+      }
 
       const result = await Promise.all(
         questions.map(async (question) => {
