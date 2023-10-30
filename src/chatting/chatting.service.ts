@@ -31,9 +31,10 @@ export class ChattingService {
         opponentInfo = await this.userRepository.get(roomInfo.studentId);
       }
     } catch (error) {
-      const errorMessage = `chatting.service > makeChatItem > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(
+        `chatting.service > makeChatItem > ${error.message} > `,
+      );
+      return new Fail('채팅 상대방 정보를 불러오는데 실패했습니다.');
     }
 
     const chatRoom: ChatRoom = {
@@ -55,9 +56,10 @@ export class ChattingService {
         chatRoom.reservedStart = tutoringInfo.reservedStart;
       }
     } catch (error) {
-      const errorMessage = `chatting.service > makeChatItem > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(
+        `chatting.service > makeChatItem > ${error.message} > `,
+      );
+      return new Fail('채팅방 정보를 불러오는데 실패했습니다.');
     }
 
     return chatRoom;
@@ -124,9 +126,8 @@ export class ChattingService {
         return new Fail('해당 채팅방에 대한 권한이 없습니다.');
       }
     } catch (error) {
-      const errorMessage = `chatting.service > findOne > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`chatting.service > findOne > ${error.message} > `);
+      return new Fail('채팅방 정보를 불러오는데 실패했습니다.');
     }
   }
 }

@@ -32,9 +32,8 @@ export class EventService {
         await this.eventRepository.create(eventId, createEventDto, image),
       );
     } catch (error) {
-      const errorMessage = `event.service > create > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`event.service > create > ${error.message} > `);
+      return new Fail('이벤트 등록 실패');
     }
   }
 
@@ -47,9 +46,8 @@ export class EventService {
         events,
       });
     } catch (error) {
-      const errorMessage = `event.service > findAll > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`event.service > findAll > ${error.message} > `);
+      return new Fail('이벤트 조회 실패');
     }
   }
 }

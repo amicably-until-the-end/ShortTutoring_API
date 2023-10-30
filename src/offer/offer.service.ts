@@ -72,9 +72,8 @@ export class OfferService {
 
       return new Success('질문 대기열에 추가되었습니다.', { chatRoomId });
     } catch (error) {
-      const errorMessage = `offer.service > append > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`offer.service > append > ${error.message} > `);
+      return new Fail('질문 대기열에 추가하는데 실패했습니다.');
     }
   }
 
@@ -126,9 +125,8 @@ export class OfferService {
 
       return new Success('시간을 제안했습니다.', chatting);
     } catch (error) {
-      const errorMessage = `offer.service > schedule > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`offer.service > schedule > ${error.message} > `);
+      return new Fail('시간을 제안하는데 실패했습니다.');
     }
   }
 
@@ -217,9 +215,8 @@ export class OfferService {
 
       return new Success('선생님 선택이 완료되었습니다.');
     } catch (error) {
-      const errorMessage = `offer.service > accept > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`offer.service > accept > ${error.message} > `);
+      return new Fail('선생님 선택에 실패했습니다.');
     }
   }
 

@@ -43,10 +43,9 @@ export class SocketGateway {
           ' 서버에 연결되었습니다.',
       );
     } catch (error) {
-      const message = `소켓 연결에 실패했습니다. ${error.message} > `;
-
-      await socketErrorWebhook.send(message);
-
+      await socketErrorWebhook.send(
+        `소켓 연결에 실패했습니다. ${error.message} > `,
+      );
       return new Error('소켓 연결에 실패했습니다.');
     }
   }
@@ -64,10 +63,9 @@ export class SocketGateway {
       await this.redisRepository.delSocketId(user.id);
       await this.redisSub.unsubscribe(client.id);
     } catch (error) {
-      const message = `소켓 연결을 끊을 수 없습니다. ${error.message} > `;
-
-      await socketErrorWebhook.send(message);
-
+      await socketErrorWebhook.send(
+        `소켓 연결을 끊을 수 없습니다. ${error.message} > `,
+      );
       return new Error('소켓 연결을 끊을 수 없습니다.');
     }
   }
@@ -86,10 +84,7 @@ export class SocketGateway {
       client.handshake.headers,
     );
     if (sender === null) {
-      const message = `사용자를 찾을 수 없습니다.`;
-
-      await socketErrorWebhook.send(message);
-
+      await socketErrorWebhook.send(`사용자를 찾을 수 없습니다.`);
       return new Error('사용자를 찾을 수 없습니다.');
     }
 
@@ -119,14 +114,11 @@ export class SocketGateway {
   @SubscribeMessage('debug')
   async handleDebug() {
     try {
-      console.log(this.server.sockets.adapter.rooms);
       return this.redisRepository.getAllKeys();
     } catch (error) {
-      const message = `디버깅에 실패했습니다. ${error.message} > `;
-
-      console.log(message);
-      await socketErrorWebhook.send(message);
-
+      await socketErrorWebhook.send(
+        `디버깅에 실패했습니다. ${error.message} > `,
+      );
       return new Error('디버깅에 실패했습니다.');
     }
   }

@@ -71,9 +71,8 @@ export class UserService {
 
       return new Success('성공적으로 회원가입했습니다.', { token });
     } catch (error) {
-      const errorMessage = `user.service > signupStudent > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > signupStudent > ${error.message} > `);
+      return new Fail('회원가입에 실패했습니다.');
     }
   }
 
@@ -117,9 +116,8 @@ export class UserService {
 
       return new Success('성공적으로 회원가입했습니다.', { token });
     } catch (error) {
-      const errorMessage = `user.service > signupTeacher > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > signupTeacher > ${error.message} > `);
+      return new Fail('회원가입에 실패했습니다.');
     }
   }
 
@@ -154,9 +152,8 @@ export class UserService {
         token,
       });
     } catch (error) {
-      const errorMessage = `user.service > login > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > login > ${error.message} > `);
+      return new Fail('로그인에 실패했습니다.');
     }
   }
 
@@ -173,9 +170,8 @@ export class UserService {
 
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
-      const errorMessage = `user.service > profile > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > profile > ${error.message} > `);
+      return new Fail('프로필을 조회하는데 실패했습니다.');
     }
   }
 
@@ -195,9 +191,8 @@ export class UserService {
         )
         .then((res) => res.toString());
     } catch (error) {
-      const errorMessage = `user.service > profileImage > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > profileImage > ${error.message} > `);
+      return new Fail('프로필 이미지 업로드에 실패했습니다.');
     }
   }
 
@@ -223,9 +218,8 @@ export class UserService {
       const user = await this.userRepository.update(userId, updateUser);
       return new Success('성공적으로 사용자 프로필을 업데이트했습니다.', user);
     } catch (error) {
-      const errorMessage = `user.service > update > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > update > ${error.message} > `);
+      return new Fail('사용자 프로필 업데이트에 실패했습니다.');
     }
   }
 
@@ -242,9 +236,8 @@ export class UserService {
 
       return new Success('사용자 프로필을 성공적으로 가져왔습니다.', user);
     } catch (error) {
-      const errorMessage = `user.service > otherProfile > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > otherProfile > ${error.message} > `);
+      return new Fail('사용자 프로필을 가져오는데 실패했습니다.');
     }
   }
 
@@ -258,9 +251,8 @@ export class UserService {
       await this.authRepository.delete(decoded.vendor, decoded.authId);
       return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', null);
     } catch (error) {
-      const errorMessage = `user.service > withdraw > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > withdraw > ${error.message} > `);
+      return new Fail('회원 탈퇴에 실패했습니다.');
     }
   }
 
@@ -269,9 +261,8 @@ export class UserService {
       await this.userRepository.follow(studentId, teacherId);
       return new Success('성공적으로 팔로우했습니다.');
     } catch (error) {
-      const errorMessage = `user.service > follow > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > follow > ${error.message} > `);
+      return new Fail('팔로우에 실패했습니다.');
     }
   }
 
@@ -280,9 +271,8 @@ export class UserService {
       await this.userRepository.unfollow(studentId, teacherId);
       return new Success('성공적으로 언팔로우했습니다.');
     } catch (error) {
-      const errorMessage = `user.service > unfollow > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > unfollow > ${error.message} > `);
+      return new Fail('언팔로우에 실패했습니다.');
     }
   }
 
@@ -296,9 +286,8 @@ export class UserService {
         await this.userRepository.following(studentId),
       );
     } catch (error) {
-      const errorMessage = `user.service > following > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > following > ${error.message} > `);
+      return new Fail('팔로잉한 선생님들을 가져오는데 실패했습니다.');
     }
   }
 
@@ -313,9 +302,8 @@ export class UserService {
         userList,
       );
     } catch (error) {
-      const errorMessage = `user.service > otherFollowers > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > otherFollowers > ${error.message} > `);
+      return new Fail('팔로워 정보를 가져오는데 실패했습니다.');
     }
   }
 
@@ -331,9 +319,8 @@ export class UserService {
         await this.userRepository.followers(teacherId),
       );
     } catch (error) {
-      const errorMessage = `user.service > followers > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(error.message);
+      await webhook.send(`user.service > followers > ${error.message} > `);
+      return new Fail('팔로워 학생들을 가져오는데 실패했습니다.');
     }
   }
 
@@ -394,9 +381,10 @@ export class UserService {
         bestTeachers,
       );
     } catch (error) {
-      const errorMessage = `user.service > getBestTeachers > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(
+        `user.service > getBestTeachers > ${error.message} > `,
+      );
+      return new Fail('최고의 선생님들을 가져오는데 실패했습니다.');
     }
   }
 
@@ -447,9 +435,10 @@ export class UserService {
         result,
       );
     } catch (error) {
-      const errorMessage = `user.service > getOnlineTeachers > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(
+        `user.service > getOnlineTeachers > ${error.message} > `,
+      );
+      return new Fail('현재 온라인 선생님들을 가져오는데 실패했습니다.');
     }
   }
 
@@ -464,9 +453,8 @@ export class UserService {
         userList,
       );
     } catch (error) {
-      const errorMessage = `user.service > otherFollowing > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > otherFollowing > ${error.message} > `);
+      return new Fail('팔로잉 정보를 가져오는데 실패했습니다.');
     }
   }
 
@@ -475,9 +463,8 @@ export class UserService {
       await this.redisRepository.setFCMToken(userId, fcmToken);
       return new Success('성공적으로 FCM 토큰을 저장했습니다.');
     } catch (error) {
-      const errorMessage = `user.service > setFCMToken > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > setFCMToken > ${error.message} > `);
+      return new Fail('FCM 토큰을 저장하는데 실패했습니다.');
     }
   }
 
@@ -486,9 +473,10 @@ export class UserService {
       await this.userRepository.receiveFreeCoin(userId);
       return new Success('성공적으로 무료 코인을 지급받았습니다.');
     } catch (error) {
-      const errorMessage = `user.service > receiveFreeCoin > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(
+        `user.service > receiveFreeCoin > ${error.message} > `,
+      );
+      return new Fail('무료 코인을 지급받는데 실패했습니다.');
     }
   }
 
@@ -528,9 +516,8 @@ export class UserService {
 
       return new Success('과외 내역을 가져왔습니다.', result);
     } catch (error) {
-      const errorMessage = `user.service > tutoringList > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > tutoringList > ${error.message} > `);
+      return new Fail('과외 내역을 가져오는데 실패했습니다.');
     }
   }
 
@@ -552,9 +539,8 @@ export class UserService {
         history: reviewHistory,
       });
     } catch (error) {
-      const errorMessage = `user.service > reviewList > ${error.message} > `;
-      await webhook.send(errorMessage);
-      return new Fail(errorMessage);
+      await webhook.send(`user.service > reviewList > ${error.message} > `);
+      return new Fail('리뷰 내역을 가져오는데 실패했습니다.');
     }
   }
 }
