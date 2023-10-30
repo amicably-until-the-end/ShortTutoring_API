@@ -79,7 +79,7 @@ export class TutoringService {
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
-      const errorMessage = `tutoring.service > finish > ${error.message}`;
+      const errorMessage = `tutoring.service > finish > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -132,7 +132,7 @@ export class TutoringService {
 
       return new Success('수업 시간이 확정되었습니다.');
     } catch (error) {
-      const errorMessage = `tutoring.service > reserveTutoring > ${error.message}`;
+      const errorMessage = `tutoring.service > reserveTutoring > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -173,7 +173,7 @@ export class TutoringService {
       };
       return accessInfo;
     } catch (error) {
-      const errorMessage = `tutoring.service > classroomChannel > ${error.message}`;
+      const errorMessage = `tutoring.service > classroomChannel > ${error.message} > `;
       await webhook.send(errorMessage);
       return null;
     }
@@ -318,7 +318,7 @@ export class TutoringService {
 
       return new Success('과외가 시작되었습니다.', roomInfo);
     } catch (error) {
-      const errorMessage = `tutoring.service > startTutoring > ${error.message}`;
+      const errorMessage = `tutoring.service > startTutoring > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -336,7 +336,7 @@ export class TutoringService {
         createReviewDto,
       );
     } catch (error) {
-      const errorMessage = `tutoring.service > createReview > ${error.message}`;
+      const errorMessage = `tutoring.service > createReview > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }

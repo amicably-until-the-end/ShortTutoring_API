@@ -45,7 +45,7 @@ export class AuthService {
       );
       return new Success('성공적으로 토큰을 가져왔습니다.', accessToken);
     } catch (error) {
-      const errorMessage = `auth.service > getAccessToken > ${error.message}`;
+      const errorMessage = `auth.service > getAccessToken > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }

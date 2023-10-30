@@ -71,7 +71,7 @@ export class UserService {
 
       return new Success('성공적으로 회원가입했습니다.', { token });
     } catch (error) {
-      const errorMessage = `user.service > signupStudent > ${error.message}`;
+      const errorMessage = `user.service > signupStudent > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -117,7 +117,7 @@ export class UserService {
 
       return new Success('성공적으로 회원가입했습니다.', { token });
     } catch (error) {
-      const errorMessage = `user.service > signupTeacher > ${error.message}`;
+      const errorMessage = `user.service > signupTeacher > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -154,7 +154,7 @@ export class UserService {
         token,
       });
     } catch (error) {
-      const errorMessage = `user.service > login > ${error.message}`;
+      const errorMessage = `user.service > login > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -173,7 +173,7 @@ export class UserService {
 
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
-      const errorMessage = `user.service > profile > ${error.message}`;
+      const errorMessage = `user.service > profile > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -195,7 +195,7 @@ export class UserService {
         )
         .then((res) => res.toString());
     } catch (error) {
-      const errorMessage = `user.service > profileImage > ${error.message}`;
+      const errorMessage = `user.service > profileImage > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -223,7 +223,7 @@ export class UserService {
       const user = await this.userRepository.update(userId, updateUser);
       return new Success('성공적으로 사용자 프로필을 업데이트했습니다.', user);
     } catch (error) {
-      const errorMessage = `user.service > update > ${error.message}`;
+      const errorMessage = `user.service > update > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -242,7 +242,7 @@ export class UserService {
 
       return new Success('사용자 프로필을 성공적으로 가져왔습니다.', user);
     } catch (error) {
-      const errorMessage = `user.service > otherProfile > ${error.message}`;
+      const errorMessage = `user.service > otherProfile > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -258,7 +258,7 @@ export class UserService {
       await this.authRepository.delete(decoded.vendor, decoded.authId);
       return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', null);
     } catch (error) {
-      const errorMessage = `user.service > withdraw > ${error.message}`;
+      const errorMessage = `user.service > withdraw > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -269,7 +269,7 @@ export class UserService {
       await this.userRepository.follow(studentId, teacherId);
       return new Success('성공적으로 팔로우했습니다.');
     } catch (error) {
-      const errorMessage = `user.service > follow > ${error.message}`;
+      const errorMessage = `user.service > follow > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -280,7 +280,7 @@ export class UserService {
       await this.userRepository.unfollow(studentId, teacherId);
       return new Success('성공적으로 언팔로우했습니다.');
     } catch (error) {
-      const errorMessage = `user.service > unfollow > ${error.message}`;
+      const errorMessage = `user.service > unfollow > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -296,7 +296,7 @@ export class UserService {
         await this.userRepository.following(studentId),
       );
     } catch (error) {
-      const errorMessage = `user.service > following > ${error.message}`;
+      const errorMessage = `user.service > following > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -313,7 +313,7 @@ export class UserService {
         userList,
       );
     } catch (error) {
-      const errorMessage = `user.service > otherFollowers > ${error.message}`;
+      const errorMessage = `user.service > otherFollowers > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -331,7 +331,7 @@ export class UserService {
         await this.userRepository.followers(teacherId),
       );
     } catch (error) {
-      const errorMessage = `user.service > followers > ${error.message}`;
+      const errorMessage = `user.service > followers > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(error.message);
     }
@@ -394,7 +394,7 @@ export class UserService {
         bestTeachers,
       );
     } catch (error) {
-      const errorMessage = `user.service > getBestTeachers > ${error.message}`;
+      const errorMessage = `user.service > getBestTeachers > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -447,7 +447,7 @@ export class UserService {
         result,
       );
     } catch (error) {
-      const errorMessage = `user.service > getOnlineTeachers > ${error.message}`;
+      const errorMessage = `user.service > getOnlineTeachers > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -464,7 +464,7 @@ export class UserService {
         userList,
       );
     } catch (error) {
-      const errorMessage = `user.service > otherFollowing > ${error.message}`;
+      const errorMessage = `user.service > otherFollowing > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -475,7 +475,7 @@ export class UserService {
       await this.redisRepository.setFCMToken(userId, fcmToken);
       return new Success('성공적으로 FCM 토큰을 저장했습니다.');
     } catch (error) {
-      const errorMessage = `user.service > setFCMToken > ${error.message}`;
+      const errorMessage = `user.service > setFCMToken > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -486,7 +486,7 @@ export class UserService {
       await this.userRepository.receiveFreeCoin(userId);
       return new Success('성공적으로 무료 코인을 지급받았습니다.');
     } catch (error) {
-      const errorMessage = `user.service > receiveFreeCoin > ${error.message}`;
+      const errorMessage = `user.service > receiveFreeCoin > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -528,7 +528,7 @@ export class UserService {
 
       return new Success('과외 내역을 가져왔습니다.', result);
     } catch (error) {
-      const errorMessage = `user.service > tutoringList > ${error.message}`;
+      const errorMessage = `user.service > tutoringList > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -552,7 +552,7 @@ export class UserService {
         history: reviewHistory,
       });
     } catch (error) {
-      const errorMessage = `user.service > reviewList > ${error.message}`;
+      const errorMessage = `user.service > reviewList > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }

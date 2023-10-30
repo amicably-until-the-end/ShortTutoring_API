@@ -55,7 +55,7 @@ export class QuestionService {
 
       return new Success('질문이 생성되었습니다.', question);
     } catch (error) {
-      const errorMessage = `question.service > createNormal > ${error.message}`;
+      const errorMessage = `question.service > createNormal > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -135,7 +135,7 @@ export class QuestionService {
         chattingId: chatRoomId,
       });
     } catch (error) {
-      const errorMessage = `question.service > createSelected > ${error.message}`;
+      const errorMessage = `question.service > createSelected > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -146,7 +146,7 @@ export class QuestionService {
       const info = await this.questionRepository.getInfo(questionId);
       return new Success('질문 정보를 가져왔습니다.', info);
     } catch (error) {
-      const errorMessage = `question.service > getQuestionInfo > ${error.message}`;
+      const errorMessage = `question.service > getQuestionInfo > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -158,7 +158,7 @@ export class QuestionService {
       await this.userRepository.earnCoin(userId);
       return new Success('질문이 삭제되었습니다.', { questionId });
     } catch (error) {
-      const errorMessage = `question.service > delete > ${error.message}`;
+      const errorMessage = `question.service > delete > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -170,7 +170,7 @@ export class QuestionService {
         await this.questionRepository.getByStatusAndType('pending', false);
       return new Success('질문 목록을 불러왔습니다.', questions);
     } catch (error) {
-      const errorMessage = `question.service > getPendingNormalQuestions > ${error.message}`;
+      const errorMessage = `question.service > getPendingNormalQuestions > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -259,7 +259,7 @@ export class QuestionService {
 
       return new Success('질문 목록을 불러왔습니다.', result);
     } catch (error) {
-      const errorMessage = `question.service > getMyQuestions > ${error.message}`;
+      const errorMessage = `question.service > getMyQuestions > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }

@@ -32,7 +32,7 @@ export class EventService {
         await this.eventRepository.create(eventId, createEventDto, image),
       );
     } catch (error) {
-      const errorMessage = `event.service > create > ${error.message}`;
+      const errorMessage = `event.service > create > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }
@@ -47,7 +47,7 @@ export class EventService {
         events,
       });
     } catch (error) {
-      const errorMessage = `event.service > findAll > ${error.message}`;
+      const errorMessage = `event.service > findAll > ${error.message} > `;
       await webhook.send(errorMessage);
       return new Fail(errorMessage);
     }

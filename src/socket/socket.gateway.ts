@@ -43,7 +43,7 @@ export class SocketGateway {
           ' 서버에 연결되었습니다.',
       );
     } catch (error) {
-      const message = `소켓 연결에 실패했습니다. ${error.message}`;
+      const message = `소켓 연결에 실패했습니다. ${error.message} > `;
 
       await socketErrorWebhook.send(message);
 
@@ -64,7 +64,7 @@ export class SocketGateway {
       await this.redisRepository.delSocketId(user.id);
       await this.redisSub.unsubscribe(client.id);
     } catch (error) {
-      const message = `소켓 연결을 끊을 수 없습니다. ${error.message}`;
+      const message = `소켓 연결을 끊을 수 없습니다. ${error.message} > `;
 
       await socketErrorWebhook.send(message);
 
@@ -122,7 +122,7 @@ export class SocketGateway {
       console.log(this.server.sockets.adapter.rooms);
       return this.redisRepository.getAllKeys();
     } catch (error) {
-      const message = `디버깅에 실패했습니다. ${error.message}`;
+      const message = `디버깅에 실패했습니다. ${error.message} > `;
 
       console.log(message);
       await socketErrorWebhook.send(message);
