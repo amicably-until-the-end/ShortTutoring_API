@@ -201,6 +201,10 @@ export class QuestionService {
             'pending',
             'normal',
           );
+        pendingNormalQuestions.filter((question) => {
+          const isAlreadyIn = questions.find((q) => q.id === question.id);
+          return isAlreadyIn == undefined;
+        });
         questions.push(...pendingNormalQuestions);
       }
 
