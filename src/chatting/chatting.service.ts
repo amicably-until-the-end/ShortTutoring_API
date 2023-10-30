@@ -1,10 +1,10 @@
+import { webhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { User } from '../user/entities/user.interface';
 import { UserRepository } from '../user/user.repository';
 import { ChattingRepository } from './chatting.repository';
-import { UpdateChattingDto } from './dto/update-chatting.dto';
 import { ChatRoom, NestedChatRoomInfo } from './items/chat.list';
 import { Injectable } from '@nestjs/common';
 
@@ -31,7 +31,10 @@ export class ChattingService {
         opponentInfo = await this.userRepository.get(roomInfo.studentId);
       }
     } catch (error) {
-      //유저 정보를 가져오는데 실패한 경우.
+      await webhook.send(
+        `chatting.service > makeChatItem > ${error.message} > `,
+      );
+      return new Fail('채팅 상대방 정보를 불러오는데 실패했습니다.');
     }
 
     const chatRoom: ChatRoom = {
@@ -52,7 +55,12 @@ export class ChattingService {
         );
         chatRoom.reservedStart = tutoringInfo.reservedStart;
       }
-    } catch (error) {}
+    } catch (error) {
+      await webhook.send(
+        `chatting.service > makeChatItem > ${error.message} > `,
+      );
+      return new Fail('채팅방 정보를 불러오는데 실패했습니다.');
+    }
 
     return chatRoom;
   }
@@ -118,15 +126,8 @@ export class ChattingService {
         return new Fail('해당 채팅방에 대한 권한이 없습니다.');
       }
     } catch (error) {
-      return new Fail('해당 채팅방 정보가 없습니다.');
+      await webhook.send(`chatting.service > findOne > ${error.message} > `);
+      return new Fail('채팅방 정보를 불러오는데 실패했습니다.');
     }
-  }
-
-  update(id: number, updateChattingDto: UpdateChattingDto) {
-    return `This action updates a #${id} chatting`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} chatting`;
   }
 }

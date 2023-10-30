@@ -1,3 +1,4 @@
+import { webhook } from '../config.discord-webhook';
 import { Fail, Success } from '../response';
 import { UploadRepository } from '../upload/upload.repository';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -31,20 +32,22 @@ export class EventService {
         await this.eventRepository.create(eventId, createEventDto, image),
       );
     } catch (error) {
+      await webhook.send(`event.service > create > ${error.message} > `);
       return new Fail('이벤트 등록 실패');
     }
   }
 
   async findAll(role: string) {
-    // try {
-    const events = await this.eventRepository.findByRole(role);
+    try {
+      const events = await this.eventRepository.findByRole(role);
 
-    return new Success('이벤트 조회 성공', {
-      count: events.length,
-      events,
-    });
-    // } catch (error) {
-    //   return new Fail('이벤트 조회 실패');
-    // }
+      return new Success('이벤트 조회 성공', {
+        count: events.length,
+        events,
+      });
+    } catch (error) {
+      await webhook.send(`event.service > findAll > ${error.message} > `);
+      return new Fail('이벤트 조회 실패');
+    }
   }
 }
