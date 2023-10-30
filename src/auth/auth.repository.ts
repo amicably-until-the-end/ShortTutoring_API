@@ -80,6 +80,31 @@ export class AuthRepository {
     }
   }
 
+  async disconnect(vendor: string, authId: string) {
+    if (vendor === 'kakao') {
+      try {
+        await firstValueFrom(
+          this.httpService.post(
+            'https://kapi.kakao.com/v1/user/unlink',
+            {
+              target_id_type: 'userId',
+              target_id: Number(authId),
+            },
+            {
+              headers: {
+                Authorization: `KakaoAK ${authId}`,
+              },
+            },
+          ),
+        );
+      } catch (error) {
+        throw new Error('카카오 연결을 해제하는데 실패했습니다.');
+      }
+    } else {
+      throw new Error('지원하지 않는 벤더입니다.');
+    }
+  }
+
   async getAuthIdFromAccessToken(vendor: string, accessToken: string) {
     if (vendor === 'kakao') {
       try {
@@ -144,6 +169,7 @@ export class AuthRepository {
         vendor,
         authId,
       });
+      await this.disconnect(vendor, authId);
     } catch (error) {
       throw new Error('인증정보를 삭제하는데 실패했습니다.');
     }
