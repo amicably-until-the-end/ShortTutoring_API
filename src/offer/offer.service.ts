@@ -140,11 +140,16 @@ export class OfferService {
       const chatting = await this.chattingRepository.getChatRoomInfo(
         chattingId,
       );
+
       const tutoring = await this.tutoringRepository.create(
         questionId,
         userId,
         chatting.teacherId,
       );
+
+      if (tutoring.status == 'reserved') {
+        return new Fail('이미 수업이 예약되었습니다.');
+      }
 
       await this.tutoringRepository.reserveTutoring(
         tutoring.id,
