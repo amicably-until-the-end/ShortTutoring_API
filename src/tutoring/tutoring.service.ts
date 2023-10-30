@@ -27,10 +27,6 @@ export class TutoringService {
     try {
       const tutoring = await this.tutoringRepository.finishTutoring(tutoringId);
 
-      if (tutoring.status !== 'ongoing') {
-        return new Fail('이미 종료된 과외입니다.');
-      }
-
       await this.questionRepository.changeStatus(
         tutoring.questionId,
         'finished',

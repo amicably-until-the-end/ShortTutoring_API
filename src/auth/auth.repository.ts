@@ -83,21 +83,25 @@ export class AuthRepository {
   async disconnect(vendor: string, authId: string) {
     if (vendor === 'kakao') {
       try {
-        await firstValueFrom(
+        const a = await firstValueFrom(
           this.httpService.post(
             'https://kapi.kakao.com/v1/user/unlink',
             {
-              target_id_type: 'userId',
+              target_id_type: 'user_id',
               target_id: Number(authId),
             },
             {
               headers: {
-                Authorization: `KakaoAK ${authId}`,
+                Authorization: `KakaoAK ${process.env.KAKAO_ADMIN_KEY}`,
+                'Content-Type':
+                  'application/x-www-form-urlencoded;charset=utf-8',
               },
             },
           ),
         );
+        console.log(a);
       } catch (error) {
+        console.log(error);
         throw new Error('카카오 연결을 해제하는데 실패했습니다.');
       }
     } else {
