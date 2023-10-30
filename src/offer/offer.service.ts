@@ -1,5 +1,6 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { ChattingStatus } from '../chatting/entities/chatting.interface';
+import { webhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
@@ -73,7 +74,9 @@ export class OfferService {
 
       return new Success('질문 대기열에 추가되었습니다.', { chatRoomId });
     } catch (error) {
-      return new Fail(error.message);
+      const errorMessage = `offer.service > append > ${error.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -125,7 +128,9 @@ export class OfferService {
 
       return new Success('시간을 제안했습니다.', chatting);
     } catch (error) {
-      return new Fail(error.message);
+      const errorMessage = `offer.service > schedule > ${error.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -214,7 +219,9 @@ export class OfferService {
 
       return new Success('선생님 선택이 완료되었습니다.');
     } catch (error) {
-      return new Fail(error.message);
+      const errorMessage = `offer.service > accept > ${error.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
