@@ -42,7 +42,7 @@ export class UploadRepository {
 
       return imagePath;
     } catch (error) {
-      throw Error('이미지 업로드에 실패했습니다.');
+      throw Error(`upload.repository > uploadBase64 > ${error.message} > `);
     }
   }
 
@@ -67,8 +67,7 @@ export class UploadRepository {
         .filter((fileName) => fileName.endsWith('.m3u8'))
         .map((fileName) => `${url}/${fileName}`);
     } catch (error) {
-      console.log(error);
-      throw error;
+      throw Error(`upload.repository > findRecordFile > ${error.message} > `);
     }
   }
 }
