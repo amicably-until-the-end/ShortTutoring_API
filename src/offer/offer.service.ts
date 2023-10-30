@@ -116,8 +116,8 @@ export class OfferService {
       };
 
       await this.socketRepository.sendMessageToBothUser(
-        userId,
         chatting.teacherId,
+        chatting.studentId,
         chattingId,
         'schedule-time',
         JSON.stringify(scheduleMessage),
