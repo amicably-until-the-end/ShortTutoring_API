@@ -6,13 +6,11 @@ import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UserRepository } from '../user/user.repository';
-import { OfferRepository } from './offer.repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class OfferService {
   constructor(
-    private readonly offerRepository: OfferRepository,
     private readonly userRepository: UserRepository,
     private readonly chattingRepository: ChattingRepository,
     private readonly questionRepository: QuestionRepository,
