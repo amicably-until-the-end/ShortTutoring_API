@@ -1,6 +1,7 @@
 import { AgoraService, WhiteBoardChannelInfo } from '../agora/agora.service';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { ChattingStatus } from '../chatting/entities/chatting.interface';
+import { webhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
@@ -78,8 +79,9 @@ export class TutoringService {
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
-      console.log(error);
-      return new Fail(`과외를 종료할 수 없습니다.`);
+      const errorMessage = `tutoring.service > finish > ${error.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -130,7 +132,9 @@ export class TutoringService {
 
       return new Success('수업 시간이 확정되었습니다.');
     } catch (error) {
-      return new Fail(error.message);
+      const errorMessage = `tutoring.service > reserveTutoring > ${error.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -169,6 +173,8 @@ export class TutoringService {
       };
       return accessInfo;
     } catch (error) {
+      const errorMessage = `tutoring.service > classroomChannel > ${error.message}`;
+      await webhook.send(errorMessage);
       return null;
     }
   }
@@ -194,7 +200,9 @@ export class TutoringService {
         await this.classroomChannel(tutoringId, userId),
       );
     } catch (e) {
-      return new Fail('수업 정보를 가져오는데 실패했습니다.');
+      const errorMessage = `tutoring.service > classroomInfo > ${e.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -219,7 +227,9 @@ export class TutoringService {
       };
       return new Success('과외 정보를 가져왔습니다.', tutoringInfo);
     } catch (e) {
-      return new Fail('해당 과외 정보를 가져오는 데 실패했습니다.');
+      const errorMessage = `tutoring.service > info > ${e.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -249,8 +259,9 @@ export class TutoringService {
 
       return new Success('과외를 거절했습니다.');
     } catch (e) {
-      console.log(e);
-      return new Fail('과외 거절에 실패했습니다.');
+      const errorMessage = `tutoring.service > decline > ${e.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -307,7 +318,9 @@ export class TutoringService {
 
       return new Success('과외가 시작되었습니다.', roomInfo);
     } catch (error) {
-      return new Fail('과외 시작에 실패했습니다.');
+      const errorMessage = `tutoring.service > startTutoring > ${error.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 
@@ -323,7 +336,9 @@ export class TutoringService {
         createReviewDto,
       );
     } catch (error) {
-      return new Fail(error.message);
+      const errorMessage = `tutoring.service > createReview > ${error.message}`;
+      await webhook.send(errorMessage);
+      return new Fail(errorMessage);
     }
   }
 }
