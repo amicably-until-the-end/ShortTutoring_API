@@ -179,7 +179,7 @@ export class TutoringService {
     }
   }
 
-  async classrroomInfo(tutoringId: string, userId: string) {
+  async classroomInfo(tutoringId: string, userId: string) {
     try {
       const userInfo = await this.userRepository.get(userId);
 
