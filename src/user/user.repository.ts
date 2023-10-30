@@ -47,7 +47,7 @@ export class UserRepository {
     try {
       return await this.userModel.create(user);
     } catch (error) {
-      throw new Error(`user.repository > create > ${error.message} > `);
+      throw Error(`user.repository > create > ${error.message} > `);
     }
   }
 
@@ -108,7 +108,7 @@ export class UserRepository {
         { following: student.following },
       );
     } catch (error) {
-      throw new Error(`user.repository > follow > ${error.message} > `);
+      throw Error(`user.repository > follow > ${error.message} > `);
     }
   }
 
@@ -118,32 +118,28 @@ export class UserRepository {
         id: teacherId,
       });
       if (teacher === undefined) {
-        throw new Error(
-          `user.repository > unfollow > 선생님을 찾을 수 없습니다.`,
-        );
+        throw Error(`user.repository > unfollow > 선생님을 찾을 수 없습니다.`);
       } else if (teacher.role !== 'teacher') {
-        throw new Error(
+        throw Error(
           `user.repository > unfollow > 학생을 팔로우할 수 없습니다.`,
         );
       } else if (teacher.followers.includes(studentId) === false) {
-        throw new Error(`user.repository > unfollow > 팔로우 중이 아닙니다.`);
+        throw Error(`user.repository > unfollow > 팔로우 중이 아닙니다.`);
       }
 
       const student: User = await this.userModel.get({
         id: studentId,
       });
       if (student === undefined) {
-        throw new Error(
-          `user.repository > unfollow > 학생을 찾을 수 없습니다.`,
-        );
+        throw Error(`user.repository > unfollow > 학생을 찾을 수 없습니다.`);
       } else if (student.role !== 'student') {
-        throw new Error(
+        throw Error(
           `user.repository > unfollow > 선생님은 팔로우할 수 없습니다.`,
         );
       }
 
       if (teacher.followers.includes(studentId) === false) {
-        throw new Error(`user.repository > unfollow > 팔로우 중이 아닙니다.`);
+        throw Error(`user.repository > unfollow > 팔로우 중이 아닙니다.`);
       }
       teacher.followers = teacher.followers.filter(
         (follower) => follower !== studentId,
@@ -165,14 +161,14 @@ export class UserRepository {
         { following: student.following },
       );
     } catch (error) {
-      throw new Error(`user.repository > unfollow > ${error.message} > `);
+      throw Error(`user.repository > unfollow > ${error.message} > `);
     }
   }
 
   async following(studentId: string) {
     const student: User = await this.get(studentId);
     if (student === undefined) {
-      throw new Error(`user.repository > following > 학생을 찾을 수 없습니다.`);
+      throw Error(`user.repository > following > 학생을 찾을 수 없습니다.`);
     }
 
     try {
@@ -185,16 +181,14 @@ export class UserRepository {
       }
       return following;
     } catch (error) {
-      throw new Error(`user.repository > following > ${error.message} > `);
+      throw Error(`user.repository > following > ${error.message} > `);
     }
   }
 
   async followers(teacherId: string) {
     const teacher: User = await this.get(teacherId);
     if (teacher === undefined) {
-      throw new Error(
-        `user.repository > followers > 선생님을 찾을 수 없습니다.`,
-      );
+      throw Error(`user.repository > followers > 선생님을 찾을 수 없습니다.`);
     }
 
     try {
@@ -207,7 +201,7 @@ export class UserRepository {
       }
       return followers;
     } catch (error) {
-      throw new Error(`user.repository > followers > ${error.message} > `);
+      throw Error(`user.repository > followers > ${error.message} > `);
     }
   }
 
@@ -239,7 +233,7 @@ export class UserRepository {
         { participatingChattingRooms: user.participatingChattingRooms },
       );
     } catch (error) {
-      throw new Error(`user.repository > joinChattingRoom > ${error.message}`);
+      throw Error(`user.repository > joinChattingRoom > ${error.message}`);
     }
   }
 
@@ -261,7 +255,7 @@ export class UserRepository {
   async receiveFreeCoin(userId: string) {
     const user: User = await this.get(userId);
     if (user === undefined) {
-      throw new Error(
+      throw Error(
         `user.repository > receiveFreeCoin > 사용자를 찾을 수 없습니다.`,
       );
     }
@@ -272,7 +266,7 @@ export class UserRepository {
       now.getMonth() == user.coin.lastReceivedFreeCoinAt.getMonth() &&
       now.getDate() == user.coin.lastReceivedFreeCoinAt.getDate()
     ) {
-      throw new Error(
+      throw Error(
         `user.repository > receiveFreeCoin > 오늘은 이미 받았습니다.`,
       );
     }
@@ -282,7 +276,7 @@ export class UserRepository {
       user.coin.lastReceivedFreeCoinAt = now;
       await this.userModel.update({ id: userId }, { coin: user.coin });
     } catch (error) {
-      throw new Error(`user.repository > receiveFreeCoin > ${error.message}`);
+      throw Error(`user.repository > receiveFreeCoin > ${error.message}`);
     }
   }
 
@@ -293,7 +287,7 @@ export class UserRepository {
   async getCoin(userId: string) {
     const user: User = await this.get(userId);
     if (user === undefined) {
-      throw new Error(`user.repository > getCoin > 사용자를 찾을 수 없습니다.`);
+      throw Error(`user.repository > getCoin > 사용자를 찾을 수 없습니다.`);
     }
 
     return user.coin.amount;
@@ -306,18 +300,18 @@ export class UserRepository {
   async useCoin(userId: string) {
     const user: User = await this.get(userId);
     if (user === undefined) {
-      throw new Error(`user.repository > useCoin > 사용자를 찾을 수 없습니다.`);
+      throw Error(`user.repository > useCoin > 사용자를 찾을 수 없습니다.`);
     }
 
     if (user.coin.amount < 1) {
-      throw new Error(`user.repository > useCoin > 코인이 부족합니다.`);
+      throw Error(`user.repository > useCoin > 코인이 부족합니다.`);
     }
     // TODO : 동시성 이슈 발생 가능
     try {
       user.coin.amount -= 1;
       await this.userModel.update({ id: userId }, { coin: user.coin });
     } catch (error) {
-      throw new Error(`user.repository > useCoin > ${error.message}`);
+      throw Error(`user.repository > useCoin > ${error.message}`);
     }
   }
 
@@ -328,7 +322,7 @@ export class UserRepository {
   async earnCoin(userId: string) {
     const user: User = await this.get(userId);
     if (user === undefined) {
-      throw new Error('사용자를 찾을 수 없습니다.');
+      throw Error('사용자를 찾을 수 없습니다.');
     }
     // TODO : 동시성 이슈 발생 가능
     const coin = user.coin;
@@ -336,7 +330,7 @@ export class UserRepository {
       coin.amount += 1;
       return await this.userModel.update({ id: userId }, { coin: coin });
     } catch (error) {
-      throw new Error(`user.repository > earnCoin > ${error.message}`);
+      throw Error(`user.repository > earnCoin > ${error.message}`);
     }
   }
 

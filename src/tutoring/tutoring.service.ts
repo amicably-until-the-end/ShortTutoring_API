@@ -145,14 +145,14 @@ export class TutoringService {
       const tutoring = await this.tutoringRepository.get(tutoringId);
 
       if (tutoring == null) {
-        throw new Error('존재하지 않는 과외입니다.');
+        throw Error('존재하지 않는 과외입니다.');
       }
 
       if (userInfo.role == 'student' && tutoring.status == 'reserved') {
-        throw new Error('아직 수업이 시작되지 않았습니다.');
+        throw Error('아직 수업이 시작되지 않았습니다.');
       }
       if (userInfo.role == 'student' && tutoring.status == 'finished') {
-        throw new Error('이미 종료된 수업입니다.');
+        throw Error('이미 종료된 수업입니다.');
       }
       const whiteBoardToken = await this.agoraService.makeWhiteBoardToken(
         tutoring.whiteBoardUUID,

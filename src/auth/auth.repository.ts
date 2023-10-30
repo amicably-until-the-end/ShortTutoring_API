@@ -29,7 +29,7 @@ export class AuthRepository {
         },
       );
     } catch (error) {
-      throw new Error(`auth.repository > signJwt > ${error.message} > `);
+      throw Error(`auth.repository > signJwt > ${error.message} > `);
     }
   }
 
@@ -45,7 +45,7 @@ export class AuthRepository {
         exp: decoded['exp'],
       };
     } catch (error) {
-      throw new Error(`auth.repository > decodeJwt > ${error.message} > `);
+      throw Error(`auth.repository > decodeJwt > ${error.message} > `);
     }
   }
 
@@ -73,12 +73,10 @@ export class AuthRepository {
 
         return data['access_token'];
       } catch (error) {
-        throw new Error(
-          `auth.repository > getAccessToken > ${error.message} > `,
-        );
+        throw Error(`auth.repository > getAccessToken > ${error.message} > `);
       }
     } else {
-      throw new Error(
+      throw Error(
         `auth.repository > getAccessToken > 지원하지 않는 벤더입니다.`,
       );
     }
@@ -104,12 +102,10 @@ export class AuthRepository {
           ),
         );
       } catch (error) {
-        throw new Error(`auth.repository > disconnect > ${error.message} > `);
+        throw Error(`auth.repository > disconnect > ${error.message} > `);
       }
     } else {
-      throw new Error(
-        `auth.repository > disconnect > 지원하지 않는 벤더입니다.`,
-      );
+      throw Error(`auth.repository > disconnect > 지원하지 않는 벤더입니다.`);
     }
   }
 
@@ -126,7 +122,7 @@ export class AuthRepository {
 
         return data.id.toString();
       } catch (error) {
-        throw new Error(
+        throw Error(
           `auth.repository > getAuthIdFromAccessToken > ${error.message} > `,
         );
       }
@@ -140,7 +136,7 @@ export class AuthRepository {
 
       return auth.userId;
     } catch (error) {
-      throw new Error(
+      throw Error(
         `auth.repository > getUserIdFromAccessToken > ${error.message} > `,
       );
     }
@@ -160,7 +156,7 @@ export class AuthRepository {
         role,
       });
     } catch (error) {
-      throw new Error(`auth.repository > createAuth > ${error.message} > `);
+      throw Error(`auth.repository > createAuth > ${error.message} > `);
     }
   }
 
@@ -171,7 +167,7 @@ export class AuthRepository {
         authId,
       });
     } catch (error) {
-      throw new Error(`auth.repository > getAuth > ${error.message} > `);
+      throw Error(`auth.repository > getAuth > ${error.message} > `);
     }
   }
 
@@ -183,7 +179,7 @@ export class AuthRepository {
       });
       await this.disconnect(vendor, authId);
     } catch (error) {
-      throw new Error(`auth.repository > delete > ${error.message} > `);
+      throw Error(`auth.repository > delete > ${error.message} > `);
     }
   }
 }

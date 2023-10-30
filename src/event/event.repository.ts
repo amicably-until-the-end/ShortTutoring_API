@@ -30,7 +30,7 @@ export class EventRepository {
           return a.createdAt.getTime() - b.createdAt.getTime();
         });
     } catch (error) {
-      throw new Error(`event.repository > findByRole > ${error.message} > `);
+      throw Error(`event.repository > findByRole > ${error.message} > `);
     }
   }
 }

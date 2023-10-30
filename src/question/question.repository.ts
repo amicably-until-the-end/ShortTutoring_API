@@ -27,7 +27,7 @@ export class QuestionRepository {
   ): Promise<Question> {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
-      throw new Error(
+      throw Error(
         'question.repository > createNormalQuestion > 선생님은 질문을 생성할 수 없습니다.',
       );
     }
@@ -51,7 +51,7 @@ export class QuestionRepository {
         isSelect: false,
       });
     } catch (error) {
-      throw new Error(
+      throw Error(
         `question.repository > createNormalQuestion > ${error.message} > `,
       );
     }
@@ -74,7 +74,7 @@ export class QuestionRepository {
     const user: User = await this.userRepository.get(userId);
 
     if (user.role === 'teacher') {
-      throw new Error(
+      throw Error(
         'question.repository > createSelectedQuestion > 선생님은 질문을 생성할 수 없습니다.',
       );
     }
@@ -97,7 +97,7 @@ export class QuestionRepository {
         isSelect: true,
       });
     } catch (error) {
-      throw new Error(
+      throw Error(
         `question.repository > createSelectedQuestion > ${error.message} > `,
       );
     }
@@ -135,7 +135,7 @@ export class QuestionRepository {
         }),
       );
     } catch (error) {
-      throw new Error(
+      throw Error(
         `question.repository > getByStatusAndType > ${error.message} > `,
       );
     }
@@ -162,7 +162,7 @@ export class QuestionRepository {
   async cancelQuestion(userId: string, questionId: string) {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
-      throw new Error(
+      throw Error(
         `question.repository > cancelQuestion > 선생님은 질문을 삭제할 수 없습니다.`,
       );
     }
@@ -171,7 +171,7 @@ export class QuestionRepository {
       id: questionId,
     });
     if (question.studentId !== userId) {
-      throw new Error(
+      throw Error(
         `question.repository > cancelQuestion > 질문을 삭제할 권한이 없습니다.`,
       );
     }

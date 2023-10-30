@@ -37,12 +37,12 @@ export class TutoringRepository {
   async reserveTutoring(tutoringId: string, startTime: Date, endTime: Date) {
     const tutoring = await this.tutoringModel.get({ id: tutoringId });
     if (tutoring === undefined) {
-      throw new Error(
+      throw Error(
         'tutoring.repository > reserveTutoring > 숏과외를 찾을 수 없습니다.',
       );
     }
     if (tutoring.reservedStart != undefined) {
-      throw new Error(
+      throw Error(
         'tutorial.repository > reserveTutoring > 이미 예약되었습니다.',
       );
     }
@@ -88,7 +88,7 @@ export class TutoringRepository {
   async get(tutoringId: string): Promise<Tutoring> {
     const tutoring = await this.tutoringModel.get({ id: tutoringId });
     if (tutoring === undefined) {
-      throw new Error(`tutoring.repository > get > 과외를 찾을 수 없습니다.`);
+      throw Error(`tutoring.repository > get > 과외를 찾을 수 없습니다.`);
     }
 
     return tutoring;
@@ -104,9 +104,7 @@ export class TutoringRepository {
         );
       }
     } catch (error) {
-      throw new Error(
-        `tutoring.repository > finishTutoring > ${error.message}`,
-      );
+      throw Error(`tutoring.repository > finishTutoring > ${error.message}`);
     }
   }
 
@@ -117,7 +115,7 @@ export class TutoringRepository {
   ) {
     const tutoring = await this.get(tutoringId);
     if (tutoring.studentId != userId) {
-      throw new Error(
+      throw Error(
         `tutoring.repository > createReview > 해당 과외를 평가할 수 없습니다.`,
       );
     }
@@ -131,7 +129,7 @@ export class TutoringRepository {
         },
       );
     } catch (error) {
-      throw new Error(`tutoring.repository > createReview > ${error.message}`);
+      throw Error(`tutoring.repository > createReview > ${error.message}`);
     }
   }
 
@@ -167,9 +165,7 @@ export class TutoringRepository {
 
       return reviewRatingCnt ? reviewRatingSum / reviewRatingCnt : 0;
     } catch (error) {
-      throw new Error(
-        `tutoring.repository > getTeacherRating > ${error.message}`,
-      );
+      throw Error(`tutoring.repository > getTeacherRating > ${error.message}`);
     }
   }
 
@@ -182,7 +178,7 @@ export class TutoringRepository {
         })
         .exec();
     } catch (error) {
-      throw new Error(`tutoring.repository > history > ${error.message}`);
+      throw Error(`tutoring.repository > history > ${error.message}`);
     }
   }
 
@@ -212,7 +208,7 @@ export class TutoringRepository {
         };
       });
     } catch (error) {
-      throw new Error(`tutoring.repository > reviewHistory > ${error.message}`);
+      throw Error(`tutoring.repository > reviewHistory > ${error.message}`);
     }
   }
 }

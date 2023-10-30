@@ -80,9 +80,7 @@ export class ChattingRepository {
         { $ADD: { messages: [newMessage] } },
       );
     } catch (error) {
-      throw new Error(
-        `chatting.repository > sendMessage > ${error.message} > `,
-      );
+      throw Error(`chatting.repository > sendMessage > ${error.message} > `);
     }
   }
 
@@ -92,7 +90,7 @@ export class ChattingRepository {
         id: roomId,
       });
     } catch (error) {
-      throw new Error(
+      throw Error(
         `chatting.repository > getChatRoomInfo > ${error.message} > `,
       );
     }
@@ -105,7 +103,7 @@ export class ChattingRepository {
     if (result.length > 0) {
       return result[0].id;
     }
-    throw new Error('채팅방을 찾을 수 없습니다.');
+    throw Error('채팅방을 찾을 수 없습니다.');
   }
 
   /*
@@ -130,7 +128,7 @@ export class ChattingRepository {
       await this.chattingModel.create(chatting);
       return chattingRoomId;
     } catch (error) {
-      throw new Error(`chatting.repository > makeChatRoom > ${error.message}`);
+      throw Error(`chatting.repository > makeChatRoom > ${error.message}`);
     }
   }
 
@@ -141,9 +139,7 @@ export class ChattingRepository {
         { status: status },
       );
     } catch (error) {
-      throw new Error(
-        `chatting.repository > changeStatus > ${error.message} > `,
-      );
+      throw Error(`chatting.repository > changeStatus > ${error.message} > `);
     }
   }
 
@@ -151,7 +147,7 @@ export class ChattingRepository {
     try {
       return await this.chattingModel.scan().exec();
     } catch (error) {
-      throw new Error(`chatting.repository > findAll > ${error.message} > `);
+      throw Error(`chatting.repository > findAll > ${error.message} > `);
     }
   }
 
@@ -159,7 +155,7 @@ export class ChattingRepository {
     try {
       return await this.chattingModel.get({ id: chattingRoomId });
     } catch (error) {
-      throw new Error(`chatting.repository > findOne > ${error.message} > `);
+      throw Error(`chatting.repository > findOne > ${error.message} > `);
     }
   }
 }
