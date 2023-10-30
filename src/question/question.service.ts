@@ -182,7 +182,7 @@ export class QuestionService {
         )
       ).filter((chatRoom) => chatRoom != undefined);
 
-      const questions: Question[] = (
+      let questions: Question[] = (
         await Promise.all(
           chatRooms.map(async (chatRoom) => {
             return await this.questionRepository.getInfo(chatRoom.questionId);
@@ -201,11 +201,14 @@ export class QuestionService {
             'pending',
             'normal',
           );
-        pendingNormalQuestions.filter((question) => {
-          const isAlreadyIn = questions.find((q) => q.id === question.id);
-          return isAlreadyIn == undefined;
-        });
         questions.push(...pendingNormalQuestions);
+        questions = questions.filter((question, index) => {
+          return (
+            questions.findIndex((q) => {
+              return q.id === question.id;
+            }) === index
+          );
+        });
       }
 
       const result = await Promise.all(
@@ -244,6 +247,7 @@ export class QuestionService {
 
       return new Success('질문 목록을 불러왔습니다.', result);
     } catch (error) {
+      console.log(error);
       return new Fail('사용자의 질문 목록을 불러오는데 실패했습니다.');
     }
   }
