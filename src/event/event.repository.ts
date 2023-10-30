@@ -19,14 +19,18 @@ export class EventRepository {
   }
 
   async findByRole(role: string) {
-    const events = await this.eventModel.scan().exec();
+    try {
+      const events = await this.eventModel.scan().exec();
 
-    return events
-      .filter((event) => {
-        return event.authority.has(role);
-      })
-      .sort((a, b) => {
-        return a.createdAt.getTime() - b.createdAt.getTime();
-      });
+      return events
+        .filter((event) => {
+          return event.authority.has(role);
+        })
+        .sort((a, b) => {
+          return a.createdAt.getTime() - b.createdAt.getTime();
+        });
+    } catch (error) {
+      throw new Error(`event.repository > findByRole > ${error.message} > `);
+    }
   }
 }
