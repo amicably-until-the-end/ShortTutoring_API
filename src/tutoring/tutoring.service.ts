@@ -241,7 +241,10 @@ export class TutoringService {
         return new Fail('해당 과외를 거절할 수 없습니다.');
       }
 
-      await this.questionRepository.changeStatus(chattingId, 'declined');
+      await this.questionRepository.changeStatus(
+        chatRoomInfo.questionId,
+        'declined',
+      );
 
       await this.chattingRepository.changeStatus(
         chattingId,
