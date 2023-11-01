@@ -3,11 +3,11 @@ API server for [Mobile Application - 숏과외](https://github.com/amicably-unti
 
 
 ## Architecture
-![infra](https://github.com/amicably-until-the-end/ShortTutoring_API/assets/79950005/29424b64-8067-4362-97db-ccc5e2b8a4e8)
-
+<img src="https://github.com/amicably-until-the-end/ShortTutoring_API/assets/79950005/29424b64-8067-4362-97db-ccc5e2b8a4e8" width="500">
 
 ## Dependencies
 - Please refer to the package.json for more detailed dependencies.
+
 | Dependency | Version |
 | --- | --- |
 | NodeJS | 18.16 |
