@@ -1,6 +1,7 @@
 import { AuthMiddleware } from './auth/auth.middleware';
 import { AuthModule } from './auth/auth.module';
 import { ChattingModule } from './chatting/chatting.module';
+import { UserAgentCheckMiddleware } from './common/middlewares/UserAgentCheckMiddleware';
 import { DynamooseConfig } from './config.dynamoose';
 import { EventModule } from './event/event.module';
 import { OfferModule } from './offer/offer.module';
@@ -45,5 +46,6 @@ export class AppModule implements NestModule {
       )
       .forRoutes({ path: '*', method: RequestMethod.ALL })
       .apply(AuthMiddleware);
+    consumer.apply(UserAgentCheckMiddleware).forRoutes('*');
   }
 }
