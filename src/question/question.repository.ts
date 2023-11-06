@@ -27,7 +27,9 @@ export class QuestionRepository {
   ): Promise<Question> {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
-      throw new Error('선생님은 질문을 생성할 수 없습니다.');
+      throw Error(
+        'question.repository > createNormalQuestion > 선생님은 질문을 생성할 수 없습니다.',
+      );
     }
 
     try {
@@ -49,14 +51,10 @@ export class QuestionRepository {
         isSelect: false,
       });
     } catch (error) {
-      throw new Error('질문을 생성할 수 없습니다.');
+      throw Error(
+        `question.repository > createNormalQuestion > ${error.message} > `,
+      );
     }
-  }
-
-  async getStudentNormalPendingQuestions(userId: string) {
-    return await this.questionModel
-      .scan({ studentId: userId, status: 'pending', isSelect: false })
-      .exec();
   }
 
   async setTutoringId(questionId: string, tutoringId: string) {
@@ -76,7 +74,9 @@ export class QuestionRepository {
     const user: User = await this.userRepository.get(userId);
 
     if (user.role === 'teacher') {
-      throw new Error('선생님은 질문을 생성할 수 없습니다.');
+      throw Error(
+        'question.repository > createSelectedQuestion > 선생님은 질문을 생성할 수 없습니다.',
+      );
     }
 
     try {
@@ -97,36 +97,48 @@ export class QuestionRepository {
         isSelect: true,
       });
     } catch (error) {
-      throw new Error('질문을 생성할 수 없습니다.');
+      throw Error(
+        `question.repository > createSelectedQuestion > ${error.message} > `,
+      );
     }
   }
 
   async getByStatusAndType(status: string, isSelect: boolean) {
-    let questions: Question[];
-    if (status === 'all') {
-      questions = await this.questionModel.scan().exec();
-    } else {
-      questions = await this.questionModel
-        .scan({
-          status: { eq: status },
-          isSelect: { eq: isSelect },
-        })
-        .exec();
+    try {
+      let questions: Question[];
+      if (status === 'all') {
+        questions = await this.questionModel.scan().exec();
+      } else {
+        questions = await this.questionModel
+          .scan({
+            status: { eq: status },
+            isSelect: { eq: isSelect },
+          })
+          .exec();
+      }
+
+      questions.sort((a, b) => {
+        return (
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+      });
+
+      return await Promise.all(
+        questions.map(async (question) => {
+          const student = await this.userRepository.getOther(
+            question.studentId,
+          );
+          return {
+            ...question,
+            student,
+          };
+        }),
+      );
+    } catch (error) {
+      throw Error(
+        `question.repository > getByStatusAndType > ${error.message} > `,
+      );
     }
-
-    questions.sort((a, b) => {
-      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-    });
-
-    return await Promise.all(
-      questions.map(async (question) => {
-        const student = await this.userRepository.getOther(question.studentId);
-        return {
-          ...question,
-          student,
-        };
-      }),
-    );
   }
 
   async getInfo(questionId: string) {
@@ -150,26 +162,26 @@ export class QuestionRepository {
   async cancelQuestion(userId: string, questionId: string) {
     const user: User = await this.userRepository.get(userId);
     if (user.role === 'teacher') {
-      throw new Error('선생님은 질문을 삭제할 수 없습니다.');
+      throw Error(
+        `question.repository > cancelQuestion > 선생님은 질문을 삭제할 수 없습니다.`,
+      );
     }
 
     const question: Question = await this.questionModel.get({
       id: questionId,
     });
     if (question.studentId !== userId) {
-      return new Error('질문을 삭제할 권한이 없습니다.');
+      throw Error(
+        `question.repository > cancelQuestion > 질문을 삭제할 권한이 없습니다.`,
+      );
     }
 
-    try {
-      return await this.questionModel.update(
-        {
-          id: questionId,
-        },
-        { status: 'canceled' },
-      );
-    } catch (error) {
-      throw new Error('질문을 삭제할 수 없습니다.');
-    }
+    return await this.questionModel.update(
+      {
+        id: questionId,
+      },
+      { status: 'canceled' },
+    );
   }
 
   /**

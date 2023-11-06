@@ -1,17 +1,16 @@
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { ChattingStatus } from '../chatting/entities/chatting.interface';
+import { webhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
 import { UserRepository } from '../user/user.repository';
-import { OfferRepository } from './offer.repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class OfferService {
   constructor(
-    private readonly offerRepository: OfferRepository,
     private readonly userRepository: UserRepository,
     private readonly chattingRepository: ChattingRepository,
     private readonly questionRepository: QuestionRepository,
@@ -73,7 +72,8 @@ export class OfferService {
 
       return new Success('질문 대기열에 추가되었습니다.', { chatRoomId });
     } catch (error) {
-      return new Fail(error.message);
+      await webhook.send(`offer.service > append > ${error.message} > `);
+      return new Fail('질문 대기열에 추가하는데 실패했습니다.');
     }
   }
 
@@ -125,7 +125,8 @@ export class OfferService {
 
       return new Success('시간을 제안했습니다.', chatting);
     } catch (error) {
-      return new Fail(error.message);
+      await webhook.send(`offer.service > schedule > ${error.message} > `);
+      return new Fail('시간을 제안하는데 실패했습니다.');
     }
   }
 
@@ -141,15 +142,15 @@ export class OfferService {
         chattingId,
       );
 
+      if (chatting.status == ChattingStatus.reserved) {
+        return new Fail('이미 수업이 예약되었습니다.');
+      }
+
       const tutoring = await this.tutoringRepository.create(
         questionId,
         userId,
         chatting.teacherId,
       );
-
-      if (tutoring.status == 'reserved') {
-        return new Fail('이미 수업이 예약되었습니다.');
-      }
 
       await this.tutoringRepository.reserveTutoring(
         tutoring.id,
@@ -214,7 +215,8 @@ export class OfferService {
 
       return new Success('선생님 선택이 완료되었습니다.');
     } catch (error) {
-      return new Fail(error.message);
+      await webhook.send(`offer.service > accept > ${error.message} > `);
+      return new Fail('선생님 선택에 실패했습니다.');
     }
   }
 

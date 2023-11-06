@@ -40,7 +40,7 @@ export class TutoringController {
     @Param('questionId') questionId: string,
     @Headers() headers: Headers,
   ) {
-    return this.tutoringService.classrroomInfo(
+    return this.tutoringService.classroomInfo(
       questionId,
       AccessToken.userId(headers),
     );

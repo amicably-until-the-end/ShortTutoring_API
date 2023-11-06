@@ -30,16 +30,21 @@ export class TutoringRepository {
       whiteBoardUUID: whiteBoardUUID,
       RTCAppId: process.env.AGORA_RTC_APP_ID,
     };
+
     return await this.tutoringModel.create(tutoringInfo);
   }
 
   async reserveTutoring(tutoringId: string, startTime: Date, endTime: Date) {
     const tutoring = await this.tutoringModel.get({ id: tutoringId });
     if (tutoring === undefined) {
-      throw new Error('숏과외를 찾을 수 없습니다.');
+      throw Error(
+        'tutoring.repository > reserveTutoring > 숏과외를 찾을 수 없습니다.',
+      );
     }
     if (tutoring.reservedStart != undefined) {
-      throw new Error('이미 예약된 과외입니다.');
+      throw Error(
+        'tutorial.repository > reserveTutoring > 이미 예약되었습니다.',
+      );
     }
 
     return await this.tutoringModel.update(
@@ -83,20 +88,15 @@ export class TutoringRepository {
   async get(tutoringId: string): Promise<Tutoring> {
     const tutoring = await this.tutoringModel.get({ id: tutoringId });
     if (tutoring === undefined) {
-      throw new Error('숏과외를 찾을 수 없습니다.');
+      throw Error(`tutoring.repository > get > 과외를 찾을 수 없습니다.`);
     }
 
     return tutoring;
   }
 
   async finishTutoring(tutoringId: string): Promise<Tutoring> {
-    let tutoring: Tutoring;
     try {
-      tutoring = await this.tutoringModel.get({ id: tutoringId });
-    } catch (error) {
-      throw new Error('해당 과외를 찾을 수 없습니다.');
-    }
-    try {
+      const tutoring = await this.tutoringModel.get({ id: tutoringId });
       if (tutoring !== undefined) {
         return await this.tutoringModel.update(
           { id: tutoringId },
@@ -104,7 +104,7 @@ export class TutoringRepository {
         );
       }
     } catch (error) {
-      throw new Error('과외 상태를 변경할 수 없습니다.');
+      throw Error(`tutoring.repository > finishTutoring > ${error.message}`);
     }
   }
 
@@ -113,12 +113,11 @@ export class TutoringRepository {
     tutoringId: string,
     createReviewDto: CreateReviewDto,
   ) {
-    const tutoring = await this.tutoringModel.get({ id: tutoringId });
-    if (tutoring === undefined) {
-      throw new Error('해당 과외를 찾을 수 없습니다.');
-    }
+    const tutoring = await this.get(tutoringId);
     if (tutoring.studentId != userId) {
-      throw new Error('해당 과외를 평가할 수 없습니다.');
+      throw Error(
+        `tutoring.repository > createReview > 해당 과외를 평가할 수 없습니다.`,
+      );
     }
 
     try {
@@ -130,23 +129,19 @@ export class TutoringRepository {
         },
       );
     } catch (error) {
-      throw new Error('과외 평가를 저장할 수 없습니다.');
+      throw Error(`tutoring.repository > createReview > ${error.message}`);
     }
   }
 
   async getTutoringCntOfTeacher(teacherId: string) {
-    try {
-      const result = await this.tutoringModel
-        .scan({
-          teacherId: {
-            eq: teacherId,
-          },
-        })
-        .exec();
-      return result.map((a) => a);
-    } catch (error) {
-      throw new Error('과외를 찾을 수 없습니다.');
-    }
+    const result = await this.tutoringModel
+      .scan({
+        teacherId: {
+          eq: teacherId,
+        },
+      })
+      .exec();
+    return result.map((a) => a);
   }
 
   async getTeacherRating(teacherId: string) {
@@ -170,22 +165,20 @@ export class TutoringRepository {
 
       return reviewRatingCnt ? reviewRatingSum / reviewRatingCnt : 0;
     } catch (error) {
-      throw new Error('선생님의 평점을 가져올 수 없습니다.');
+      throw Error(`tutoring.repository > getTeacherRating > ${error.message}`);
     }
   }
 
   async history(userId: string, role: string): Promise<Tutoring[]> {
     try {
-      const history: Tutoring[] = await this.tutoringModel
+      return await this.tutoringModel
         .scan({
           [role + 'Id']: { eq: userId },
           status: { eq: 'finished' },
         })
         .exec();
-
-      return history;
     } catch (error) {
-      throw new Error('과외 내역을 가져올 수 없습니다.');
+      throw Error(`tutoring.repository > history > ${error.message}`);
     }
   }
 
@@ -215,7 +208,7 @@ export class TutoringRepository {
         };
       });
     } catch (error) {
-      throw new Error('과외 내역을 가져올 수 없습니다.');
+      throw Error(`tutoring.repository > reviewHistory > ${error.message}`);
     }
   }
 }

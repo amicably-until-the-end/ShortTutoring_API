@@ -29,7 +29,7 @@ export class AuthRepository {
         },
       );
     } catch (error) {
-      throw new Error('JWT를 생성하는데 실패했습니다.');
+      throw Error(`auth.repository > signJwt > ${error.message} > `);
     }
   }
 
@@ -45,7 +45,7 @@ export class AuthRepository {
         exp: decoded['exp'],
       };
     } catch (error) {
-      throw new Error('JWT를 읽는데 실패했습니다.');
+      throw Error(`auth.repository > decodeJwt > ${error.message} > `);
     }
   }
 
@@ -73,10 +73,39 @@ export class AuthRepository {
 
         return data['access_token'];
       } catch (error) {
-        throw new Error('카카오 인가코드를 가져오는데 실패했습니다.');
+        throw Error(`auth.repository > getAccessToken > ${error.message} > `);
       }
     } else {
-      throw new Error('지원하지 않는 벤더입니다.');
+      throw Error(
+        `auth.repository > getAccessToken > 지원하지 않는 벤더입니다.`,
+      );
+    }
+  }
+
+  async disconnect(vendor: string, authId: string) {
+    if (vendor === 'kakao') {
+      try {
+        await firstValueFrom(
+          this.httpService.post(
+            'https://kapi.kakao.com/v1/user/unlink',
+            {
+              target_id_type: 'user_id',
+              target_id: Number(authId),
+            },
+            {
+              headers: {
+                Authorization: `KakaoAK ${process.env.KAKAO_ADMIN_KEY}`,
+                'Content-Type':
+                  'application/x-www-form-urlencoded;charset=utf-8',
+              },
+            },
+          ),
+        );
+      } catch (error) {
+        throw Error(`auth.repository > disconnect > ${error.message} > `);
+      }
+    } else {
+      throw Error(`auth.repository > disconnect > 지원하지 않는 벤더입니다.`);
     }
   }
 
@@ -93,7 +122,9 @@ export class AuthRepository {
 
         return data.id.toString();
       } catch (error) {
-        throw new Error('카카오 사용자 정보를 가져오는데 실패했습니다.');
+        throw Error(
+          `auth.repository > getAuthIdFromAccessToken > ${error.message} > `,
+        );
       }
     }
   }
@@ -105,7 +136,9 @@ export class AuthRepository {
 
       return auth.userId;
     } catch (error) {
-      throw new Error('사용자를 찾을 수 없습니다.');
+      throw Error(
+        `auth.repository > getUserIdFromAccessToken > ${error.message} > `,
+      );
     }
   }
 
@@ -123,7 +156,7 @@ export class AuthRepository {
         role,
       });
     } catch (error) {
-      throw new Error('인증정보를 생성하는데 실패했습니다.');
+      throw Error(`auth.repository > createAuth > ${error.message} > `);
     }
   }
 
@@ -134,7 +167,7 @@ export class AuthRepository {
         authId,
       });
     } catch (error) {
-      throw new Error('인증정보를 가져오는데 실패했습니다.');
+      throw Error(`auth.repository > getAuth > ${error.message} > `);
     }
   }
 
@@ -144,8 +177,9 @@ export class AuthRepository {
         vendor,
         authId,
       });
+      await this.disconnect(vendor, authId);
     } catch (error) {
-      throw new Error('인증정보를 삭제하는데 실패했습니다.');
+      throw Error(`auth.repository > delete > ${error.message} > `);
     }
   }
 }

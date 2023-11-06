@@ -1,3 +1,4 @@
+import { webhook } from '../config.discord-webhook';
 import { Fail, Success } from '../response';
 import { AuthRepository } from './auth.repository';
 import { GetAccessTokenDto } from './dto/get-accesstoken.dto';
@@ -25,10 +26,10 @@ export class AuthService {
 
   async decodeJwt(jwt: string) {
     try {
-      const decoded = await this.authRepository.decodeJwt(jwt);
+      const decoded = this.authRepository.decodeJwt(jwt);
       return new Success('성공적으로 토큰을 디코딩했습니다.', decoded);
     } catch (error) {
-      return new Fail(error.message);
+      return new Fail('토큰을 디코딩하는데 실패했습니다.');
     }
   }
 
@@ -44,7 +45,8 @@ export class AuthService {
       );
       return new Success('성공적으로 토큰을 가져왔습니다.', accessToken);
     } catch (error) {
-      return new Fail(error.message);
+      await webhook.send(`auth.service > getAccessToken > ${error.message} > `);
+      return new Fail('토큰을 가져오는데 실패했습니다.');
     }
   }
 

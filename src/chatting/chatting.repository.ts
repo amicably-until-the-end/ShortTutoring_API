@@ -68,22 +68,32 @@ export class ChattingRepository {
     format: string,
     body?: any,
   ) {
-    const newMessage = {
-      sender: senderId,
-      format: format,
-      body: JSON.stringify(body),
-      createdAt: new Date().toISOString(),
-    };
-    return await this.chattingModel.update(
-      { id: roomId },
-      { $ADD: { messages: [newMessage] } },
-    );
+    try {
+      const newMessage = {
+        sender: senderId,
+        format: format,
+        body: JSON.stringify(body),
+        createdAt: new Date().toISOString(),
+      };
+      return await this.chattingModel.update(
+        { id: roomId },
+        { $ADD: { messages: [newMessage] } },
+      );
+    } catch (error) {
+      throw Error(`chatting.repository > sendMessage > ${error.message} > `);
+    }
   }
 
   async getChatRoomInfo(roomId: string) {
-    return await this.chattingModel.get({
-      id: roomId,
-    });
+    try {
+      return await this.chattingModel.get({
+        id: roomId,
+      });
+    } catch (error) {
+      throw Error(
+        `chatting.repository > getChatRoomInfo > ${error.message} > `,
+      );
+    }
   }
 
   async getIdByQuestionAndTeacher(questionId: string, teacherId: string) {
@@ -93,12 +103,7 @@ export class ChattingRepository {
     if (result.length > 0) {
       return result[0].id;
     }
-    throw new Error('채팅방을 찾을 수 없습니다.');
-  }
-
-  async getChatRoomsInfo(roomIds: string[]) {
-    const ids = roomIds.map((id) => ({ id }));
-    return (await this.chattingModel.batchGet(ids)).map((chatting) => chatting);
+    throw Error('채팅방을 찾을 수 없습니다.');
   }
 
   /*
@@ -110,35 +115,47 @@ export class ChattingRepository {
     studentId: string,
     questionId: string,
   ): Promise<string> {
-    const chattingRoomId = uuid();
-    const chatting: Chatting = {
-      id: chattingRoomId,
-      teacherId,
-      studentId,
-      questionId,
-      messages: [],
-      status: ChattingStatus.proposed,
-    };
-    await this.chattingModel.create(chatting);
-    return chattingRoomId;
+    try {
+      const chattingRoomId = uuid();
+      const chatting: Chatting = {
+        id: chattingRoomId,
+        teacherId,
+        studentId,
+        questionId,
+        messages: [],
+        status: ChattingStatus.proposed,
+      };
+      await this.chattingModel.create(chatting);
+      return chattingRoomId;
+    } catch (error) {
+      throw Error(`chatting.repository > makeChatRoom > ${error.message}`);
+    }
   }
 
   async changeStatus(chattingRoomId: string, status: ChattingStatus) {
-    await this.chattingModel.update({ id: chattingRoomId }, { status: status });
+    try {
+      await this.chattingModel.update(
+        { id: chattingRoomId },
+        { status: status },
+      );
+    } catch (error) {
+      throw Error(`chatting.repository > changeStatus > ${error.message} > `);
+    }
   }
 
   async findAll() {
-    return await this.chattingModel.scan().exec();
+    try {
+      return await this.chattingModel.scan().exec();
+    } catch (error) {
+      throw Error(`chatting.repository > findAll > ${error.message} > `);
+    }
   }
 
   async findOne(chattingRoomId: string) {
-    return await this.chattingModel.get({ id: chattingRoomId });
-  }
-
-  async getTeachersId(chattingIds: string[]) {
-    const chatRooms = await this.chattingModel.batchGet(
-      chattingIds.map((id) => ({ id })),
-    );
-    return chatRooms.map((chatRoom) => chatRoom.teacherId);
+    try {
+      return await this.chattingModel.get({ id: chattingRoomId });
+    } catch (error) {
+      throw Error(`chatting.repository > findOne > ${error.message} > `);
+    }
   }
 }

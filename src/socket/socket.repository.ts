@@ -1,6 +1,7 @@
 import { AuthRepository } from '../auth/auth.repository';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { Message } from '../chatting/entities/chatting.interface';
+import { webhook } from '../config.discord-webhook';
 import { RedisRepository } from '../redis/redis.repository';
 import { UserRepository } from '../user/user.repository';
 import { Injectable } from '@nestjs/common';
@@ -30,6 +31,9 @@ export class SocketRepository {
 
       return await this.userRepository.get(userId);
     } catch (error) {
+      await webhook.send(
+        `socket.repository > getUserFromAuthorization > ${error.message} > `,
+      );
       return null;
     }
   }
@@ -51,17 +55,23 @@ export class SocketRepository {
   ) {
     const receiverFCMToken = await this.redisRepository.getFCMToken(receiverId);
     if (receiverFCMToken != null) {
-      await getMessaging().send({
-        data: {
-          chattingId,
-          sender: senderId,
-          format,
-          body,
-          createdAt: new Date().toISOString(),
-          type: 'chatting',
-        },
-        token: receiverFCMToken,
-      });
+      try {
+        await getMessaging().send({
+          data: {
+            chattingId,
+            sender: senderId,
+            format,
+            body,
+            createdAt: new Date().toISOString(),
+            type: 'chatting',
+          },
+          token: receiverFCMToken,
+        });
+      } catch (error) {
+        return Error(
+          `socket.repository > sendPushMessageToUser > ${error.message} > `,
+        );
+      }
     }
   }
 
@@ -110,43 +120,51 @@ export class SocketRepository {
     format: string,
     body: string,
   ) {
-    const message: Message = {
-      sender: senderId,
-      format,
-      body,
-      createdAt: new Date().toISOString(),
-    };
-    const receiverSocketId = await this.redisRepository.getSocketId(receiverId);
-
-    await this.sendPushMessageToUser(
-      senderId,
-      receiverId,
-      chattingId,
-      format,
-      body,
-    );
-
-    await this.sendPushMessageToUser(
-      senderId,
-      senderId,
-      chattingId,
-      format,
-      body,
-    );
-
-    const senderSocketId = await this.redisRepository.getSocketId(senderId);
-
-    if (receiverSocketId != null) {
-      await this.redisRepository.publish(
-        receiverSocketId,
-        JSON.stringify({ chattingId, message }),
+    try {
+      const message: Message = {
+        sender: senderId,
+        format,
+        body,
+        createdAt: new Date().toISOString(),
+      };
+      const receiverSocketId = await this.redisRepository.getSocketId(
+        receiverId,
       );
-    }
 
-    if (senderSocketId != null) {
-      await this.redisRepository.publish(
-        senderSocketId,
-        JSON.stringify({ chattingId, message }),
+      await this.sendPushMessageToUser(
+        senderId,
+        receiverId,
+        chattingId,
+        format,
+        body,
+      );
+
+      await this.sendPushMessageToUser(
+        senderId,
+        senderId,
+        chattingId,
+        format,
+        body,
+      );
+
+      const senderSocketId = await this.redisRepository.getSocketId(senderId);
+
+      if (receiverSocketId != null) {
+        await this.redisRepository.publish(
+          receiverSocketId,
+          JSON.stringify({ chattingId, message }),
+        );
+      }
+
+      if (senderSocketId != null) {
+        await this.redisRepository.publish(
+          senderSocketId,
+          JSON.stringify({ chattingId, message }),
+        );
+      }
+    } catch (error) {
+      return Error(
+        `socket.repository > sendMessageToBothUser > ${error.message} >`,
       );
     }
   }

@@ -1,6 +1,7 @@
 import { AgoraService, WhiteBoardChannelInfo } from '../agora/agora.service';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { ChattingStatus } from '../chatting/entities/chatting.interface';
+import { webhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
@@ -26,10 +27,6 @@ export class TutoringService {
   async finish(tutoringId: string) {
     try {
       const tutoring = await this.tutoringRepository.finishTutoring(tutoringId);
-
-      if (tutoring.status !== 'ongoing') {
-        return new Fail('이미 종료된 과외입니다.');
-      }
 
       await this.questionRepository.changeStatus(
         tutoring.questionId,
@@ -82,8 +79,8 @@ export class TutoringService {
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
-      console.log(error);
-      return new Fail(`과외를 종료할 수 없습니다.`);
+      await webhook.send(`tutoring.service > finish > ${error.message} > `);
+      return new Fail('과외를 종료하는데 실패했습니다.');
     }
   }
 
@@ -134,7 +131,10 @@ export class TutoringService {
 
       return new Success('수업 시간이 확정되었습니다.');
     } catch (error) {
-      return new Fail(error.message);
+      await webhook.send(
+        `tutoring.service > reserveTutoring > ${error.message} > `,
+      );
+      return new Fail('수업 시간을 확정하는데 실패했습니다.');
     }
   }
 
@@ -145,14 +145,14 @@ export class TutoringService {
       const tutoring = await this.tutoringRepository.get(tutoringId);
 
       if (tutoring == null) {
-        throw new Error('존재하지 않는 과외입니다.');
+        throw Error('존재하지 않는 과외입니다.');
       }
 
       if (userInfo.role == 'student' && tutoring.status == 'reserved') {
-        throw new Error('아직 수업이 시작되지 않았습니다.');
+        throw Error('아직 수업이 시작되지 않았습니다.');
       }
       if (userInfo.role == 'student' && tutoring.status == 'finished') {
-        throw new Error('이미 종료된 수업입니다.');
+        throw Error('이미 종료된 수업입니다.');
       }
       const whiteBoardToken = await this.agoraService.makeWhiteBoardToken(
         tutoring.whiteBoardUUID,
@@ -173,11 +173,14 @@ export class TutoringService {
       };
       return accessInfo;
     } catch (error) {
+      await webhook.send(
+        `tutoring.service > classroomChannel > ${error.message} > `,
+      );
       return null;
     }
   }
 
-  async classrroomInfo(tutoringId: string, userId: string) {
+  async classroomInfo(tutoringId: string, userId: string) {
     try {
       const userInfo = await this.userRepository.get(userId);
 
@@ -198,6 +201,7 @@ export class TutoringService {
         await this.classroomChannel(tutoringId, userId),
       );
     } catch (e) {
+      await webhook.send(`tutoring.service > classroomInfo > ${e.message}`);
       return new Fail('수업 정보를 가져오는데 실패했습니다.');
     }
   }
@@ -223,7 +227,8 @@ export class TutoringService {
       };
       return new Success('과외 정보를 가져왔습니다.', tutoringInfo);
     } catch (e) {
-      return new Fail('해당 과외 정보를 가져오는 데 실패했습니다.');
+      await webhook.send(`tutoring.service > info > ${e.message}`);
+      return new Fail('과외 정보를 가져오는데 실패했습니다.');
     }
   }
 
@@ -236,7 +241,10 @@ export class TutoringService {
         return new Fail('해당 과외를 거절할 수 없습니다.');
       }
 
-      await this.questionRepository.changeStatus(chattingId, 'declined');
+      await this.questionRepository.changeStatus(
+        chatRoomInfo.questionId,
+        'declined',
+      );
 
       await this.chattingRepository.changeStatus(
         chattingId,
@@ -253,8 +261,8 @@ export class TutoringService {
 
       return new Success('과외를 거절했습니다.');
     } catch (e) {
-      console.log(e);
-      return new Fail('과외 거절에 실패했습니다.');
+      await webhook.send(`tutoring.service > decline > ${e.message}`);
+      return new Fail('과외를 거절하는데 실패했습니다.');
     }
   }
 
@@ -311,7 +319,10 @@ export class TutoringService {
 
       return new Success('과외가 시작되었습니다.', roomInfo);
     } catch (error) {
-      return new Fail('과외 시작에 실패했습니다.');
+      await webhook.send(
+        `tutoring.service > startTutoring > ${error.message} > `,
+      );
+      return new Fail('과외를 시작하는데 실패했습니다.');
     }
   }
 
@@ -321,13 +332,19 @@ export class TutoringService {
     createReviewDto: CreateReviewDto,
   ) {
     try {
-      return this.tutoringRepository.createReview(
-        userId,
-        tutoringId,
-        createReviewDto,
+      return new Success(
+        '리뷰를 작성했습니다.',
+        this.tutoringRepository.createReview(
+          userId,
+          tutoringId,
+          createReviewDto,
+        ),
       );
     } catch (error) {
-      return new Fail(error.message);
+      await webhook.send(
+        `tutoring.service > createReview > ${error.message} > `,
+      );
+      return new Fail('리뷰를 작성하는데 실패했습니다.');
     }
   }
 }
