@@ -20,6 +20,7 @@ export class UserRepository {
         amount: 0,
         lastReceivedFreeCoinAt: new Date(0),
       },
+      createdAt: new Date().toISOString(),
       followers: [],
       following: [],
       id: userId,

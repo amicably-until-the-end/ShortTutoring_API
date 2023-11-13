@@ -1,4 +1,4 @@
-import { webhook } from '../config.discord-webhook';
+import { apiErrorWebhook } from '../config.discord-webhook';
 import { Fail, Success } from '../response';
 import { AuthRepository } from './auth.repository';
 import { GetAccessTokenDto } from './dto/get-accesstoken.dto';
@@ -45,7 +45,9 @@ export class AuthService {
       );
       return new Success('성공적으로 토큰을 가져왔습니다.', accessToken);
     } catch (error) {
-      await webhook.send(`auth.service > getAccessToken > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] auth.service > getAccessToken > ${error.message} > `,
+      );
       return new Fail('토큰을 가져오는데 실패했습니다.');
     }
   }
