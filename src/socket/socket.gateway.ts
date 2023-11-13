@@ -1,4 +1,4 @@
-import { socketErrorWebhook, webhook } from '../config.discord-webhook';
+import { socketErrorWebhook, socketWebhook } from '../config.discord-webhook';
 import { RedisRepository } from '../redis/redis.repository';
 import { SocketRepository } from './socket.repository';
 import { Inject } from '@nestjs/common';
@@ -37,14 +37,12 @@ export class SocketGateway {
       await this.redisSub.subscribe(client.id, (message) => {
         client.emit('message', message);
       });
-      await webhook.send(
-        `${user.id}(${user.role})이 ` +
-          process.env.NODE_ENV +
-          ' 서버에 연결되었습니다.',
+      await socketWebhook.send(
+        `[${process.env.NODE_ENV}] ${user.id}(${user.role})이 연결되었습니다.`,
       );
     } catch (error) {
       await socketErrorWebhook.send(
-        `소켓 연결에 실패했습니다. ${error.message} > `,
+        `[${process.env.NODE_ENV}] 소켓 연결에 실패했습니다. ${error.message} > `,
       );
       return new Error('소켓 연결에 실패했습니다.');
     }
@@ -64,7 +62,7 @@ export class SocketGateway {
       await this.redisSub.unsubscribe(client.id);
     } catch (error) {
       await socketErrorWebhook.send(
-        `소켓 연결을 끊을 수 없습니다. ${error.message} > `,
+        `[${process.env.NODE_ENV}] 소켓 연결을 끊을 수 없습니다. ${error.message} > `,
       );
       return new Error('소켓 연결을 끊을 수 없습니다.');
     }
@@ -84,7 +82,9 @@ export class SocketGateway {
       client.handshake.headers,
     );
     if (sender === null) {
-      await socketErrorWebhook.send(`사용자를 찾을 수 없습니다.`);
+      await socketErrorWebhook.send(
+        `[${process.env.NODE_ENV}] 사용자를 찾을 수 없습니다.`,
+      );
       return new Error('사용자를 찾을 수 없습니다.');
     }
 
@@ -117,7 +117,7 @@ export class SocketGateway {
       return this.redisRepository.getAllKeys();
     } catch (error) {
       await socketErrorWebhook.send(
-        `디버깅에 실패했습니다. ${error.message} > `,
+        `[${process.env.NODE_ENV}] 디버깅에 실패했습니다. ${error.message} > `,
       );
       return new Error('디버깅에 실패했습니다.');
     }

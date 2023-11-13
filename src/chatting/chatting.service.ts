@@ -1,4 +1,4 @@
-import { webhook } from '../config.discord-webhook';
+import { apiErrorWebhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { TutoringRepository } from '../tutoring/tutoring.repository';
@@ -31,8 +31,8 @@ export class ChattingService {
         opponentInfo = await this.userRepository.get(roomInfo.studentId);
       }
     } catch (error) {
-      await webhook.send(
-        `chatting.service > makeChatItem > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] chatting.service > makeChatItem > ${error.message} > `,
       );
       return new Fail('채팅 상대방 정보를 불러오는데 실패했습니다.');
     }
@@ -56,8 +56,8 @@ export class ChattingService {
         chatRoom.reservedStart = tutoringInfo.reservedStart;
       }
     } catch (error) {
-      await webhook.send(
-        `chatting.service > makeChatItem > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] chatting.service > makeChatItem > ${error.message} > `,
       );
       return new Fail('채팅방 정보를 불러오는데 실패했습니다.');
     }
@@ -126,7 +126,9 @@ export class ChattingService {
         return new Fail('해당 채팅방에 대한 권한이 없습니다.');
       }
     } catch (error) {
-      await webhook.send(`chatting.service > findOne > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] chatting.service > findOne > ${error.message} > `,
+      );
       return new Fail('채팅방 정보를 불러오는데 실패했습니다.');
     }
   }

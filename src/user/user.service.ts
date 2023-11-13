@@ -1,5 +1,5 @@
 import { AuthRepository } from '../auth/auth.repository';
-import { webhook } from '../config.discord-webhook';
+import { apiErrorWebhook, signupWebhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { RedisRepository } from '../redis/redis.repository';
 import { Fail, Success } from '../response';
@@ -66,12 +66,14 @@ export class UserService {
         .setImage(
           `https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile-img/ic_profile_${user.profileImage}.png`,
         )
-        .setDescription(`${user.name}님이 회원가입했습니다.`);
-      await webhook.send(embed);
+        .setDescription(`${user.name} ${user.role}이 회원가입했습니다.`);
+      await signupWebhook.send(embed);
 
       return new Success('성공적으로 회원가입했습니다.', { token });
     } catch (error) {
-      await webhook.send(`user.service > signupStudent > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > signupStudent > ${error.message} > `,
+      );
       return new Fail('회원가입에 실패했습니다.');
     }
   }
@@ -111,12 +113,14 @@ export class UserService {
         .setImage(
           `https://short-tutoring.s3.ap-northeast-2.amazonaws.com/default/profile-img/ic_profile_${user.profileImage}.png`,
         )
-        .setDescription(`${user.name}님이 회원가입했습니다.`);
-      await webhook.send(embed);
+        .setDescription(`${user.name} ${user.role}이 회원가입했습니다.`);
+      await signupWebhook.send(embed);
 
       return new Success('성공적으로 회원가입했습니다.', { token });
     } catch (error) {
-      await webhook.send(`user.service > signupTeacher > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > signupTeacher > ${error.message} > `,
+      );
       return new Fail('회원가입에 실패했습니다.');
     }
   }
@@ -152,7 +156,9 @@ export class UserService {
         token,
       });
     } catch (error) {
-      await webhook.send(`user.service > login > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > login > ${error.message} > `,
+      );
       return new Fail('로그인에 실패했습니다.');
     }
   }
@@ -170,7 +176,9 @@ export class UserService {
 
       return new Success('나의 프로필을 성공적으로 조회했습니다.', user);
     } catch (error) {
-      await webhook.send(`user.service > profile > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > profile > ${error.message} > `,
+      );
       return new Fail('프로필을 조회하는데 실패했습니다.');
     }
   }
@@ -191,7 +199,9 @@ export class UserService {
         )
         .then((res) => res.toString());
     } catch (error) {
-      await webhook.send(`user.service > profileImage > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > profileImage > ${error.message} > `,
+      );
       return new Fail('프로필 이미지 업로드에 실패했습니다.');
     }
   }
@@ -218,7 +228,9 @@ export class UserService {
       const user = await this.userRepository.update(userId, updateUser);
       return new Success('성공적으로 사용자 프로필을 업데이트했습니다.', user);
     } catch (error) {
-      await webhook.send(`user.service > update > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > update > ${error.message} > `,
+      );
       return new Fail('사용자 프로필 업데이트에 실패했습니다.');
     }
   }
@@ -236,7 +248,9 @@ export class UserService {
 
       return new Success('사용자 프로필을 성공적으로 가져왔습니다.', user);
     } catch (error) {
-      await webhook.send(`user.service > otherProfile > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > otherProfile > ${error.message} > `,
+      );
       return new Fail('사용자 프로필을 가져오는데 실패했습니다.');
     }
   }
@@ -251,7 +265,9 @@ export class UserService {
       await this.authRepository.delete(decoded.vendor, decoded.authId);
       return new Success('회원 탈퇴가 성공적으로 진행되었습니다.', null);
     } catch (error) {
-      await webhook.send(`user.service > withdraw > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > withdraw > ${error.message} > `,
+      );
       return new Fail('회원 탈퇴에 실패했습니다.');
     }
   }
@@ -261,7 +277,9 @@ export class UserService {
       await this.userRepository.follow(studentId, teacherId);
       return new Success('성공적으로 팔로우했습니다.');
     } catch (error) {
-      await webhook.send(`user.service > follow > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > follow > ${error.message} > `,
+      );
       return new Fail('팔로우에 실패했습니다.');
     }
   }
@@ -271,7 +289,9 @@ export class UserService {
       await this.userRepository.unfollow(studentId, teacherId);
       return new Success('성공적으로 언팔로우했습니다.');
     } catch (error) {
-      await webhook.send(`user.service > unfollow > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > unfollow > ${error.message} > `,
+      );
       return new Fail('언팔로우에 실패했습니다.');
     }
   }
@@ -286,7 +306,9 @@ export class UserService {
         await this.userRepository.following(studentId),
       );
     } catch (error) {
-      await webhook.send(`user.service > following > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > following > ${error.message} > `,
+      );
       return new Fail('팔로잉한 선생님들을 가져오는데 실패했습니다.');
     }
   }
@@ -302,7 +324,9 @@ export class UserService {
         userList,
       );
     } catch (error) {
-      await webhook.send(`user.service > otherFollowers > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > otherFollowers > ${error.message} > `,
+      );
       return new Fail('팔로워 정보를 가져오는데 실패했습니다.');
     }
   }
@@ -319,7 +343,9 @@ export class UserService {
         await this.userRepository.followers(teacherId),
       );
     } catch (error) {
-      await webhook.send(`user.service > followers > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > followers > ${error.message} > `,
+      );
       return new Fail('팔로워 학생들을 가져오는데 실패했습니다.');
     }
   }
@@ -381,8 +407,8 @@ export class UserService {
         bestTeachers,
       );
     } catch (error) {
-      await webhook.send(
-        `user.service > getBestTeachers > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > getBestTeachers > ${error.message} > `,
       );
       return new Fail('최고의 선생님들을 가져오는데 실패했습니다.');
     }
@@ -435,8 +461,8 @@ export class UserService {
         result,
       );
     } catch (error) {
-      await webhook.send(
-        `user.service > getOnlineTeachers > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > getOnlineTeachers > ${error.message} > `,
       );
       return new Fail('현재 온라인 선생님들을 가져오는데 실패했습니다.');
     }
@@ -453,7 +479,9 @@ export class UserService {
         userList,
       );
     } catch (error) {
-      await webhook.send(`user.service > otherFollowing > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > otherFollowing > ${error.message} > `,
+      );
       return new Fail('팔로잉 정보를 가져오는데 실패했습니다.');
     }
   }
@@ -463,7 +491,9 @@ export class UserService {
       await this.redisRepository.setFCMToken(userId, fcmToken);
       return new Success('성공적으로 FCM 토큰을 저장했습니다.');
     } catch (error) {
-      await webhook.send(`user.service > setFCMToken > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > setFCMToken > ${error.message} > `,
+      );
       return new Fail('FCM 토큰을 저장하는데 실패했습니다.');
     }
   }
@@ -473,8 +503,8 @@ export class UserService {
       await this.userRepository.receiveFreeCoin(userId);
       return new Success('성공적으로 무료 코인을 지급받았습니다.');
     } catch (error) {
-      await webhook.send(
-        `user.service > receiveFreeCoin > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > receiveFreeCoin > ${error.message} > `,
       );
       return new Fail('무료 코인을 지급받는데 실패했습니다.');
     }
@@ -516,7 +546,9 @@ export class UserService {
 
       return new Success('과외 내역을 가져왔습니다.', result);
     } catch (error) {
-      await webhook.send(`user.service > tutoringList > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > tutoringList > ${error.message} > `,
+      );
       return new Fail('과외 내역을 가져오는데 실패했습니다.');
     }
   }
@@ -539,7 +571,9 @@ export class UserService {
         history: reviewHistory,
       });
     } catch (error) {
-      await webhook.send(`user.service > reviewList > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] user.service > reviewList > ${error.message} > `,
+      );
       return new Fail('리뷰 내역을 가져오는데 실패했습니다.');
     }
   }

@@ -1,4 +1,4 @@
-import { webhook } from '../config.discord-webhook';
+import { uploadWebhook } from '../config.discord-webhook';
 import { Injectable } from '@nestjs/common';
 import * as AWS from 'aws-sdk';
 import { MessageBuilder } from 'discord-webhook-node';
@@ -28,7 +28,7 @@ export class UploadRepository {
 
     try {
       const imagePath = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${path}/${fileName}`;
-      await webhook.info(`Uploading ${path}/${fileName}`);
+      await uploadWebhook.info(`Uploading ${path}/${fileName}`);
       await new AWS.S3()
         .putObject({
           Key: `${path}/${fileName}`,
@@ -38,7 +38,7 @@ export class UploadRepository {
         .promise();
 
       const embed = new MessageBuilder().setImage(imagePath);
-      await webhook.send(embed);
+      await uploadWebhook.send(embed);
 
       return imagePath;
     } catch (error) {

@@ -1,7 +1,7 @@
 import { AgoraService, WhiteBoardChannelInfo } from '../agora/agora.service';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { ChattingStatus } from '../chatting/entities/chatting.interface';
-import { webhook } from '../config.discord-webhook';
+import { apiErrorWebhook } from '../config.discord-webhook';
 import { QuestionRepository } from '../question/question.repository';
 import { Fail, Success } from '../response';
 import { SocketRepository } from '../socket/socket.repository';
@@ -79,7 +79,9 @@ export class TutoringService {
 
       return new Success('과외가 종료되었습니다.', { tutoringId });
     } catch (error) {
-      await webhook.send(`tutoring.service > finish > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > finish > ${error.message} > `,
+      );
       return new Fail('과외를 종료하는데 실패했습니다.');
     }
   }
@@ -131,8 +133,8 @@ export class TutoringService {
 
       return new Success('수업 시간이 확정되었습니다.');
     } catch (error) {
-      await webhook.send(
-        `tutoring.service > reserveTutoring > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > reserveTutoring > ${error.message} > `,
       );
       return new Fail('수업 시간을 확정하는데 실패했습니다.');
     }
@@ -173,8 +175,8 @@ export class TutoringService {
       };
       return accessInfo;
     } catch (error) {
-      await webhook.send(
-        `tutoring.service > classroomChannel > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > classroomChannel > ${error.message} > `,
       );
       return null;
     }
@@ -201,7 +203,9 @@ export class TutoringService {
         await this.classroomChannel(tutoringId, userId),
       );
     } catch (e) {
-      await webhook.send(`tutoring.service > classroomInfo > ${e.message}`);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > classroomInfo > ${e.message}`,
+      );
       return new Fail('수업 정보를 가져오는데 실패했습니다.');
     }
   }
@@ -227,7 +231,9 @@ export class TutoringService {
       };
       return new Success('과외 정보를 가져왔습니다.', tutoringInfo);
     } catch (e) {
-      await webhook.send(`tutoring.service > info > ${e.message}`);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > info > ${e.message}`,
+      );
       return new Fail('과외 정보를 가져오는데 실패했습니다.');
     }
   }
@@ -261,7 +267,9 @@ export class TutoringService {
 
       return new Success('과외를 거절했습니다.');
     } catch (e) {
-      await webhook.send(`tutoring.service > decline > ${e.message}`);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > decline > ${e.message}`,
+      );
       return new Fail('과외를 거절하는데 실패했습니다.');
     }
   }
@@ -319,8 +327,8 @@ export class TutoringService {
 
       return new Success('과외가 시작되었습니다.', roomInfo);
     } catch (error) {
-      await webhook.send(
-        `tutoring.service > startTutoring > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > startTutoring > ${error.message} > `,
       );
       return new Fail('과외를 시작하는데 실패했습니다.');
     }
@@ -341,8 +349,8 @@ export class TutoringService {
         ),
       );
     } catch (error) {
-      await webhook.send(
-        `tutoring.service > createReview > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] tutoring.service > createReview > ${error.message} > `,
       );
       return new Fail('리뷰를 작성하는데 실패했습니다.');
     }

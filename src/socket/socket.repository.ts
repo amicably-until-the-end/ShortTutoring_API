@@ -1,12 +1,13 @@
 import { AuthRepository } from '../auth/auth.repository';
 import { ChattingRepository } from '../chatting/chatting.repository';
 import { Message } from '../chatting/entities/chatting.interface';
-import { webhook } from '../config.discord-webhook';
+import { apiErrorWebhook } from '../config.discord-webhook';
 import { RedisRepository } from '../redis/redis.repository';
 import { UserRepository } from '../user/user.repository';
 import { Injectable } from '@nestjs/common';
 import { WebSocketServer } from '@nestjs/websockets';
 import { getMessaging } from 'firebase-admin/messaging';
+import * as process from 'process';
 import { Server } from 'socket.io';
 
 @Injectable()
@@ -31,8 +32,8 @@ export class SocketRepository {
 
       return await this.userRepository.get(userId);
     } catch (error) {
-      await webhook.send(
-        `socket.repository > getUserFromAuthorization > ${error.message} > `,
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] socket.repository > getUserFromAuthorization > ${error.message} > `,
       );
       return null;
     }

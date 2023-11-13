@@ -1,4 +1,4 @@
-import { webhook } from '../config.discord-webhook';
+import { apiErrorWebhook } from '../config.discord-webhook';
 import { Fail, Success } from '../response';
 import { UploadRepository } from '../upload/upload.repository';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -32,7 +32,9 @@ export class EventService {
         await this.eventRepository.create(eventId, createEventDto, image),
       );
     } catch (error) {
-      await webhook.send(`event.service > create > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] event.service > create > ${error.message} > `,
+      );
       return new Fail('이벤트 등록 실패');
     }
   }
@@ -46,7 +48,9 @@ export class EventService {
         events,
       });
     } catch (error) {
-      await webhook.send(`event.service > findAll > ${error.message} > `);
+      await apiErrorWebhook.send(
+        `[${process.env.NODE_ENV}] event.service > findAll > ${error.message} > `,
+      );
       return new Fail('이벤트 조회 실패');
     }
   }
